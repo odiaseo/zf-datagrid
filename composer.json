@@ -1,0 +1,36 @@
+{
+    "name": "synergy/synergydatagrid",
+    "description": "Module to display data in grid using the jqGrid javascript plugin",
+    "type": "synergy-module",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "data grid",
+        "jqgrid",
+        "zf2",
+        "module"
+    ],
+    "homepage": "https://bitbucket.org/odiaseo/data-grid-for-zend-framework-2.git",
+    "authors": [
+        {
+            "name": "Pele Odiase",
+            "email": "peleodiase@yahoo.co.uk"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "dev-master",
+        "doctrine/doctrine-orm-module": "dev-master",
+        "doctrine/doctrine-module": "dev-master"
+    },
+    "suggest": {
+        "gedmo/doctrine-extensions": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "SynergyDataGrid": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
