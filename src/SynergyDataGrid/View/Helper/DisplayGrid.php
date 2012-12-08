@@ -3,7 +3,7 @@ namespace SynergyDataGrid\View\Helper;
 
 use Zend\Http\Request;
 use Zend\View\Helper\AbstractHelper;
-use SynergyDataGrid\Grid\JqGrid;
+use SynergyDataGrid\Grid\JqGridFactory;
 use Zend\Json\Json;
 
 /**
@@ -17,11 +17,11 @@ class DisplayGrid extends AbstractHelper
     /**
      * Grid Instance
      *
-     * @param \SynergyDataGrid\Grid\JqGrid $grid
+     * @param \SynergyDataGrid\Grid\JqGridFactory$grid
      *
      * @return string
      */
-    public function __invoke(JqGrid $grid)
+    public function __invoke(JqGridFactory $grid)
     {
         $view = $this->getView();
         $html = array();
@@ -74,16 +74,15 @@ class DisplayGrid extends AbstractHelper
 
             if (is_array($navButtons)) {
                 foreach ($navButtons as $title => $button) {
-                    $jsPager .= sprintf('
-                            .navButtonAdd("#%s",{
-                            caption: "%s", 
-                            title: "%s", 
-                            buttonicon: "%s", 
-                            onClickButton: %s, 
+                    $jsPager .= sprintf('.navButtonAdd("#%s",{
+                            caption: "%s",
+                            title: "%s",
+                            buttonicon: "%s",
+                            onClickButton: %s,
                             position: "%s",
                             cursor: "%s",
                             id: "%s"
-                            })                        
+                            })
                         ',
                         $grid->getPager(),
                         $button['caption'],
@@ -96,8 +95,8 @@ class DisplayGrid extends AbstractHelper
                     );
                 }
             }
-            $jsPager .= ';';
 
+            $jsPager .= ';';
             $htmlPager = '<div id="' . $grid->getPager() . '"></div>';
         }
 
