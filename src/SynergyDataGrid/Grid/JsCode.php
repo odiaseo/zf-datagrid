@@ -3,6 +3,7 @@ namespace SynergyDataGrid\Grid;
 
 use SynergyDataGrid\Grid\Column;
 use SynergyDataGrid\Util\ArrayUtils;
+use SynergyDataGrid\Grid\JqGridFactory;
 use Zend\Json\Expr;
 
 /**203
@@ -24,11 +25,9 @@ class JsCode extends Base
     /**
      * Set up base JsCode options
      *
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance
-     *
-     * @return void
+     * @param JqGridFactory $grid
      */
-    public function __construct($grid = null)
+    public function __construct(JqGridFactory $grid = null)
     {
         $this->grid = $grid;
     }
@@ -41,32 +40,32 @@ class JsCode extends Base
     public function addActionsColumn()
     {
         $datePickerFunctionName = $this->grid->getDatePicker()->getFunctionName();
-        $this->grid->addColumn('Actions', array('name'          => 'myac',
-                                                'width'         => 80,
-                                                'fixed'         => true,
-                                                'sortable'      => false,
-                                                'resize'        => false,
-                                                'formatter'     => 'mactions',
-                                                'formatoptions' => array('keys'           => true,
-                                                                         'editbutton'     => $this->grid->getAllowEdit(),
-                                                                         'editformbutton' => $this->grid->getAllowEditForm(),
-                                                                         'delbutton'      => $this->grid->getAllowDelete(),
-                                                                         'delOptions'     => array('afterSubmit' => new Expr("function(response, postdata) {
+        $this->grid->addColumn('Actions', array('name' => 'myac',
+            'width' => 80,
+            'fixed' => true,
+            'sortable' => false,
+            'resize' => false,
+            'formatter' => 'mactions',
+            'formatoptions' => array('keys' => true,
+                'editbutton' => $this->grid->getAllowEdit(),
+                'editformbutton' => $this->grid->getAllowEditForm(),
+                'delbutton' => $this->grid->getAllowDelete(),
+                'delOptions' => array('afterSubmit' => new Expr("function(response, postdata) {
                                                                                                     var json = eval('(' + response.responseText + ')');
                                                                                                     return [json.success, json.message];
                                                                                                 }
                                                                                                 ")
-                                                                         ),
-                                                                         'editOptions'    => array('closeOnEscape' => true,
-                                                                                                   'afterShowForm' => new Expr("function (elem){ $datePickerFunctionName(elem); }")),
-                                                                         'onError'        => new Expr("function(rowid,response) {
+                ),
+                'editOptions' => array('closeOnEscape' => true,
+                    'afterShowForm' => new Expr("function (elem){ $datePickerFunctionName(elem); }")),
+                'onError' => new Expr("function(rowid,response) {
                                                                                                     var json = eval('(' + response.responseText + ')');
                                                                                                     alert('Error saving row: ' + json.message);
                                                                                                     jQuery('#" . $this->grid->getGridId() . "').restoreAfterErorr = false;
                                                                                                     return true;
                                                                                                    }
                                                                                                  ")
-                                                )));
+            )));
     }
 
     /**
@@ -77,7 +76,7 @@ class JsCode extends Base
      */
     public function renderActionsFormatter()
     {
-        $formatterCode    = '
+        $formatterCode = '
             jQuery.extend($.fn.fmatter , {
                 mactions : function(cellval,opts, rwd) {
                             var op ={keys:false, editbutton:true, delbutton:true, editformbutton: false};
@@ -129,7 +128,7 @@ class JsCode extends Base
     public function getCustomButtonsShow($id = '')
     {
         $customButtonsShow = "";
-        $rowActionButtons  = $this->grid->getRowActionButtons();
+        $rowActionButtons = $this->grid->getRowActionButtons();
         foreach ($rowActionButtons as $button) {
             if (!$id) {
                 $customButtonsShow .= "
@@ -155,7 +154,7 @@ class JsCode extends Base
     public function getCustomButtonsHide($id = '')
     {
         $customButtonsHide = "";
-        $rowActionButtons  = $this->grid->getRowActionButtons();
+        $rowActionButtons = $this->grid->getRowActionButtons();
         foreach ($rowActionButtons as $button) {
             if (!$id) {
                 $customButtonsHide .= "
@@ -181,12 +180,12 @@ class JsCode extends Base
     public function prepareAfterInsertRow()
     {
         $this->grid->setAfterInsertRow(new Expr("
-            function(rowid,rowdata,rowelem) { 
+            function(rowid,rowdata,rowelem) {
                 if (rowid == 'new_row') {
                     jQuery('tr#new_row div.ui-inline-edit, tr#new_row div.ui-inline-del').hide();
                     jQuery('tr#new_row div.ui-inline-save, tr#new_row div.ui-inline-cancel').show();
                     " . $this->getCustomButtonsHide('new_row') . "
-                }    
+                }
         }
         "));
     }
@@ -229,10 +228,10 @@ class JsCode extends Base
                         " . $this->getCustomButtonsShow() . "
                     }
                     if (!json.success && rowid == 'new_row') {
-                        jQuery('#" . $this->grid->getId() . "').jqGrid('setRowData',rowid,{id:0});  
-                    }        
+                        jQuery('#" . $this->grid->getId() . "').jqGrid('setRowData',rowid,{id:0});
+                    }
                     return false;
-                    }   
+                    }
                 ")));
         }
     }
@@ -268,8 +267,8 @@ class JsCode extends Base
             $actionColumn->mergeFormatOptions(
                 array('afterRestore' => new Expr("function(rowid,response) {
             jQuery('#" . $this->grid->getId() . "_iladd').removeClass('ui-state-disabled');
-            " . $this->getCustomButtonsShow() . "    
-        } 
+            " . $this->getCustomButtonsShow() . "
+        }
         ")));
         }
     }
@@ -307,7 +306,7 @@ class JsCode extends Base
                 } else {
                     newValue = newValue.substr(0, newValue.length - 1);
                 }
-                jQuery.cookie(columnSizesCookieName, newValue, { expires: 30, path: '/' }); 
+                jQuery.cookie(columnSizesCookieName, newValue, { expires: 30, path: '/' });
                 " . ($this->grid->getReloadAfterResize() ? "window.document.location.reload();" : "") . "
           }
             ");
@@ -322,10 +321,10 @@ class JsCode extends Base
     {
         return new Expr("
           function(index,iCol,sortorder) {
-                sortingCookieName = '" . JqGrid::COOKIE_SORTING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                sortingCookieName = '" . JqGridFactory::COOKIE_SORTING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 sortingCookieName = sortingCookieName.toLowerCase().replace(/\//g,'_');
                 newValue = index + ':' + sortorder;
-                jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' }); 
+                jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' });
           }
             ");
     }
@@ -339,10 +338,10 @@ class JsCode extends Base
     {
         return new Expr("
           function(pgButton) {
-                pagingCookieName = '" . JqGrid::COOKIE_PAGING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                pagingCookieName = '" . JqGridFactory::COOKIE_PAGING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 pagingCookieName = pagingCookieName.toLowerCase().replace(/\//g,'_');
                 newValue = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','rowNum');
-                jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' }); 
+                jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' });
           }
             ");
     }
@@ -355,9 +354,9 @@ class JsCode extends Base
     public function prepareSetColumnsOrderingCookie()
     {
         return new Expr("
-         jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop', 
+         jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop',
             function(event, ui) {
-                orderingCookieName = '" . JqGrid::COOKIE_COLUMNS_ORDERING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                orderingCookieName = '" . JqGridFactory::COOKIE_COLUMNS_ORDERING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 orderingCookieName = orderingCookieName.toLowerCase().replace(/\//g,'_');
                 colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
                 newValue = '';
@@ -365,7 +364,7 @@ class JsCode extends Base
                     newValue += colModel[i].name + ':';
                 }
                 newValue = newValue.substr(0, newValue.length - 1);
-                jQuery.cookie(orderingCookieName, newValue, { expires: 30, path: '/' }); 
+                jQuery.cookie(orderingCookieName, newValue, { expires: 30, path: '/' });
                 " . ($this->grid->getReloadAfterChangeColumnsOrdering() ? "window.document.location.reload();" : "") . "
             });
             ");
@@ -385,22 +384,22 @@ class JsCode extends Base
         $retv = '';
         if ($detailGridId && $detailFieldName) {
             $retv = new Expr("
-                            function(ids) { 
+                            function(ids) {
                                 url = jQuery('#" . $detailGridId . "').jqGrid('getGridParam','url');
-                                if (ids == null) { 
-                                    ids=0; 
-                                    if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) { 
-                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
+                                if (ids == null) {
+                                    ids=0;
+                                    if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) {
+                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                         jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids).trigger('reloadGrid');
-                                    } 
-                                } 
-                                else 
-                                { 
-                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
+                                    }
+                                }
+                                else
+                                {
+                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                     jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids);
                                     setTimeout(\"jQuery('#" . $detailGridId . "').trigger('reloadGrid')\", 100);
-                                } 
-                            }                     
+                                }
+                            }
              ");
 
         }
@@ -415,11 +414,11 @@ class JsCode extends Base
     public function prepareDetailCodeGridComplete()
     {
         return new Expr("
-                    function() { 
+                    function() {
                         gridIds = jQuery('#" . $this->grid->getId() . "').jqGrid('getDataIDs');
                         if (gridIds.length > 0) {
                             jQuery('#" . $this->grid->getId() . "').jqGrid('setSelection', gridIds[0]);
-                        }    
+                        }
                     }
                 ");
     }
