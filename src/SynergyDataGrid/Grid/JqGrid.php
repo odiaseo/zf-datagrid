@@ -265,7 +265,8 @@ class JqGrid extends Base
         $className = $service->getEntityClass();
         $mapping = $service->getEntityManager()
             ->getClassMetadata($className);
-        $id = strtolower(basename($className));
+        $id = preg_replace('/[^a-z]+/i', '-', basename($className));
+        $id = strtolower($id);
 
         $this->_setDefaultOptions($id);
         $this->setOptions($options);
