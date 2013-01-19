@@ -9,7 +9,7 @@
         "zf2",
         "module"
     ],
-    "homepage": "https://bitbucket.org/odiaseo/data-grid-for-zend-framework-2.git",
+    "homepage": "https://github.com/odiaseo/zf2-datagrid",
     "authors": [
         {
             "name": "Pele Odiase",
