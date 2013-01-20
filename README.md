@@ -27,7 +27,7 @@ Installation - manual
 1.   Go to your project's directory.
 2.   Clone this project into your `./vendor/synergy/` directory as a `synergydatagrid` module:
 
-     `git clone https://bitbucket.org/odiaseo/data-grid-for-zend-framework-2.git`
+     `git clone https://github.com/odiaseo/zf2-datagrid.git`
 3. Copy all files in public directory to your project's public folder
 
 Installation - with Composer
