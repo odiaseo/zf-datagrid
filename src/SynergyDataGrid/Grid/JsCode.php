@@ -27,6 +27,7 @@ class JsCode extends Base
      *
      * @param JqGridFactory $grid
      */
+
     public function __construct(JqGridFactory $grid = null)
     {
         $this->grid = $grid;
@@ -180,12 +181,12 @@ class JsCode extends Base
     public function prepareAfterInsertRow()
     {
         $this->grid->setAfterInsertRow(new Expr("
-            function(rowid,rowdata,rowelem) {
+            function(rowid,rowdata,rowelem) { 
                 if (rowid == 'new_row') {
                     jQuery('tr#new_row div.ui-inline-edit, tr#new_row div.ui-inline-del').hide();
                     jQuery('tr#new_row div.ui-inline-save, tr#new_row div.ui-inline-cancel').show();
                     " . $this->getCustomButtonsHide('new_row') . "
-                }
+                }    
         }
         "));
     }
@@ -228,10 +229,10 @@ class JsCode extends Base
                         " . $this->getCustomButtonsShow() . "
                     }
                     if (!json.success && rowid == 'new_row') {
-                        jQuery('#" . $this->grid->getId() . "').jqGrid('setRowData',rowid,{id:0});
-                    }
+                        jQuery('#" . $this->grid->getId() . "').jqGrid('setRowData',rowid,{id:0});  
+                    }        
                     return false;
-                    }
+                    }   
                 ")));
         }
     }
@@ -267,8 +268,8 @@ class JsCode extends Base
             $actionColumn->mergeFormatOptions(
                 array('afterRestore' => new Expr("function(rowid,response) {
             jQuery('#" . $this->grid->getId() . "_iladd').removeClass('ui-state-disabled');
-            " . $this->getCustomButtonsShow() . "
-        }
+            " . $this->getCustomButtonsShow() . "    
+        } 
         ")));
         }
     }
@@ -306,7 +307,7 @@ class JsCode extends Base
                 } else {
                     newValue = newValue.substr(0, newValue.length - 1);
                 }
-                jQuery.cookie(columnSizesCookieName, newValue, { expires: 30, path: '/' });
+                jQuery.cookie(columnSizesCookieName, newValue, { expires: 30, path: '/' }); 
                 " . ($this->grid->getReloadAfterResize() ? "window.document.location.reload();" : "") . "
           }
             ");
@@ -324,7 +325,7 @@ class JsCode extends Base
                 sortingCookieName = '" . JqGridFactory::COOKIE_SORTING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 sortingCookieName = sortingCookieName.toLowerCase().replace(/\//g,'_');
                 newValue = index + ':' + sortorder;
-                jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' });
+                jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
     }
@@ -341,7 +342,7 @@ class JsCode extends Base
                 pagingCookieName = '" . JqGridFactory::COOKIE_PAGING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 pagingCookieName = pagingCookieName.toLowerCase().replace(/\//g,'_');
                 newValue = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','rowNum');
-                jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' });
+                jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
     }
@@ -354,7 +355,7 @@ class JsCode extends Base
     public function prepareSetColumnsOrderingCookie()
     {
         return new Expr("
-         jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop',
+         jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop', 
             function(event, ui) {
                 orderingCookieName = '" . JqGridFactory::COOKIE_COLUMNS_ORDERING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
                 orderingCookieName = orderingCookieName.toLowerCase().replace(/\//g,'_');
@@ -364,7 +365,7 @@ class JsCode extends Base
                     newValue += colModel[i].name + ':';
                 }
                 newValue = newValue.substr(0, newValue.length - 1);
-                jQuery.cookie(orderingCookieName, newValue, { expires: 30, path: '/' });
+                jQuery.cookie(orderingCookieName, newValue, { expires: 30, path: '/' }); 
                 " . ($this->grid->getReloadAfterChangeColumnsOrdering() ? "window.document.location.reload();" : "") . "
             });
             ");
@@ -384,22 +385,22 @@ class JsCode extends Base
         $retv = '';
         if ($detailGridId && $detailFieldName) {
             $retv = new Expr("
-                            function(ids) {
+                            function(ids) { 
                                 url = jQuery('#" . $detailGridId . "').jqGrid('getGridParam','url');
-                                if (ids == null) {
-                                    ids=0;
-                                    if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) {
-                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
+                                if (ids == null) { 
+                                    ids=0; 
+                                    if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) { 
+                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
                                         jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids).trigger('reloadGrid');
-                                    }
-                                }
-                                else
-                                {
-                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
+                                    } 
+                                } 
+                                else 
+                                { 
+                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
                                     jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids);
                                     setTimeout(\"jQuery('#" . $detailGridId . "').trigger('reloadGrid')\", 100);
-                                }
-                            }
+                                } 
+                            }                     
              ");
 
         }
@@ -414,11 +415,11 @@ class JsCode extends Base
     public function prepareDetailCodeGridComplete()
     {
         return new Expr("
-                    function() {
+                    function() { 
                         gridIds = jQuery('#" . $this->grid->getId() . "').jqGrid('getDataIDs');
                         if (gridIds.length > 0) {
                             jQuery('#" . $this->grid->getId() . "').jqGrid('setSelection', gridIds[0]);
-                        }
+                        }    
                     }
                 ");
     }

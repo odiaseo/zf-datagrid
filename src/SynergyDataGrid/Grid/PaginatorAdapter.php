@@ -57,7 +57,7 @@ class PaginatorAdapter implements AdapterInterface
     /**
      * JqGrid object instance
      *
-     * @var \SynergyDataGrid\Grid\JqGrid
+     * @var \SynergyDataGrid\Grid\JqGridFactory
      */
     protected $_grid;
 
@@ -67,7 +67,7 @@ class PaginatorAdapter implements AdapterInterface
      * @param \SynergyDataGrid\Model\BaseService $service Doctrine Service Model
      * @param array $filter array of filter options
      * @param array $sort array of sort options
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance
      *
      * @return void
      */
@@ -295,7 +295,7 @@ class PaginatorAdapter implements AdapterInterface
      *
      * @param \SynergyDataGrid\Model\BaseService $service Doctrine Service Model
      *
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function setService($service)
     {
@@ -318,7 +318,7 @@ class PaginatorAdapter implements AdapterInterface
      *
      * @param array $filter filter option to apply to current query
      *
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function setFilter($filter)
     {
@@ -341,7 +341,7 @@ class PaginatorAdapter implements AdapterInterface
      *
      * @param array $sort sort option to apply to current query
      *
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function setSort($sort)
     {
@@ -352,7 +352,7 @@ class PaginatorAdapter implements AdapterInterface
     /**
      * Get JqGrid instance
      *
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function getGrid()
     {
@@ -362,9 +362,9 @@ class PaginatorAdapter implements AdapterInterface
     /**
      * Set JqGrid instance
      *
-     * @param \SynergyDataGrid\Grid\JqGrid
+     * @param \SynergyDataGrid\Grid\JqGridFactory
      *
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function setGrid($grid)
     {

@@ -9,7 +9,7 @@
         "zf2",
         "module"
     ],
-    "homepage": "https://github.com/odiaseo/zf2-datagrid",
+    "homepage": "https://bitbucket.org/odiaseo/data-grid-for-zend-framework-2.git",
     "authors": [
         {
             "name": "Pele Odiase",
@@ -20,7 +20,7 @@
         "php": ">=5.3.3",
         "zendframework/zendframework": "dev-master",
         "doctrine/doctrine-orm-module": "dev-master",
-        "doctrine/doctrine-module": "0.7.*"
+        "doctrine/doctrine-module": "dev-master"
     },
     "suggest": {
         "gedmo/doctrine-extensions": "dev-master"

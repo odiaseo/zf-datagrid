@@ -246,6 +246,8 @@ class JqGridFactory extends Base implements FactoryInterface
      */
     const COOKIE_PAGING_PREFIX = 'jqgrid_paging_';
 
+
+    public static $gridRegistry = array();
     /**
      * @param \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
      *
@@ -267,7 +269,10 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->_jsCode = new JsCode($this);
         $mapping = $this->_service->getEntityManager()
             ->getClassMetadata($className);
-        $id = strtolower(basename($className));
+
+        $id = 'grid_' . count(self::$gridRegistry);
+        self::$gridRegistry[] = $className ;
+
         $this->_setDefaultOptions($id);
 
         foreach ($mapping->fieldMappings as $map) {
@@ -287,9 +292,7 @@ class JqGridFactory extends Base implements FactoryInterface
             if (($map['length'] and $map['length'] > 255) or $map['type'] == 'text') {
                 $columnData[$title]['edittype'] = 'textarea';
                 $columnData[$title]['hidden'] = true;
-            }
-
-            if ('boolean' == $map['type']) {
+            }elseif ('boolean' == $map['type']) {
                 $columnData[$title]['edittype'] = 'checkbox';
             }
 

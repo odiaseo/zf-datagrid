@@ -23,7 +23,7 @@ class Column extends Base
     /**
      * Parent jqGrid object
      *
-     * @var \SynergyDataGrid\Grid\JqGrid
+     * @var \SynergyDataGrid\Grid\JqGridFactory
      */
     protected $_grid;
     /**
@@ -126,7 +126,7 @@ class Column extends Base
      * Set up base options
      *
      * @param array $options array of options
-     * @param \SynergyDataGrid\Grid\JqGrid $grid instanse of JqGrid object
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid instanse of JqGrid object
      *
      * @return void
      */
@@ -469,7 +469,7 @@ class Column extends Base
     /**
      * Set JqGrid instance for current column
      *
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance for current column
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance for current column
      *
      * @return \SynergyDataGrid\Grid\Column
      */

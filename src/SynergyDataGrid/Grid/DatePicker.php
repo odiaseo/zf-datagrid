@@ -41,14 +41,15 @@ class DatePicker extends Property
     /**
      * Set up base DatePicker options
      * 
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance
      * @param array $options array of options
      * @return void
      */
     public function __construct($grid, $options = array()) 
     {
         $this->setGrid($grid);
-        $this->setFunctionName('dp_' . $this->getGrid()->getId());
+        //$this->setFunctionName('dp_' . $this->getGrid()->getId());
+        $this->setFunctionName('dp_picker');
         $this->setDateFormat(self::DATE_DEFAULTFORMAT);
         $this->setOptions($options);
     }
@@ -78,7 +79,7 @@ class DatePicker extends Property
     /**
      * Get JqGrid instance
      * 
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function getGrid()
     {
@@ -87,7 +88,7 @@ class DatePicker extends Property
     
     /**
      * Set JqGrid instance
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance
      * 
      * @return \SynergyDataGrid\DatePicker
      */

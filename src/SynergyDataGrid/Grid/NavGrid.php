@@ -55,14 +55,14 @@ class NavGrid extends Property
     /**
      * JqGrid instance
      * 
-     * @var \SynergyDataGrid\Grid\JqGrid
+     * @var \SynergyDataGrid\Grid\JqGridFactory
      */
     protected $_grid;
     
     /**
      * Set up base NavGrid options
      * 
-     * @param \SynergyDataGrid\Grid\JqGrid $grid JqGrid instance
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance
      * @param array $options array of options
      * @return void
      */
@@ -185,7 +185,7 @@ class NavGrid extends Property
     /**
      * Get grid instance
      * 
-     * @return \SynergyDataGrid\Grid\JqGrid
+     * @return \SynergyDataGrid\Grid\JqGridFactory
      */
     public function getGrid() 
     {
@@ -194,7 +194,7 @@ class NavGrid extends Property
     
     /**
      * Set grid instance
-     * @param \SynergyDataGrid\Grid\JqGrid $grid
+     * @param \SynergyDataGrid\Grid\JqGridFactory $grid
      * 
      * @return \SynergyDataGrid\NavGrid
      */
