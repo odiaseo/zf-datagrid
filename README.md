@@ -47,7 +47,7 @@ Usage.
     In your controller class:
 
      <?php
-	 use  SynergyDataGrid\Grid\JqGrid ;
+	 use  SynergyDataGrid\Grid\JqGridFactory ;
 
         public function gridAction()
         {

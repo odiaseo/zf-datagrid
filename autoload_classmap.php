@@ -8,7 +8,6 @@ return array(
     'SynergyDataGrid\Grid\Column'               => __DIR__ . '/src/SynergyDataGrid/Grid/Column.php',
     'SynergyDataGrid\Grid\DatePicker'           => __DIR__ . '/src/SynergyDataGrid/Grid/DatePicker.php',
     'SynergyDataGrid\Grid\InlineNav'            => __DIR__ . '/src/SynergyDataGrid/Grid/InlineNav.php',
-    'SynergyDataGrid\Grid\JqGrid'               => __DIR__ . '/src/SynergyDataGrid/Grid/JqGrid.php',
     'SynergyDataGrid\Grid\JsCode'               => __DIR__ . '/src/SynergyDataGrid/Grid/JsCode.php',
     'SynergyDataGrid\Grid\NavGrid'              => __DIR__ . '/src/SynergyDataGrid/Grid/NavGrid.php',
     'SynergyDataGrid\Grid\PaginatorAdapter'     => __DIR__ . '/src/SynergyDataGrid/Grid/PaginatorAdapter.php',
