@@ -42,21 +42,21 @@ class Column extends Base
      * EditOptions object of jqGrid Column
      *
      * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editoptions
-     * @var SynergyDataGrid\Grid\Column\EditOptions
+     * @var \SynergyDataGrid\Grid\Column\EditOptions
      */
     protected $_editoptions;
     /**
      * FormatOptions object of jqGrid Column
      *
      * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:predefined_formatter
-     * @var SynergyDataGrid\Grid\Column\EditOptions
+     * @var \SynergyDataGrid\Grid\Column\EditOptions
      */
     protected $_formatoptions;
     /**
      * EditRules object of jqGrid Column
      *
      * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editrules
-     * @var SynergyDataGrid\Grid\Column\EditOptions
+     * @var \SynergyDataGrid\Grid\Column\EditOptions
      */
     protected $_editrules;
     /**

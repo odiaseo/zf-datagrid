@@ -121,7 +121,7 @@ class JqGridFactory extends Base implements FactoryInterface
     /**
      * NavGrid instance
      *
-     * @var \SynergyDataGrid\NavGrid
+     * @var \SynergyDataGrid\Grid\NavGrid
      */
     protected $_navGrid;
     /**
@@ -133,13 +133,13 @@ class JqGridFactory extends Base implements FactoryInterface
     /**
      * InlineNav instance
      *
-     * @var \SynergyDataGrid\InlineNav
+     * @var \SynergyDataGrid\Grid\InlineNav
      */
     protected $_inlineNav;
     /**
      * DatePicker object instance
      *
-     * @var \SynergyDataGrid\DatePicker
+     * @var \SynergyDataGrid\Grid\DatePicker
      */
     protected $_datePicker;
     /**
@@ -245,9 +245,8 @@ class JqGridFactory extends Base implements FactoryInterface
      * @var string
      */
     const COOKIE_PAGING_PREFIX = 'jqgrid_paging_';
-
-
     public static $gridRegistry = array();
+
     /**
      * @param \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
      *
@@ -271,7 +270,7 @@ class JqGridFactory extends Base implements FactoryInterface
             ->getClassMetadata($className);
 
         $id = 'grid_' . count(self::$gridRegistry);
-        self::$gridRegistry[] = $className ;
+        self::$gridRegistry[] = $className;
 
         $this->_setDefaultOptions($id);
 
@@ -292,8 +291,9 @@ class JqGridFactory extends Base implements FactoryInterface
             if (($map['length'] and $map['length'] > 255) or $map['type'] == 'text') {
                 $columnData[$title]['edittype'] = 'textarea';
                 $columnData[$title]['hidden'] = true;
-            }elseif ('boolean' == $map['type']) {
+            } elseif ('boolean' == $map['type']) {
                 $columnData[$title]['edittype'] = 'checkbox';
+                $columnData[$title]['searchoptions']['sort'] = array('eq', 'ne');
             }
 
             if (in_array($map['fieldName'], $this->_nonEditable)) {
@@ -325,7 +325,20 @@ class JqGridFactory extends Base implements FactoryInterface
             foreach ($list as $item) {
                 $values[] = $item->id . ':' . $item->title;
             }
-            $columnData[$title]['editoptions']['value'] = implode(';', $values);
+            $values = implode(';', $values);
+            $columnData[$title] = array(
+                'name' => $map['fieldName'],
+                'sortable' => true,
+                'edittype' => 'select',
+                'stype' => 'select',
+                'searchoptions' => array(
+                    'value' => $values,
+                    'sopt' => array('eq', 'ne')
+                ),
+                'editoptions' => array(
+                    'value' => $values
+                )
+            );
         }
         // close form after edit
         if ($actionColumn = $this->getColumn('myac')) {
@@ -338,12 +351,25 @@ class JqGridFactory extends Base implements FactoryInterface
 
         ));
 
+        $this->getNavGrid()
+            ->mergeAddParameters(array('closeAfterAdd' => true,
+                'reloadAfterSubmit' => true,
+                'jqModal' => true,
+                'closeOnEscape' => false,
+                'modal' => true,
+                'recreateForm' => true,
+                'checkOnSubmit' => true,
+                'closeAfterAdd' => true,
+                'bottominfo ' => 'Fields marked with (*) are required'
+            )
+        );
+
         $this->addColumns($columnData)
             ->setMultipleSearch(true)
             ->setAllowEditForm(true)
-            ->setAllowEdit(true)
-            ->setAllowDelete(true)
-            ->setAllowAdd(true)
+        //->setAllowEdit(true)
+        //->setAllowDelete(true)
+        //->setAllowAdd(true)
             ->setMultiselect(true)
             ->setNavButton(array(
             'icon' => PredefinedIcons::ICON_SUITCASE,
@@ -357,6 +383,7 @@ class JqGridFactory extends Base implements FactoryInterface
             'caption' => "Columns",
             'position' => 25
         ));
+
         return $this;
     }
 
@@ -571,7 +598,9 @@ class JqGridFactory extends Base implements FactoryInterface
             }
 
             $grid->rows[$k]['cell'] = array();
-
+            /**
+             * @var $column \SynergyDataGrid\Grid\Column
+             */
             foreach ($columns as $name => $column) {
                 $index = array_search($name, $columnNames);
                 if ($index !== false) {
@@ -580,9 +609,11 @@ class JqGridFactory extends Base implements FactoryInterface
                 //array_push($grid->rows[$k]['cell'], $column->cellValue($row));
             }
 
-            if ($this->isTreeGrid) {
-                $this->setTreeGrid(true);
-            }
+
+        }
+
+        if ($this->isTreeGrid) {
+            $this->setTreeGrid(true);
         }
 
         return $grid;
@@ -595,8 +626,7 @@ class JqGridFactory extends Base implements FactoryInterface
      *
      * @return array
      */
-    private
-    function _getFilterParams(Request $request)
+    private function _getFilterParams(Request $request)
     {
 
         $filters = array();
@@ -671,7 +701,7 @@ class JqGridFactory extends Base implements FactoryInterface
     public function edit($request)
     {
         $params = $request->getPost();
-        $return = true;
+        $pass = true;
         $id = 0;
         $message = '';
         $service = $this->getService();
@@ -695,7 +725,7 @@ class JqGridFactory extends Base implements FactoryInterface
                         $value = new \DateTime($value);
                         $entity->{$param} = $value;
                     } catch (\Exception $e) {
-                        $return = false;
+                        $pass = false;
                         $message = 'Wrong date format for column "' . $param . '"';
                         break;
                     }
@@ -707,15 +737,23 @@ class JqGridFactory extends Base implements FactoryInterface
                     $entity->{$param} = $value;
                 }
             }
-            if ($return) {
-                $entity = $this->getService()->save($entity);
-                $id = $entity->id;
-                $message = '';
-            } else {
+
+            if ($pass) {
+                try {
+                    $entity = $this->getService()->save($entity);
+                    $id = $entity->id;
+                    $message = '';
+                } catch (\Exception $e) {
+                    $message = $e->getMessage();
+                    $pass = false;
+                }
+            }
+
+            if (!$pass) {
                 header('HTTP/1.1 400 Error Saving Data');
             }
         }
-        return Json::encode(array('success' => $return, 'message' => $message, 'id' => $id));
+        return Json::encode(array('success' => $pass, 'message' => $message, 'id' => $id));
     }
 
     /**
@@ -1100,7 +1138,7 @@ class JqGridFactory extends Base implements FactoryInterface
             $this->setColModel($this->getColumns());
         }
         if ($allowEditForm) {
-            $this->getNavGrid()->setAddparameters(array('closeOnEscape' => true));
+            $this->getNavGrid()->mergeAddparameters(array('closeOnEscape' => true));
             $this->getNavGrid()->mergeOptions(array('add' => true));
             $this->getInlineNav()->mergeOptions(array('add' => false));
         } else {
@@ -1395,7 +1433,7 @@ class JqGridFactory extends Base implements FactoryInterface
     /**
      * Get NavGrid object instance for current grid
      *
-     * @return \SynergyDataGrid\NavGrid
+     * @return \SynergyDataGrid\Grid\NavGrid
      */
     public function getNavGrid()
     {

@@ -59,15 +59,23 @@ class DisplayGrid extends AbstractHelper
             if ($grid->getIsDetailGrid()) {
                 $grid->getNavGrid()->setSearch(false);
             }
+
+            $options = $grid->getNavGrid()->getOptions() ? : new \stdClass();
+            $prmEdit = $grid->getNavGrid()->getEditParameters() ? : new \stdClass();
+            $prmAdd = $grid->getNavGrid()->getAddParameters() ? : new \stdClass();
+            $prmDel = $grid->getNavGrid()->getDelParameters() ? : new \stdClass();
+            $prmSearch = $grid->getNavGrid()->getSearchParameters() ? : new \stdClass();
+            $prmView = $grid->getNavGrid()->getViewParameters() ? : new \stdClass();
+
             $jsPager = sprintf('jQuery("#%s").jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s)',
                 $grid->getId(),
                 $grid->getPager(),
-                Json::encode($grid->getNavGrid()->getOptions(), false, array('enableJsonExprFinder' => true)),
-                Json::encode($grid->getNavGrid()->getEditParameters(), false, array('enableJsonExprFinder' => true)),
-                Json::encode($grid->getNavGrid()->getAddParameters(), false, array('enableJsonExprFinder' => true)),
-                Json::encode($grid->getNavGrid()->getDelParameters(), false, array('enableJsonExprFinder' => true)),
-                Json::encode($grid->getNavGrid()->getSearchParameters(), false, array('enableJsonExprFinder' => true)),
-                Json::encode($grid->getNavGrid()->getViewParameters(), false, array('enableJsonExprFinder' => true))
+                Json::encode($options, false, array('enableJsonExprFinder' => true)),
+                Json::encode($prmEdit, false, array('enableJsonExprFinder' => true)),
+                Json::encode($prmAdd, false, array('enableJsonExprFinder' => true)),
+                Json::encode($prmDel, false, array('enableJsonExprFinder' => true)),
+                Json::encode($prmSearch, false, array('enableJsonExprFinder' => true)),
+                Json::encode($prmView, false, array('enableJsonExprFinder' => true))
             );
 
             $navButtons = $grid->getNavButtons();
@@ -113,7 +121,7 @@ class DisplayGrid extends AbstractHelper
             $onLoad[] = $jsInline;
             $onLoad[] = $grid->getProcessAfterSubmit();
             if (!$htmlPager) {
-                $htmlPager = '<div id="' . $grid->getPager() . '"></div>';
+                $html[] = '<div id="' . $grid->getPager() . '"></div>';
             }
         }
 
