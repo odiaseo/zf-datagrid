@@ -22,6 +22,7 @@
         "doctrine/doctrine-orm-module": "dev-master",
         "doctrine/doctrine-module": "dev-master"
     },
+
     "suggest": {
         "gedmo/doctrine-extensions": "dev-master"
     },
