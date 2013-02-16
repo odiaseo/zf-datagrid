@@ -20,9 +20,8 @@
         "php": ">=5.3.3",
         "zendframework/zendframework": "dev-master",
         "doctrine/doctrine-orm-module": "dev-master",
-        "doctrine/doctrine-module": "dev-master"
+        "doctrine/doctrine-module": "0.7.*"
     },
-
     "suggest": {
         "gedmo/doctrine-extensions": "dev-master"
     },
