@@ -46,7 +46,8 @@ class Module
     {
         return array(
             'factories' => array(
-                'ModelService' => __NAMESPACE__ . '\Model\ServiceFactory'
+                'ModelService' => __NAMESPACE__ . '\Model\ServiceFactory',
+                'jqgrid' => 'SynergyDataGrid\Grid\JqGridFactory'
             ),
         );
     }
