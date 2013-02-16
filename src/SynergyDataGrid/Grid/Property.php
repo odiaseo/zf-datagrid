@@ -42,7 +42,7 @@ class Property extends Base
      * @param array $options array of property options
      * @return array
      */
-    public function mergeOptions($options = array())
+    public function mergeOptions(array $options = array())
     {
         $merged = parent::mergeOptions($options);
         if ($this->getProperty() && $this->getOwner()) {
