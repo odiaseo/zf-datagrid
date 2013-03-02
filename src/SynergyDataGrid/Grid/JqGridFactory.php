@@ -9,7 +9,6 @@ use Zend\Http\Request;
 use Zend\Paginator\Paginator;
 use SynergyDataGrid\Model\BaseService;
 use SynergyDataGrid\Grid\JsCode;
-use SynergyDataGrid\View\Helper\DisplayGrid;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -217,8 +216,24 @@ class JqGridFactory extends Base implements FactoryInterface
      */
     protected $_jsCode;
     protected $_url;
+    /**
+     * columns not displayed on the grid
+     *
+     * @var array
+     */
     protected $_excludedColumns = array();
+    /**
+     * columns displayed on the grid but not ediable
+     *
+     * @var array
+     */
     protected $_nonEditable = array();
+    /**
+     * mapping of columns to jqgrid types
+     *
+     * @var array
+     */
+    protected $_columnTypeMapping = array();
     private $isTreeGrid = false;
     protected $_nodeData = array();
     /**
@@ -258,6 +273,7 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->_service = $serviceLocator->get('ModelService');
         $this->_excludedColumns = $config['jqgrid']['excluded_columns'];
         $this->_nonEditable = $config['jqgrid']['non_editable_columns'];
+        $this->_columnTypeMapping = $config['jqgrid']['column_type_mapping'];
 
         return $this;
     }
@@ -288,17 +304,27 @@ class JqGridFactory extends Base implements FactoryInterface
                 $columnData[$title]['editable'] = false;
                 $columnData[$title]['required'] = false;
             }
-            if (($map['length'] and $map['length'] > 255) or $map['type'] == 'text') {
+            if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
                 $columnData[$title]['edittype'] = 'textarea';
-                $columnData[$title]['hidden'] = true;
+                $columnData[$title]['editrules']['required'] = true;
             } elseif ('boolean' == $map['type']) {
                 $columnData[$title]['edittype'] = 'checkbox';
                 $columnData[$title]['searchoptions']['sort'] = array('eq', 'ne');
+                $columnData[$title]['editoptions']['value'] = '1:0';
             }
 
             if (in_array($map['fieldName'], $this->_nonEditable)) {
                 $columnData[$title]['editable'] = false;
                 $columnData[$title]['hidden'] = true;
+            }
+
+            if (isset($map['nullable']) and $map['nullable'] == false) {
+                $columnData[$title]['editrules']['required'] = true;
+                $columnData[$title]['formatoptions']['elmprefix'] = '(*)';
+            }
+
+            if(isset($this->_columnTypeMapping[$map['fieldName']])){
+                $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']] ;
             }
         }
 
@@ -312,25 +338,24 @@ class JqGridFactory extends Base implements FactoryInterface
                 continue;
             }
             $title = ucwords($map['fieldName']);
+
+            $list = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
+
+            $values = array(':select');
+
+            foreach ($list as $item) {
+                $values[] = $item->id . ':' . $item->title;
+            }
+
+            $values = implode(';', $values);
+
             $columnData[$title] = array(
                 'name' => $map['fieldName'],
                 'edittype' => 'select',
                 'stype' => 'select',
                 'hidden' => true,
-                'editrules' => array('edithidden' => true)
-            );
-
-            $list = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
-            $values = array(':select');
-            foreach ($list as $item) {
-                $values[] = $item->id . ':' . $item->title;
-            }
-            $values = implode(';', $values);
-            $columnData[$title] = array(
-                'name' => $map['fieldName'],
+                'editrules' => array('edithidden' => true, 'hidden' => true),
                 'sortable' => true,
-                'edittype' => 'select',
-                'stype' => 'select',
                 'searchoptions' => array(
                     'value' => $values,
                     'sopt' => array('eq', 'ne')
@@ -367,16 +392,10 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->addColumns($columnData)
             ->setMultipleSearch(true)
             ->setAllowEditForm(true)
-        //->setAllowEdit(true)
-        //->setAllowDelete(true)
-        //->setAllowAdd(true)
+            ->setAllowEdit(true)
+            ->setAllowDelete(true)
+            ->setAllowAdd(true)
             ->setMultiselect(true)
-            ->setNavButton(array(
-            'icon' => PredefinedIcons::ICON_SUITCASE,
-            'action' => new Expr("alert('this is custom navigator button!')"),
-            'title' => 'Suitcase',
-            'position' => 20
-        ))
             ->setNavButton(array('icon' => PredefinedIcons::ICON_NEWWIN,
             'action' => new Expr("function (){ jQuery('#" . $this->getId() . "').jqGrid('columnChooser');  }"),
             'title' => "Reorder Columns",
@@ -408,7 +427,10 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->setViewsortcols(true);
         $this->setRowNum($this->_defaultItemCountPerPage);
         $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
-        $this->setCaption(ucwords(str_replace("_", " ", $id)));
+
+        if (!$this->cation) {
+            $this->setCaption(ucwords(str_replace("_", " ", $id)));
+        }
         $this->setPostData(array('grid' => $this->getId()));
 
         $this->setDatePicker(new DatePicker($this));
@@ -593,8 +615,8 @@ class JqGridFactory extends Base implements FactoryInterface
         $columnNames = array_keys($columns);
 
         foreach ($rows as $k => $row) {
-            if (isset($row['id'])) {
-                $grid->rows[$k]['id'] = $row['id'];
+            if (isset($row->id)) {
+                $grid->rows[$k]['id'] = $row->id;
             }
 
             $grid->rows[$k]['cell'] = array();

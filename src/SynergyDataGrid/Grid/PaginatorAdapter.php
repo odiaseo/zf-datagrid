@@ -1,6 +1,7 @@
 <?php
 namespace SynergyDataGrid\Grid;
 use Zend\Paginator\Adapter\AdapterInterface;
+use Doctrine\ORM\Query;
 
 /**
  * Pagination Adapter to paginate results for JqGrid
@@ -41,18 +42,18 @@ class PaginatorAdapter implements AdapterInterface
      * @var array
      */
     protected $_operator = array(
-        'EQUAL'                 => '= ?',
-        'NOT_EQUAL'             => '!= ?',
-        'LESS_THAN'             => '< ?',
-        'LESS_THAN_OR_EQUAL'    => '<= ?',
-        'GREATER_THAN'          => '> ?',
+        'EQUAL' => '= ?',
+        'NOT_EQUAL' => '!= ?',
+        'LESS_THAN' => '< ?',
+        'LESS_THAN_OR_EQUAL' => '<= ?',
+        'GREATER_THAN' => '> ?',
         'GREATER_THAN_OR_EQUAL' => '>= ?',
-        'BEGIN_WITH'            => 'LIKE ?',
-        'NOT_BEGIN_WITH'        => 'NOT LIKE ?',
-        'END_WITH'              => 'LIKE ?',
-        'NOT_END_WITH'          => 'NOT LIKE ?',
-        'CONTAIN'               => 'LIKE ?',
-        'NOT_CONTAIN'           => 'NOT LIKE ?'
+        'BEGIN_WITH' => 'LIKE ?',
+        'NOT_BEGIN_WITH' => 'NOT LIKE ?',
+        'END_WITH' => 'LIKE ?',
+        'NOT_END_WITH' => 'NOT LIKE ?',
+        'CONTAIN' => 'LIKE ?',
+        'NOT_CONTAIN' => 'NOT LIKE ?'
     );
     /**
      * JqGrid object instance
@@ -90,7 +91,8 @@ class PaginatorAdapter implements AdapterInterface
     public function getItems($offset, $itemCountPerPage)
     {
         $this->_createQuery(false, $offset, $itemCountPerPage);
-        return $this->_qb->getQuery()->getArrayResult();
+        return $this->_qb->getQuery()->execute();
+        //return $this->_qb->getQuery()->getArrayResult();
     }
 
     /**
@@ -115,11 +117,11 @@ class PaginatorAdapter implements AdapterInterface
      */
     public function _createQuery($countOnly = false, $offset = null, $itemCountPerPage = null)
     {
-        $service   = $this->getService();
+        $service = $this->getService();
         $this->_qb = $service->getEntityManager()->createQueryBuilder();
-        $alias     = $service->getAlias();
-        $entity    = $service->getEntityClass();
-        $debug     = false;
+        $alias = $service->getAlias();
+        $entity = $service->getEntityClass();
+        $debug = false;
 
         if ($countOnly) {
             $this->_qb->select('count(' . $alias . ')');
@@ -127,7 +129,7 @@ class PaginatorAdapter implements AdapterInterface
             //$this->_qb->select($this->_getFields($alias));
             $this->_qb->select($alias);
             //$this->_qb->innerJoin('Application\Entity\Site', 'u');
-           // $debug = true;
+            // $debug = true;
         }
 
         $this->_qb->from($entity, $alias);
@@ -146,9 +148,13 @@ class PaginatorAdapter implements AdapterInterface
             $this->sort($sort['sidx'], $sort['sord']);
         }
 
-        if ($debug) {
-            $dql = $this->_qb->getDQL();
-            die($dql);
+        if ($debug and !$countOnly) {
+            $data = array(
+                'dql' => $this->_qb->getDQL(),
+                'sql' => $this->_qb->getQuery()->getSQL()
+            );
+            var_dump('<pre>' . print_r($data, true) . '</pre>');
+            die();
         }
 
     }
@@ -184,9 +190,9 @@ class PaginatorAdapter implements AdapterInterface
             if (is_array($field) && is_array($value) && is_array($expression) && count($field) == count($value) && count($field) == count($expression)) {
                 $rules = array();
                 for ($i = 0; $i < count($field); $i++) {
-                    $rules[] = array('field'      => $field[$i],
-                                     'value'      => $value[$i],
-                                     'expression' => $expression[$i]);
+                    $rules[] = array('field' => $field[$i],
+                        'value' => $value[$i],
+                        'expression' => $expression[$i]);
                 }
                 $this->_multiFilter($rules, $options);
             }
@@ -206,7 +212,7 @@ class PaginatorAdapter implements AdapterInterface
      */
     private function _multiFilter($rules, $options = array())
     {
-        $boolean     = strtoupper($options['boolean']);
+        $boolean = strtoupper($options['boolean']);
         $paramNumber = 1;
         foreach ($rules as $rule) {
             if ($boolean == 'OR') {
@@ -257,9 +263,9 @@ class PaginatorAdapter implements AdapterInterface
      */
     public function _getFields($alias = '')
     {
-        $columns  = $this->getGrid()->getColumns();
+        $columns = $this->getGrid()->getColumns();
         $metadata = $this->getService()->getClassMetadata();
-        $fields   = array();
+        $fields = array();
 
         foreach ($columns as $column) {
             if ($column->getSelectable()) {

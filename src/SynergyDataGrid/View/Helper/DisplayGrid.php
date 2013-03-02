@@ -17,7 +17,7 @@ class DisplayGrid extends AbstractHelper
     /**
      * Grid Instance
      *
-     * @param \SynergyDataGrid\Grid\JqGridFactory$grid
+     * @param $grid \SynergyDataGrid\Grid\JqGridFactory
      *
      * @return string
      */
@@ -133,8 +133,8 @@ class DisplayGrid extends AbstractHelper
 
         $onLoadScript = 'jQuery(function(){' . implode("\n", $onLoad) . '});';
 
-        $view->headScript()->offsetSetScript(100, $onLoadScript);
-        $view->headScript()->offsetSetScript(105, implode("\n", $js));
+        $view->headScript()->appendScript($onLoadScript);
+        $view->headScript()->appendScript(implode("\n", $js));
 
         return implode("\n", $html);
     }

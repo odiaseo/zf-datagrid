@@ -207,7 +207,18 @@ class Column extends Base
      */
     public function cellValue($row)
     {
-        $cellValue = array_key_exists($this->getName(), $row) ? $row[$this->getName()] : '';
+        $name = $this->getName();
+
+        if(property_exists($row, $name)){
+            if(is_object($row->{$name})){
+                $cellValue = $row->{$name}->id;
+            }else{
+                $cellValue = $row->{$name} ;
+            }
+        }else{
+            $cellValue = '';
+        }
+        //$cellValue = array_key_exists($this->getName(), $row) ? $row->{$name} : '';
         if ($this->getEdittype() == 'select') {
             $value = $this->getEditoptions()->getValue();
             $retv  = htmlentities($cellValue);

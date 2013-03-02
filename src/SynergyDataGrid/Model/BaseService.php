@@ -19,13 +19,13 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Entity manager
      *
-     * @var Doctrine\ORM\EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $_em;
     /**
      * Entity repository
      *
-     * @var Doctrine\ORM\EntityRepository
+     * @var \Doctrine\ORM\EntityRepository
      */
     protected $_repository;
     /**
@@ -43,7 +43,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Class metadata
      *
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var \Doctrine\ORM\Mapping\ClassMetadata
      */
     protected $_classMetadata;
     /**
@@ -101,7 +101,7 @@ class BaseService implements ServiceManagerAwareInterface
      *
      * @param int @id id of an object
      *
-     * @return Doctrine\ORM\Mapping\Entity
+     * @return \Doctrine\ORM\Mapping\Entity
      */
     public function findObject($id = 0)
     {
@@ -137,9 +137,9 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Save given entity
      *
-     * @param Doctrine\ORM\Mapping\Entity $entity entity to save
+     * @param \Doctrine\ORM\Mapping\Entity $entity entity to save
      *
-     * @return Doctrine\ORM\Mapping\Entity
+     * @return \Doctrine\ORM\Mapping\Entity
      */
     public function save($entity)
     {
@@ -170,7 +170,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Get entity repository
      *
-     * @return Doctrine\ORM\EntityRepository
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getRepository()
     {
@@ -180,7 +180,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Set entity repository
      *
-     * @param Doctrine\ORM\EntityRepository $repository repository to set
+     * @param \Doctrine\ORM\EntityRepository $repository repository to set
      *
      * @return \SynergyDataGrid\Model\BaseService
      */
@@ -216,7 +216,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Get entity manager
      *
-     * @return Doctrine\ORM\EntityManager
+     * @return \Doctrine\ORM\EntityManager
      */
     public function getEntityManager()
     {
@@ -226,7 +226,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Set entity manager
      *
-     * @param Doctrine\ORM\EntityManager $em entity manager to set
+     * @param \Doctrine\ORM\EntityManager $em entity manager to set
      *
      * @return \SynergyDataGrid\Model\BaseService
      */
@@ -262,7 +262,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Get class metadata
      *
-     * @return Doctrine\ORM\Mapping\ClassMetadata
+     * @return \Doctrine\ORM\Mapping\ClassMetadata
      */
     public function getClassMetadata()
     {
@@ -272,7 +272,7 @@ class BaseService implements ServiceManagerAwareInterface
     /**
      * Set class metadata
      *
-     * @param Doctrine\ORM\Mapping\ClassMetadata $classMetadata class metadata
+     * @param \Doctrine\ORM\Mapping\ClassMetadata $classMetadata class metadata
      *
      * @return \SynergyDataGrid\Model\BaseService
      */
