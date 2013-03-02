@@ -323,8 +323,8 @@ class JqGridFactory extends Base implements FactoryInterface
                 $columnData[$title]['formatoptions']['elmprefix'] = '(*)';
             }
 
-            if(isset($this->_columnTypeMapping[$map['fieldName']])){
-                $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']] ;
+            if (isset($this->_columnTypeMapping[$map['fieldName']])) {
+                $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']];
             }
         }
 
@@ -514,10 +514,23 @@ class JqGridFactory extends Base implements FactoryInterface
     }
 
     /**
-     * Completely render current grid object or just send AJAX response
+     * Function to replace the deprecated render function
+     *Completely render current grid object or just send AJAX response
+     *
+     * @return string
+     */
+    public function prepareGrid()
+    {
+        return $this->render();
+    }
+
+    /**
+     * Function would be deprecated iin future release
+     * use prepareGrid() instead
      *
      * @param Zend_View_Interface $view
      *
+     * @deprecated
      * @return string
      */
     public function render()
