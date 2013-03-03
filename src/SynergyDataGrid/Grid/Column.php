@@ -2,6 +2,7 @@
 namespace SynergyDataGrid\Grid;
 
 use SynergyDataGrid\Grid\Column\EditOptions;
+use Doctrine\ORM\PersistentCollection;
 use SynergyDataGrid\Grid\Column\FormatOptions;
 use SynergyDataGrid\Grid\Column\EditRules;
 
@@ -209,19 +210,19 @@ class Column extends Base
     {
         $name = $this->getName();
 
-        if(property_exists($row, $name)){
-            if(is_object($row->{$name})){
-                $cellValue = isset($row->{$name}->id) ? $row->{$name}->id : null;
-            }else{
-                $cellValue = $row->{$name} ;
+        if (property_exists($row, $name)) {
+            if (is_object($row->{$name})) {
+                $cellValue = $row->{$name}->id;
+            } else {
+                $cellValue = $row->{$name};
             }
-        }else{
+        } else {
             $cellValue = '';
         }
         //$cellValue = array_key_exists($this->getName(), $row) ? $row->{$name} : '';
         if ($this->getEdittype() == 'select') {
             $value = $this->getEditoptions()->getValue();
-            $retv  = htmlentities($cellValue);
+            $retv = htmlentities($cellValue);
             if ($value) {
                 $allPairs = explode(';', $value);
                 if (is_array($allPairs) && count($allPairs)) {
@@ -236,7 +237,7 @@ class Column extends Base
                     }
                 }
             }
-        }elseif($cellValue instanceof \DateTime){
+        } elseif ($cellValue instanceof \DateTime) {
             /**
              * @var \DateTime $cellValue
              */
@@ -255,8 +256,8 @@ class Column extends Base
     private function _fetchDbColumnType()
     {
         if ($this->getSelectable()) {
-            $metadata     = $this->getGrid()->getService()->getClassMetadata();
-            $name         = $this->getName();
+            $metadata = $this->getGrid()->getService()->getClassMetadata();
+            $name = $this->getName();
             $dbColumnType = null;
             if (isset($metadata->fieldMappings[$name])) {
                 $dbColumnType = $metadata->fieldMappings[$name]['type'];
@@ -277,7 +278,7 @@ class Column extends Base
      */
     private function _setUpEditing()
     {
-        $editOptions   = $this->getEditoptions();
+        $editOptions = $this->getEditoptions();
         $formatOptions = $this->getFormatoptions();
         switch ($this->getDbColumnType()) {
             case 'date':

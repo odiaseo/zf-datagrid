@@ -21,6 +21,23 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class JqGridFactory extends Base implements FactoryInterface
 {
+    const SORT_ID = 'sidx';
+    const SORT_ORDER_ID = 'order';
+    const SEARCH_ID = 'search';
+    const ND_ID = 'nd';
+    const OPERATOR_KEY = 'oper';
+    const OPER_EDIT = 'editoper';
+    const OPER_ADD = 'addoper';
+    const OPER_DELETE = 'deloper';
+    const SUBGRID_ID = 'subgridid';
+    const TOTALROWS_ID = 'totalrows';
+    const SORT_COLUMN = 'title';
+    const TOP = 'top';
+    const BOTTOM = 'bottom';
+    const RECORD_LIMIT = 'rows';
+    const CURRENT_PAGE = 'page';
+    const CURRENT_ROW = 'id';
+    const ROW_TOTAL = 'totalrows';
     /**
      * Array of grid columns
      *
@@ -210,6 +227,43 @@ class JqGridFactory extends Base implements FactoryInterface
         'nc' => 'NOT_CONTAIN'
     );
     /**
+     * The default value of this property is:
+     * {page:“page”,rows:“rows”, sort:“sidx”, order:“sord”, search:“_search”, nd:“nd”, id:“id”, oper:“oper”, editoper:“edit”, addoper:“add”, deloper:“del”, subgridid:“id”, npage:null, totalrows:“totalrows”}
+     * This customizes names of the fields sent to the server on a POST request. For example, with this setting, you can change the sort order element from sidx to mysort by setting prmNames: {sort: “mysort”}. The string that will be POST-ed to the server will then be myurl.php?page=1&rows=10&mysort=myindex&sord=asc rather than myurl.php?page=1&rows=10&sidx=myindex&sord=asc
+     * So the value of the column on which to sort upon can be obtained by looking at $POST['mysort'] in PHP. When some parameter is set to null, it will be not sent to the server. For example if we set prmNames: {nd:null} the nd parameter will not be sent to the server. For npage option see the scroll option.
+     * These options have the following meaning and default values:
+     *  page: the requested page (default value page)
+     * rows: the number of rows requested (default value rows)
+     * sort: the sorting column (default value sidx)
+     * order: the sort order (default value sord)
+     * search: the search indicator (default value _search)
+     * nd: the time passed to the request (for IE browsers not to cache the request) (default value nd)
+     * id: the name of the id when POST-ing data in editing modules (default value id)
+     * oper: the operation parameter (default value oper)
+     * editoper: the name of operation when the data is POST-ed in edit mode (default value edit)
+     * addoper: the name of operation when the data is posted in add mode (default value add)
+     * deloper: the name of operation when the data is posted in delete mode (default value del)
+     * totalrows: the number of the total rows to be obtained from server - see rowTotal (default value totalrows)
+     * subgridid: the name passed when we click to load data in the subgrid (default value id)
+     *
+     * @var array
+     */
+    protected $_prmNames = array(
+        self::SORT_ID => 'sidx',
+        self::SORT_ORDER_ID => 'sord',
+        self::SEARCH_ID => '_search',
+        self::ND_ID => 'nd',
+        self::OPERATOR_KEY => 'oper',
+        self::OPER_EDIT => 'edit',
+        self::OPER_ADD => 'add',
+        self::OPER_DELETE => 'del',
+        self::SUBGRID_ID => 'subgridid',
+        self::TOTALROWS_ID => 'totalrows',
+        self::RECORD_LIMIT => 'rows',
+        self::CURRENT_PAGE => 'page',
+        self::CURRENT_ROW => '_id_'
+    );
+    /**
      * JsCode class to keep all javascript code for jqGrid
      *
      * @var \SynergyDataGrid\Grid\JsCode
@@ -305,7 +359,7 @@ class JqGridFactory extends Base implements FactoryInterface
             }
 
             if ($map['columnName'] == 'id') {
-                $columnData[$title]['editable'] = false;
+                $columnData[$title]['editable'] = true;
                 $required = false;
             }
             if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
@@ -337,7 +391,7 @@ class JqGridFactory extends Base implements FactoryInterface
         }
 
         foreach ($mapping->associationMappings as $map) {
-            if (in_array($map['fieldName'], $this->_excludedColumns)) {
+            if (in_array($map['fieldName'], $this->_excludedColumns) or $map['type'] != 2) {
                 continue;
             }
 
@@ -373,29 +427,24 @@ class JqGridFactory extends Base implements FactoryInterface
             $actionColumn->mergeFormatoptions(array('editOptions' => array('closeAfterEdit' => true)));
         }
 
-        // close form after add
-        $this->getNavGrid()
-            ->mergeAddParameters(array('closeAfterAdd' => true
-
-        ));
-
-        $this->getNavGrid()
-            ->mergeAddParameters(array('closeAfterAdd' => true,
-                'reloadAfterSubmit' => true,
-                'jqModal' => true,
-                'closeOnEscape' => false,
-                'modal' => true,
-                'recreateForm' => true,
-                'checkOnSubmit' => true,
-                'closeAfterAdd' => true,
-                'bottominfo ' => 'Fields marked with (*) are required'
-            )
+        $formOptions = array('closeAfterAdd' => true,
+            'reloadAfterSubmit' => true,
+            'jqModal' => true,
+            'closeOnEscape' => false,
+            'modal' => true,
+            'recreateForm' => true,
+            'checkOnSubmit' => true,
+            'bottominfo' => 'Fields marked with (*) are required',
+            'beforeShowForm' => new Expr(" function(formid){ jQuery('input[id=\"id\"]', formid).parents('tr:first').hide() ; } ")
         );
+
+        $this->getNavGrid()->mergeAddParameters($formOptions );
+        $this->getNavGrid() ->mergeEditParameters($formOptions);
 
         $this->addColumns($columnData)
             ->setAllowDelete(true)
             ->setMultiselect(true)
-            //->setAllowEditForm(true)
+        //->setAllowEditForm(true)
             ->setMultipleSearch(true);
 
         $this->setNavButton(array('icon' => PredefinedIcons::ICON_FOLDER_OPEN,
@@ -430,6 +479,8 @@ class JqGridFactory extends Base implements FactoryInterface
         $this->setViewsortcols(true);
         $this->setRowNum($this->_defaultItemCountPerPage);
         $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
+        $this->setPrmNames($this->_prmNames);
+
 
         if (!$this->cation) {
             $this->setCaption(ucwords(str_replace("_", " ", $id)));
@@ -757,7 +808,7 @@ class JqGridFactory extends Base implements FactoryInterface
             $mapping = $service->getEntityManager()->getClassMetadata($entityClass);
 
             foreach ($params as $param => $value) {
-                if (array_key_exists($param, $mapping->fieldMappings)) {
+                if (array_key_exists($param, $mapping->fieldMappings) or array_key_exists($param, $mapping->associationMappings)) {
                     $type = $this->getColumn($param)->getDbColumnType();
                     if ($type == 'datetime' || $type == 'date') {
                         try {
