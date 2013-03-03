@@ -111,7 +111,7 @@ class DisplayGrid extends AbstractHelper
         $onLoad[] = $jsPager;
         $html[] = $htmlPager;
 
-        if ($grid->getInlineNavEnabled()) {
+        if ($grid->getInlineNavEnabled() and $grid->getInlineNav()) {
             $jsInline = sprintf('jQuery("#%s").jqGrid("inlineNav", "#%s",%s)',
                 $grid->getId(),
                 $grid->getPager(),

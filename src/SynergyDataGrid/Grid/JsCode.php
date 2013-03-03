@@ -51,21 +51,21 @@ class JsCode extends Base
                 'editbutton' => $this->grid->getAllowEdit(),
                 'editformbutton' => $this->grid->getAllowEditForm(),
                 'delbutton' => $this->grid->getAllowDelete(),
-                'delOptions' => array('afterSubmit' => new Expr("function(response, postdata) {
-                                                                                                    var json = eval('(' + response.responseText + ')');
-                                                                                                    return [json.success, json.message];
-                                                                                                }
-                                                                                                ")
+                'delOptions' => array(
+                    'afterSubmit' => new Expr("function(response, postdata) {  var json = eval('(' + response.responseText + ')');
+                                               return [json.success, json.message];
+                                               }
+                                              ")
                 ),
-                'editOptions' => array('closeOnEscape' => true,
-                    'afterShowForm' => new Expr("function (elem){ $datePickerFunctionName(elem); }")),
-                'onError' => new Expr("function(rowid,response) {
-                                                                                                    var json = eval('(' + response.responseText + ')');
-                                                                                                    alert('Error saving row: ' + json.message);
-                                                                                                    jQuery('#" . $this->grid->getGridId() . "').restoreAfterErorr = false;
-                                                                                                    return true;
-                                                                                                   }
-                                                                                                 ")
+                'editOptions' => array( 'closeOnEscape' => true,
+                                        'afterShowForm' => new Expr("function (elem){ $datePickerFunctionName(elem); }")
+                ),
+                'onError' => new Expr("function(rowid,response) {  var json = eval('(' + response.responseText + ')');
+                                                                   alert('Error saving row: ' + json.message);
+                                                                   jQuery('#" . $this->grid->getGridId() . "').restoreAfterErorr = false;
+                                                                         return true;
+                                                                   }
+                                                                   ")
             )));
     }
 

@@ -292,6 +292,7 @@ class JqGridFactory extends Base implements FactoryInterface
 
         foreach ($mapping->fieldMappings as $map) {
             $title = ucwords($map['fieldName']);
+            $required = false;
             if (in_array($map['fieldName'], $this->_excludedColumns)) {
                 continue;
             }
@@ -299,14 +300,16 @@ class JqGridFactory extends Base implements FactoryInterface
                 'name' => $map['fieldName'],
                 'sortable' => true,
             );
+            if (isset($map['nullable']) and $map['nullable'] == false) {
+                $required = true;
+            }
 
             if ($map['columnName'] == 'id') {
                 $columnData[$title]['editable'] = false;
-                $columnData[$title]['required'] = false;
+                $required = false;
             }
             if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
                 $columnData[$title]['edittype'] = 'textarea';
-                $columnData[$title]['editrules']['required'] = true;
             } elseif ('boolean' == $map['type']) {
                 $columnData[$title]['edittype'] = 'checkbox';
                 $columnData[$title]['searchoptions']['sort'] = array('eq', 'ne');
@@ -318,13 +321,13 @@ class JqGridFactory extends Base implements FactoryInterface
                 $columnData[$title]['hidden'] = true;
             }
 
-            if (isset($map['nullable']) and $map['nullable'] == false) {
-                $columnData[$title]['editrules']['required'] = true;
-                $columnData[$title]['formatoptions']['elmprefix'] = '(*)';
-            }
-
             if (isset($this->_columnTypeMapping[$map['fieldName']])) {
                 $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']];
+            }
+
+            if ($required) {
+                $columnData[$title]['editrules']['required'] = true;
+                $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-reg">*</span> ';
             }
         }
 
@@ -337,8 +340,8 @@ class JqGridFactory extends Base implements FactoryInterface
             if (in_array($map['fieldName'], $this->_excludedColumns)) {
                 continue;
             }
-            $title = ucwords($map['fieldName']);
 
+            $title = ucwords($map['fieldName']);
             $list = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
 
             $values = array(':select');
@@ -390,17 +393,17 @@ class JqGridFactory extends Base implements FactoryInterface
         );
 
         $this->addColumns($columnData)
-            ->setMultipleSearch(true)
-            ->setAllowEditForm(true)
-            ->setAllowEdit(true)
             ->setAllowDelete(true)
-            ->setAllowAdd(true)
             ->setMultiselect(true)
-            ->setNavButton(array('icon' => PredefinedIcons::ICON_NEWWIN,
+            //->setAllowEditForm(true)
+            ->setMultipleSearch(true);
+
+        $this->setNavButton(array('icon' => PredefinedIcons::ICON_FOLDER_OPEN,
             'action' => new Expr("function (){ jQuery('#" . $this->getId() . "').jqGrid('columnChooser');  }"),
             'title' => "Reorder Columns",
             'caption' => "Columns",
-            'position' => 25
+            'position' => 'last',
+            'id' => 'column-chooser'
         ));
 
         return $this;
@@ -437,11 +440,11 @@ class JqGridFactory extends Base implements FactoryInterface
         $datePickerFunctionName = $this->getDatePicker()->getFunctionName();
 
         $this->setNavGrid(
-            array('edit' => false, 'add' => false, 'del' => false, 'view' => true, 'refresh' => true, 'search' => true, 'cloneToTop' => true)
+            array('edit' => true, 'add' => true, 'del' => false, 'view' => true, 'refresh' => true, 'search' => true, 'cloneToTop' => true)
         );
 
         $this->setInlineNav(
-            array('add' => true, 'del' => false, 'edit' => false, 'cancel' => false, 'save' => false,
+            array('add' => false, 'del' => false, 'edit' => false, 'cancel' => false, 'save' => false,
                 'addParams' => array(
                     'useFormatter' => true,
                     'addRowParams' => array(
@@ -754,22 +757,24 @@ class JqGridFactory extends Base implements FactoryInterface
             $mapping = $service->getEntityManager()->getClassMetadata($entityClass);
 
             foreach ($params as $param => $value) {
-                $type = $this->getColumn($param)->getDbColumnType();
-                if ($type == 'datetime' || $type == 'date') {
-                    try {
-                        $value = new \DateTime($value);
+                if (array_key_exists($param, $mapping->fieldMappings)) {
+                    $type = $this->getColumn($param)->getDbColumnType();
+                    if ($type == 'datetime' || $type == 'date') {
+                        try {
+                            $value = new \DateTime($value);
+                            $entity->{$param} = $value;
+                        } catch (\Exception $e) {
+                            $pass = false;
+                            $message = 'Wrong date format for column "' . $param . '"';
+                            break;
+                        }
+                    } elseif (isset($mapping->associationMappings[$param])) {
+                        $target = $mapping->associationMappings[$param]['targetEntity'];
+                        $foreignEntity = $service->getEntityManager()->find($target, $value);
+                        $entity->{$param} = $foreignEntity;
+                    } else {
                         $entity->{$param} = $value;
-                    } catch (\Exception $e) {
-                        $pass = false;
-                        $message = 'Wrong date format for column "' . $param . '"';
-                        break;
                     }
-                } elseif (isset($mapping->associationMappings[$param])) {
-                    $target = $mapping->associationMappings[$param]['targetEntity'];
-                    $foreignEntity = $service->getEntityManager()->find($target, $value);
-                    $entity->{$param} = $foreignEntity;
-                } else {
-                    $entity->{$param} = $value;
                 }
             }
 
@@ -969,11 +974,6 @@ class JqGridFactory extends Base implements FactoryInterface
     public function getView()
     {
         if ($this->_view === null) {
-            /*            $viewRenderer = \Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
-          if ($viewRenderer->view === null) {
-              $viewRenderer->initView();
-          }
-          $this->_view = $viewRenderer->view;*/
             $this->_view = new \Zend\View\View();
         }
         return $this->_view;
