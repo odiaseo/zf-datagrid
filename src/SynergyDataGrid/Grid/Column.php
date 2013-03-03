@@ -211,7 +211,7 @@ class Column extends Base
 
         if(property_exists($row, $name)){
             if(is_object($row->{$name})){
-                $cellValue = $row->{$name}->id;
+                $cellValue = isset($row->{$name}->id) ? $row->{$name}->id : null;
             }else{
                 $cellValue = $row->{$name} ;
             }
