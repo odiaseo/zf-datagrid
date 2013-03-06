@@ -333,9 +333,6 @@ class JqGridFactory extends Base implements FactoryInterface
         $config = $serviceLocator->get('Config');
         $this->_config = $config['jqgrid'];
         $this->_service = $serviceLocator->get('ModelService');
-        $this->_excludedColumns = $this->_config['excluded_columns'];
-        $this->_nonEditable = $this->_config['non_editable_columns'];
-        $this->_columnTypeMapping = $this->_config['column_type_mapping'];
 
         return $this;
     }
@@ -355,7 +352,7 @@ class JqGridFactory extends Base implements FactoryInterface
         foreach ($mapping->fieldMappings as $map) {
             $title = ucwords($map['fieldName']);
             $required = false;
-            if (in_array($map['fieldName'], $this->_excludedColumns)) {
+            if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
                 continue;
             }
             $columnData[$title] = array(
@@ -378,13 +375,13 @@ class JqGridFactory extends Base implements FactoryInterface
                 $columnData[$title]['editoptions']['value'] = '1:0';
             }
 
-            if (in_array($map['fieldName'], $this->_nonEditable)) {
+            if (in_array($map['fieldName'], $this->_config['non_editable_columns'])) {
                 $columnData[$title]['editable'] = false;
                 $columnData[$title]['hidden'] = true;
             }
 
-            if (isset($this->_columnTypeMapping[$map['fieldName']])) {
-                $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']];
+            if (isset($this->_config['column_type_mapping'][$map['fieldName']])) {
+                $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$map['fieldName']];
             }
 
             if ($required and $this->_config['enforce_required_fields']) {
@@ -399,7 +396,7 @@ class JqGridFactory extends Base implements FactoryInterface
         }
 
         foreach ($mapping->associationMappings as $map) {
-            if (in_array($map['fieldName'], $this->_excludedColumns) or $map['type'] != 2) {
+            if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
                 continue;
             }
 
