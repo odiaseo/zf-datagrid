@@ -291,6 +291,13 @@ class JqGridFactory extends Base implements FactoryInterface
     private $isTreeGrid = false;
     protected $_nodeData = array();
     /**
+     * Grid configuration options
+     *
+     * @see module.config.php
+     * @var array
+     */
+    protected $_options = array();
+    /**
      * Cookie prefix for column sizes
      *
      * @var string
@@ -324,10 +331,11 @@ class JqGridFactory extends Base implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $config = $serviceLocator->get('Config');
+        $this->_config = $config['jqgrid'];
         $this->_service = $serviceLocator->get('ModelService');
-        $this->_excludedColumns = $config['jqgrid']['excluded_columns'];
-        $this->_nonEditable = $config['jqgrid']['non_editable_columns'];
-        $this->_columnTypeMapping = $config['jqgrid']['column_type_mapping'];
+        $this->_excludedColumns = $this->_config['excluded_columns'];
+        $this->_nonEditable = $this->_config['non_editable_columns'];
+        $this->_columnTypeMapping = $this->_config['column_type_mapping'];
 
         return $this;
     }
@@ -379,7 +387,7 @@ class JqGridFactory extends Base implements FactoryInterface
                 $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_columnTypeMapping[$map['fieldName']];
             }
 
-            if ($required) {
+            if ($required and $this->_config['enforce_required_fields']) {
                 $columnData[$title]['editrules']['required'] = true;
                 $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-reg">*</span> ';
             }

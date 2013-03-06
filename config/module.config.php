@@ -22,10 +22,12 @@ return array(
         ),
 
         /*
-         * Map database base columns to grid types e.g. description => textarea
+         * Map database base columns to grid types e.g. array(description => textarea, 'image' => 'file')
          */
         'column_type_mapping' => array(
 
-        )
+        ),
+        /* If set to true, entities with nullable=false would be required */
+        'enforce_required_fields' => false,
     ),
 );
