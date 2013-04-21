@@ -390,10 +390,11 @@ class JqGridFactory extends Base implements FactoryInterface
             }
         }
 
+        /** @TODO treeGrid display is buggy
         if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName) {
-            $this->setTreeGrid(true);
-            $this->isTreeGrid = true;
-        }
+        $this->setTreeGrid(true);
+        $this->isTreeGrid = true;
+        }*/
 
         foreach ($mapping->associationMappings as $map) {
             if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
@@ -443,13 +444,13 @@ class JqGridFactory extends Base implements FactoryInterface
             'beforeShowForm' => new Expr(" function(formid){ jQuery('input[id=\"id\"]', formid).parents('tr:first').hide() ; } ")
         );
 
-        $this->getNavGrid()->mergeAddParameters($formOptions );
-        $this->getNavGrid() ->mergeEditParameters($formOptions);
+        $this->getNavGrid()->mergeAddParameters($formOptions);
+        $this->getNavGrid()->mergeEditParameters($formOptions);
 
         $this->addColumns($columnData)
             ->setAllowDelete(true)
             ->setMultiselect(true)
-        //->setAllowEditForm(true)
+            //->setAllowEditForm(true)
             ->setMultipleSearch(true);
 
         $this->setNavButton(array('icon' => PredefinedIcons::ICON_FOLDER_OPEN,
