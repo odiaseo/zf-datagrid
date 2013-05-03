@@ -55,12 +55,14 @@ Usage.
 
             $serviceManager = $this->getServiceLocator() ;
             $grid = $serviceManager->get('jqgrid')
-                                   ->create({Entity_Name});
+                                   ->create({Entity_Name}, {grid_id});
 
-            $grid->setToolbar = array(true, 'bottom'); //optional
-            $grid->setToppager = true; //optional
+            $grid->toolbar = array(true, 'bottom'); //optional
+            $grid->toppager = true;
+            $grid->altRows  = true;
+            $grid->gridview = true;
 
-            $grid->render();
+            $grid->prepareGrid();
 
 			return array('grid' => $grid);
 
