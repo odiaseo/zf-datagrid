@@ -1,6 +1,7 @@
 <?php
     namespace SynergyDataGrid\Grid;
 
+    use Doctrine\ORM\AbstractQuery;
     use SynergyDataGrid\Grid\Column;
     use SynergyDataGrid\Util\ArrayUtils;
     use Zend\Json\Expr;
@@ -21,26 +22,25 @@
      */
     class JqGridFactory extends Base implements FactoryInterface
     {
-        const SORT_ID       = 'sidx';
-        const SORT_ORDER_ID = 'order';
-        const SEARCH_ID     = 'search';
-        const ND_ID         = 'nd';
-        const OPERATOR_KEY  = 'oper';
-        const OPER_EDIT     = 'editoper';
-        const OPER_ADD      = 'addoper';
-        const OPER_DELETE   = 'deloper';
-        const SUBGRID_ID    = 'subgridid';
-        const TOTALROWS_ID  = 'totalrows';
-        const SORT_COLUMN   = 'title';
-        const TOP           = 'top';
-        const BOTTOM        = 'bottom';
-        const RECORD_LIMIT  = 'rows';
-        const CURRENT_PAGE  = 'page';
-        const CURRENT_ROW   = 'id';
-        const ROW_TOTAL     = 'totalrows';
-
-
-        const ID_PREFIX = 'grid_';
+        const SORT_ID         = 'sidx';
+        const SORT_ORDER_ID   = 'order';
+        const SEARCH_ID       = 'search';
+        const ND_ID           = 'nd';
+        const OPERATOR_KEY    = 'oper';
+        const OPER_EDIT       = 'editoper';
+        const OPER_ADD        = 'addoper';
+        const OPER_DELETE     = 'deloper';
+        const SUBGRID_ID      = 'subgridid';
+        const TOTALROWS_ID    = 'totalrows';
+        const SORT_COLUMN     = 'title';
+        const TOP             = 'top';
+        const BOTTOM          = 'bottom';
+        const RECORD_LIMIT    = 'rows';
+        const CURRENT_PAGE    = 'page';
+        const CURRENT_ROW     = 'id';
+        const ROW_TOTAL       = 'totalrows';
+        const ID_PREFIX       = 'grid_';
+        const GRID_IDENTIFIER = 'grid';
         /**
          * Cookie prefix for column sizes
          *
@@ -66,6 +66,12 @@
          */
         const COOKIE_PAGING_PREFIX = 'jqgrid_paging_';
         /**
+         * Entity class name
+         *
+         * @var string
+         */
+        private $_entity;
+        /**
          * @var \SynergyDataGrid\Grid\Toolbar
          */
         protected $_toolbarConfig;
@@ -75,12 +81,6 @@
          * @var array
          */
         protected $_columns = array();
-        /**
-         * View Interface instance
-         *
-         * @var \Zend_View_Interface
-         */
-        protected $_view = null;
         /**
          * Html code for jqGrid control
          *
@@ -117,6 +117,10 @@
          * @var int
          */
         protected $_service;
+        /**
+         * @var \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
+         */
+        protected $_serviceLocator;
         /**
          * Last selected row variable name, javascript
          *
@@ -300,6 +304,9 @@
          * @var \SynergyDataGrid\Grid\JsCode
          */
         protected $_jsCode;
+        /**
+         * @var Grid Url
+         */
         protected $_url;
         /**
          * columns not displayed on the grid
@@ -338,138 +345,142 @@
          */
         public function createService(ServiceLocatorInterface $serviceLocator)
         {
-            $config         = $serviceLocator->get('Config');
-            $this->_config  = $config['jqgrid'];
-            $this->_service = $serviceLocator->get('ModelService');
+            $config                = $serviceLocator->get('Config');
+            $this->_config         = $config['jqgrid'];
+            $this->_serviceLocator = $serviceLocator;
+            $this->_jsCode         = new JsCode($this);
 
             return $this;
         }
 
-        public function create($className, $id = '')
+        /**
+         * Binds the grid to the database entity and assigns an ID to the grid
+         *
+         * @param      $entityClassName
+         * @param null $gridId
+         */
+        public function setGridIdentity($entityClassName, $gridId = '')
         {
-            $this->_service = $this->_service->getService($className);
-            $this->_jsCode  = new JsCode($this);
-            $mapping        = $this->_service->getEntityManager()->getClassMetadata($className);
+            $this->setId($gridId);
+            $this->setEntity($entityClassName);
+            self::$gridRegistry[] = $entityClassName;
 
-
-            self::$gridRegistry[] = $className;
-            if (empty($id)) {
-                $id = count(self::$gridRegistry);
-            }
-            $id = self::ID_PREFIX . $id;
-            $this->_setDefaultOptions($id);
-
-            foreach ($mapping->fieldMappings as $map) {
-                $title    = ucwords($map['fieldName']);
-                $required = false;
-                if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
-                    continue;
-                }
-                $columnData[$title] = array(
-                    'name'     => $map['fieldName'],
-                    'sortable' => true,
-                );
-                if (isset($map['nullable']) and $map['nullable'] == false) {
-                    $required = true;
-                }
-
-                if ($map['columnName'] == 'id') {
-                    $columnData[$title]['editable'] = true;
-                    $required                       = false;
-                }
-                if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
-                    $columnData[$title]['edittype'] = 'textarea';
-                } elseif ('boolean' == $map['type']) {
-                    $columnData[$title]['edittype']              = 'checkbox';
-                    $columnData[$title]['searchoptions']['sort'] = array('eq', 'ne');
-                    $columnData[$title]['editoptions']['value']  = '1:0';
-                }
-
-                if (in_array($map['fieldName'], $this->_config['non_editable_columns'])) {
-                    $columnData[$title]['editable'] = false;
-                    $columnData[$title]['hidden']   = true;
-                }
-
-                if (isset($this->_config['column_type_mapping'][$map['fieldName']])) {
-                    $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$map['fieldName']];
-                }
-
-                if ($required and $this->_config['enforce_required_fields']) {
-                    $columnData[$title]['editrules']['required']    = true;
-                    $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-reg">*</span> ';
-                }
-            }
-
-            /** @TODO treeGrid display is buggy */
+            $mapping = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
             if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName) {
                 $this->setTreeGrid(true);
                 $this->isTreeGrid = true;
             }
 
-            foreach ($mapping->associationMappings as $map) {
-                if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
-                    continue;
-                }
+            return $this;
+        }
 
-                $title = ucwords($map['fieldName']);
-                $list  = $this->getService()->getEntityManager()->getRepository($map['targetEntity'])->findAll();
-
-                $values = array(':select');
-
-                foreach ($list as $item) {
-                    $values[] = $item->id . ':' . $item->title;
-                }
-
-                $values = implode(';', $values);
-
-                $columnData[$title] = array(
-                    'name'          => $map['fieldName'],
-                    'edittype'      => 'select',
-                    'stype'         => 'select',
-                    'hidden'        => true,
-                    'editrules'     => array('edithidden' => true, 'hidden' => true),
-                    'sortable'      => true,
-                    'searchoptions' => array(
-                        'value' => $values,
-                        'sopt'  => array('eq', 'ne')
-                    ),
-                    'editoptions'   => array(
-                        'value' => $values
-                    )
+        public function setGridColumns()
+        {
+            if (!$this->_columns) {
+                $mapping         = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
+                $excludedColumns = array_merge(
+                    array_values($this->_config['tree_grid_options']['treeReader']),
+                    $this->_config['excluded_columns']
                 );
+
+                $excludedColumns = array_unique($excludedColumns);
+
+                foreach ($mapping->fieldMappings as $map) {
+                    $title = ucwords($map['fieldName']);
+
+                    if (in_array($map['fieldName'], $excludedColumns)) {
+                        continue;
+                    }
+                    $columnData[$title] = array(
+                        'name'     => $map['fieldName'],
+                        'sortable' => true,
+                    );
+
+                    switch ($map['type']) {
+                        case 'integer':
+                            $columnData[$title]['editrules']['number'] = true;
+                            break;
+                    }
+
+
+                    if ($map['columnName'] == 'id') {
+                        $columnData[$title]['editable'] = true;
+                        $columnData[$title]['key']      = true;
+
+                        if (!$this->getIsTreeGrid()) {
+                            //@TODO add config to specify column width
+                            $columnData[$title]['width'] = '40px';
+                        }
+                    }
+
+                    if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
+                        $columnData[$title]['edittype'] = 'textarea';
+                    } elseif ('boolean' == $map['type']) {
+                        $columnData[$title]['edittype']              = 'checkbox';
+                        $columnData[$title]['searchoptions']['sort'] = array('eq', 'ne');
+                        $columnData[$title]['editoptions']['value']  = '1:0';
+                    }
+
+                    if (in_array($map['fieldName'], $this->_config['hidden_columns'])) {
+                        $columnData[$title]['hidden']                  = true;
+                        $columnData[$title]['editrules']['edithidden'] = true;
+                    }
+
+                    if (in_array($map['fieldName'], $this->_config['non_editable_columns'])) {
+                        $columnData[$title]['editable'] = false;
+                        $columnData[$title]['hidden']   = true;
+                    }
+
+                    if (isset($this->_config['column_type_mapping'][$map['fieldName']])) {
+                        $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$map['fieldName']];
+                    }
+
+                }
+
+                foreach ($mapping->associationMappings as $map) {
+                    if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
+                        continue;
+                    }
+
+                    $title = ucwords($map['fieldName']);
+
+                    if (is_callable($this->_config['association_mapping_callback'])) {
+                        $function = $this->_config['association_mapping_callback'];
+                        $values   = $function($this->_serviceLocator, $map['targetEntity']);
+                    } else {
+                        $list   = $this->_getRelatedList($map['targetEntity']);
+                        $values = array(':select');
+                        foreach ($list as $item) {
+                            $values[] = $item['id'] . ':' . $item['title'];
+                        }
+                        $values = implode(';', $values);
+                    }
+
+                    $columnData[$title] = array(
+                        'name'          => $map['fieldName'],
+                        'edittype'      => 'select',
+                        'stype'         => 'select',
+                        'hidden'        => true,
+                        'editrules'     => array(
+                            'edithidden' => true,
+                        ),
+                        'sortable'      => true,
+                        'searchoptions' => array(
+                            'value' => $values,
+                            'sopt'  => array('eq', 'ne')
+                        ),
+                        'editoptions'   => array(
+                            'value' => $values
+                        )
+                    );
+                }
+
+                $this->addColumns($columnData);
+                // close form after edit
+                if ($actionColumn = $this->getColumn('myac')) {
+                    $actionColumn->mergeFormatoptions(array('editOptions' => array('closeAfterEdit' => true)));
+                }
             }
-            // close form after edit
-            if ($actionColumn = $this->getColumn('myac')) {
-                $actionColumn->mergeFormatoptions(array('editOptions' => array('closeAfterEdit' => true)));
-            }
-
-            $formOptions = array('closeAfterAdd'     => true,
-                                 'reloadAfterSubmit' => true,
-                                 'jqModal'           => true,
-                                 'closeOnEscape'     => false,
-                                 'modal'             => true,
-                                 'recreateForm'      => true,
-                                 'checkOnSubmit'     => true,
-                                 'bottominfo'        => 'Fields marked with (*) are required',
-                                 'beforeShowForm'    => new Expr(" function(formid){ jQuery('input[id=\"id\"]', formid).parents('tr:first').hide() ; } ")
-            );
-
-            $this->getNavGrid()->mergeAddParameters($formOptions);
-            $this->getNavGrid()->mergeEditParameters($formOptions);
-
-            $this->addColumns($columnData)
-                ->setAllowDelete(true)
-                ->setMultiselect(true)
-                ->setAllowEditForm(true)
-                ->setMultipleSearch(true);
-
-            $this->setNavButton(array('icon'     => PredefinedIcons::ICON_FOLDER_OPEN,
-                                      'action'   => new Expr("function (){ jQuery('#" . $this->getId() . "').jqGrid('columnChooser');  }"),
-                                      'title'    => "Reorder Columns",
-                                      'caption'  => "Columns",
-                                      'position' => 'last',
-                                      'id'       => 'column-chooser'
-                                ));
 
             return $this;
         }
@@ -481,55 +492,84 @@
          *
          * @return \SynergyDataGrid\Grid\JqGridFactory
          */
-        protected function _setDefaultOptions($id = '')
+        public function setGridDisplayOptions()
         {
-            $this->setId($id);
-            $this->setPager($id . '_pager');
-            $this->setUrl('');
-            $this->setDatatype('json');
-            $this->setMtype('POST');
-            $this->setViewrecords(true);
-            $this->setHeight('auto');
-            //$this->setAllowResizeColumns(false);
-
-            $this->setSortable(true);
-            $this->setViewsortcols(true);
-            $this->setRowNum($this->_defaultItemCountPerPage);
+            $this->setPager($this->getId() . '_pager');
             $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
             $this->setPrmNames($this->_prmNames);
 
-
-            if (!$this->cation) {
-                $this->setCaption(ucwords(str_replace("_", " ", $id)));
+            //Set grid options
+            $gridOptions = isset($this->_config['grid_options']) ? $this->_config['grid_options'] : array();
+            foreach ($gridOptions as $key => $val) {
+                $method = 'set' . ucfirst($key);
+                $this->$method($val);
             }
-            $this->setPostData(array('grid' => $this->getId()));
+
+            //Set tree grid options
+            if ($this->getIsTreeGrid()) {
+                $treeOptions = isset($this->_config['tree_grid_options']) ? $this->_config['tree_grid_options'] : array();
+                foreach ($treeOptions as $key => $val) {
+                    $method = 'set' . ucfirst($key);
+                    $this->$method($val);
+                }
+            }
+
+            //Set default data to be posted back to server
+            $this->setPostData(array(self::GRID_IDENTIFIER => $this->getId()));
 
             $this->setDatePicker(new DatePicker($this));
             $datePickerFunctionName = $this->getDatePicker()->getFunctionName();
 
-            $this->setNavGrid(
-                array('edit' => true, 'add' => true, 'del' => true, 'view' => true, 'refresh' => true, 'search' => true, 'cloneToTop' => true)
-            );
+            //Set navigation options
+            $navGrid = isset($this->_config['nav_grid']) ? $this->_config['nav_grid'] : array();
+            $this->setNavGrid($navGrid);
 
-            $this->setInlineNav(
-                array('add'       => false, 'del' => false, 'edit' => false, 'cancel' => false, 'save' => false,
-                      'addParams' => array(
-                          'useFormatter' => true,
-                          'addRowParams' => array(
-                              'keys'              => true,
-                              'restoreAfterError' => true,
-                              'oneditfunc'        => new Expr("
-                                    function() {
-                                        $datePickerFunctionName ('new_row');
-                                    }
-                                ")
-                          ))));
+            //Add parameters
+            $addParameters = isset($this->_config['add_parameters']) ? $this->_config['add_parameters'] : array();
+            $this->getNavGrid()->mergeAddParameters($addParameters);
 
-            $this->setLastSelectVariable($id . '_lastSel');
+
+            //Edit parameters
+            $editParameters = isset($this->_config['edit_parameters']) ? $this->_config['edit_parameters'] : array();
+            $this->getNavGrid()->mergeEditParameters($editParameters);
+
+
+            //set add/edit form options
+            $formOptions = isset($this->_config['form_options']) ? $this->_config['form_options'] : array();
+            if ($formOptions) {
+                $this->getNavGrid()->mergeAddParameters($formOptions);
+                $this->getNavGrid()->mergeEditParameters($formOptions);
+            }
+
+            $inlineNavOptions = isset($this->_config['inline_nav']) ? $this->_config['inline_nav'] : array();
+            if ($inlineNavOptions) {
+                $this->setInlineNav($inlineNavOptions);
+            }
+
+            //add user defined navigation buttons
+            if (isset($this->_config['custom_nav_buttons'])) {
+                $customNavOptions = $this->_config['custom_nav_buttons'];
+                if (is_callable($customNavOptions)) {
+                    $optionArray = $customNavOptions($this->getId());
+                } else {
+                    $optionArray = $customNavOptions;
+                }
+
+                foreach ($optionArray as $buttonId => $button) {
+                    $button['id'] = 'nav_' . $buttonId;
+                    $this->setNavButton($button);
+                }
+            }
+
+            $this->setLastSelectVariable($this->getId() . '_lastSel');
 
             if ($this->getActionsColumn()) {
                 $this->getJsCode()->addActionsColumn();
+                $this->_config['nav_grid']['edit'] = false;
+                $this->_config['nav_grid']['del']  = false;
+                $this->setNavGrid($this->_config['nav_grid']);
             }
+
 
             $this->setOnSortCol(new Expr($this->getJsCode()->prepareSetSortingCookie()));
             $this->setOnPaging(new Expr($this->getJsCode()->prepareSetPagingCookie()));
@@ -579,8 +619,8 @@
                 foreach ($columns as $colName => $column) {
                     $this->addColumn($colName, $column);
                 }
-                $this->setColNames($this->getColumns());
-                $this->setColModel($this->getColumns());
+                $this->setColNames($this->_columns);
+                $this->setColModel($this->_columns);
             }
 
             return $this;
@@ -592,63 +632,32 @@
          *
          * @return string
          */
-        public function prepareGrid()
+        public function prepareGridData()
         {
-            return $this->render();
-        }
-
-        /**
-         * Function would be deprecated iin future release
-         * use prepareGrid() instead
-         *
-         * @param Zend_View_Interface $view
-         *
-         * @deprecated
-         * @return string
-         */
-        public function render()
-        {
-            $serviceManager = $this->getService()->getServiceManager();
-            $request        = $serviceManager->get('request');
-
-            $retv = '';
-            if (!$this->getUrl()) {
-                $this->setUrl($request->getRequestUri());
-            }
-            if ($request->isXmlHttpRequest()) {
-                $data      = null;
+            try {
+                $serviceManager = $this->getService()->getServiceManager();
+                $request        = $serviceManager->get('request');
+                if (!$this->getUrl()) {
+                    $this->setUrl($request->getRequestUri());
+                }
+                $data = null;
+                $this->setGridColumns();
                 $operation = $request->getPost('oper');
-                // update grid
-                if ($request->getPost('grid') == $this->getId()) {
-                    $data = $this->getGridData($request);
-                    // delete record
-                } else {
-                    if ($operation == 'del') {
-                        $data = $this->delete($request);
-                        // edit record
-                    } else {
-                        if ($operation == 'edit' || $operation == 'add') {
-                            $data = $this->edit($request);
-                        }
-                    }
-                }
-                if ($data) {
-                    $this->sendResponse($data);
-                }
-            }
-        }
 
-        /**
-         * Send AJAX response back to browser
-         *
-         * @param string $data response body
-         *
-         * @return void
-         */
-        protected function sendResponse($data)
-        {
-            echo $data;
-            exit;
+                if ($request->getPost(self::GRID_IDENTIFIER) == $this->getId()) {
+                    $data = $this->_createGridData($request);
+                } elseif ($operation == 'del') {
+                    $data = $this->delete($request);
+                } elseif ($operation == 'edit' || $operation == 'add') {
+                    $data = $this->edit($request);
+                }
+
+            } catch (\Exception $e) {
+                header('HTTP/1.1 400 Error Saving Data');
+                $data = array('error' => $e->getMessage());
+            }
+
+            return $data;
         }
 
         /**
@@ -660,28 +669,37 @@
          */
         protected function _createGridData(Request $request)
         {
-            $filter = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
+            $filter     = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
+            $treeFilter = array();
 
             if ($this->isTreeGrid) {
-                $sort = array('sidx' => 'lft', 'sord' => 'ASC');
+                $sort = array(
+                    'sidx' => 'lft',
+                    'sord' => 'ASC'
+                );
                 $node = $request->getPost('nodeid', false);
                 if ($node > 0) {
-                    $n_lvl    = (integer)$request->getPost("n_level");
-                    $n_lvl    = $n_lvl + 1;
-                    $nodeData = array(
-                        'nLft'   => (integer)$request->getPost("n_left"),
-                        'nRgt'   => (integer)$request->getPost("n_right"),
-                        'nLvl'   => $n_lvl,
+                    $n_lvl      = (integer)$request->getPost("n_level");
+                    $n_lvl      = $n_lvl + 1;
+                    $treeFilter = array(
+                        'lft'    => (integer)$request->getPost("n_left"),
+                        'rgt'    => (integer)$request->getPost("n_right"),
+                        'level'  => $n_lvl,
                         'parent' => $node
                     );
-                    $this->setNodeData($nodeData);
+
+                } else {
+                    $treeFilter = array(
+                        'level' => 1
+                    );
                 }
+
             } else {
                 $sort = $request->getPost('sidx') ? array('sidx' => $request->getPost('sidx'), 'sord' => $request->getPost('sord')) : false;
             }
 
 
-            $adapter = new PaginatorAdapter($this->getService(), $filter, $sort, $this);
+            $adapter = new PaginatorAdapter($this->getService(), $filter, $sort, $this, $treeFilter);
 
             // Instantiate Zend_Paginator with the required data source adapter
             if (!$this->_paginator instanceof Paginator) {
@@ -695,33 +713,44 @@
             // Fetch a row of items from the adapter
             $rows = $this->_paginator->getCurrentItems();
 
-            $grid          = new \stdClass();
-            $grid->page    = $this->_paginator->getCurrentPageNumber();
-            $grid->total   = ceil($this->_paginator->getTotalItemCount() / $this->_paginator->getItemCountPerPage());
-            $grid->records = $this->_paginator->getTotalItemCount();
-            $grid->rows    = array();
+            $grid = array(
+                'page'    => $this->_paginator->getCurrentPageNumber(),
+                'total'   => ceil($this->_paginator->getTotalItemCount() / $this->_paginator->getItemCountPerPage()),
+                'records' => $this->_paginator->getTotalItemCount(),
+                'rows'    => array()
+            );
+
             $this->reorderColumns();
-            $columns     = $this->getColumns();
+            $columns     = $this->setGridColumns()->getColumns();
             $columnNames = array_keys($columns);
 
             foreach ($rows as $k => $row) {
+
                 if (isset($row->id)) {
-                    $grid->rows[$k]['id'] = $row->id;
+                    $grid['rows'][$k]['id'] = $row->id;
                 }
 
-                $grid->rows[$k]['cell'] = array();
+                $grid['rows'][$k]['cell'] = array();
                 /**
                  * @var $column \SynergyDataGrid\Grid\Column
                  */
                 foreach ($columns as $name => $column) {
+
                     $index = array_search($name, $columnNames);
                     if ($index !== false) {
-                        $grid->rows[$k]['cell'][$index] = $column->cellValue($row);
+                        $grid['rows'][$k]['cell'][$index] = $column->cellValue($row);
                     }
-                    //array_push($grid->rows[$k]['cell'], $column->cellValue($row));
                 }
 
+                ksort($grid['rows'][$k]['cell']);
 
+                if ($this->isTreeGrid) {
+                    $grid['rows'][$k]['cell'][] = $row->level; //level
+                    $grid['rows'][$k]['cell'][] = $row->lft; //lft
+                    $grid['rows'][$k]['cell'][] = $row->rgt; //rgt
+                    $grid['rows'][$k]['cell'][] = (($row->rgt - $row->lft) == 1); //isLeaf
+                    $grid['rows'][$k]['cell'][] = 0; //($row->level == 0); //expanded
+                }
             }
 
             if ($this->isTreeGrid) {
@@ -771,20 +800,6 @@
         }
 
         /**
-         * Encode prepared grid data to JSON
-         *
-         * @param \Zend\Http\Request $request
-         *
-         * @return mixed
-         */
-        public function getGridData(Request $request)
-        {
-            $data = $this->_createGridData($request);
-
-            return Json::encode($data);
-        }
-
-        /**
          * Delete record based on passed id and return result
          *
          * @param \Zend\Http\Request $request
@@ -803,7 +818,7 @@
                 }
             }
 
-            return Json::encode(array('success' => $retv, 'message' => $message));
+            return array('success' => $retv, 'message' => $message);
         }
 
         /**
@@ -871,7 +886,7 @@
                 }
             }
 
-            return Json::encode(array('success' => $pass, 'message' => $message, 'id' => $id));
+            return array('success' => $pass, 'message' => $message, 'id' => $id);
         }
 
         /**
@@ -953,16 +968,15 @@
         public function reorderColumns()
         {
             if ($this->getSortable()) {
-                $allColumns     = $this->getColumns();
                 $id             = $this->getId();
                 $url            = $this->getUrl();
                 $orderingCookie = str_replace('/', '_', strtolower(self::COOKIE_COLUMNS_ORDERING_PREFIX . $url . '_' . $id));
                 if (isset($_COOKIE[$orderingCookie])) {
                     $ordering = explode(':', $_COOKIE[$orderingCookie]);
-                    if (count($ordering) == count($allColumns)) {
+                    if (count($ordering) == count($this->_columns)) {
                         $newColumns = array();
                         foreach ($ordering as $col) {
-                            foreach ($allColumns as $oldCol) {
+                            foreach ($this->_columns as $oldCol) {
                                 if ($oldCol->getName() == $col) {
                                     $newColumns[] = $oldCol;
                                     break;
@@ -970,8 +984,8 @@
                             }
                         }
                         $this->setColumns($newColumns);
-                        $this->setColModel($this->getColumns());
-                        $this->setColNames($this->getColumns());
+                        $this->setColModel($this->_columns);
+                        $this->setColNames($this->_columns);
                     }
                 }
             }
@@ -1048,34 +1062,6 @@
         public function setJsCode($jsCode)
         {
             $this->_jsCode = $jsCode;
-
-            return $this;
-        }
-
-        /**
-         * Get View Interface object instance
-         *
-         * @return \Zend_View_Interface
-         */
-        public function getView()
-        {
-            if ($this->_view === null) {
-                $this->_view = new \Zend\View\View();
-            }
-
-            return $this->_view;
-        }
-
-        /**
-         * Set View Interface object instance
-         *
-         * @param \Zend_View_Interface $view Zend_View_Interface object instance
-         *
-         * @return JsGrid
-         */
-        public function setView(Zend_View_Interface $view = null)
-        {
-            $this->_view = $view;
 
             return $this;
         }
@@ -1171,7 +1157,7 @@
          */
         public function setId($id)
         {
-            $this->_id = $id;
+            $this->_id = self::ID_PREFIX . $id . count(self::$gridRegistry);
 
             return $this;
         }
@@ -1226,7 +1212,7 @@
                     ->getFormatoptions()
                     ->setEditbutton($allowEdit);
                 $actionColumn->setFormatoptions($currentFormatOptions);
-                $this->setColModel($this->getColumns());
+                $this->setColModel($this->_columns);
             }
             if ($allowEdit) {
                 $this->getNavGrid()->mergeOptions(array('add' => false));
@@ -1264,7 +1250,7 @@
                     ->getFormatoptions()
                     ->setEditformbutton($allowEditForm);
                 $actionColumn->setFormatoptions($currentFormatOptions);
-                $this->setColModel($this->getColumns());
+                $this->setColModel($this->_columns);
             }
             if ($allowEditForm) {
                 $this->getNavGrid()->mergeAddparameters(array('closeOnEscape' => true));
@@ -1303,7 +1289,7 @@
                     ->getFormatoptions()
                     ->setDelbutton($allowDelete);
                 $actionColumn->setFormatoptions($currentFormatOptions);
-                $this->setColModel($this->getColumns());
+                $this->setColModel($this->_columns);
             }
 
             return $this;
@@ -1395,6 +1381,10 @@
          */
         public function getService()
         {
+            if (!$this->_service) {
+                $this->_service = $this->_serviceLocator->get('ModelService')->getService($this->_entity);
+            }
+
             return $this->_service;
         }
 
@@ -1445,10 +1435,9 @@
          */
         public function getColumn($name)
         {
-            $return  = false;
-            $columns = $this->getColumns();
-            if (array_key_exists($name, $columns)) {
-                $return = $columns[$name];
+            $return = false;
+            if (array_key_exists($name, $this->_columns)) {
+                $return = $this->_columns[$name];
             }
 
             return $return;
@@ -1466,7 +1455,7 @@
             if (gettype($column) == 'object' && substr(get_class($column), -7) == '\Column') {
                 $name                  = $column->getName();
                 $this->_columns[$name] = $column;
-                $this->setColModel($this->getColumns());
+                $this->setColModel($this->_columns);
             }
 
             return $this;
@@ -1603,7 +1592,7 @@
         /**
          * Get DatePicker object instance for current grid
          *
-         * @return \SynergyDataGrid\DatePicker
+         * @return \SynergyDataGrid\Grid\DatePicker
          */
         public function getDatePicker()
         {
@@ -1805,8 +1794,8 @@
                 $this->setResizeStop(null);
                 $this->setAutowidth(true);
                 // no columns allowed to be resized
-                $allColumns = $this->getColumns();
-                foreach ($allColumns as $column) {
+
+                foreach ($this->_columns as $column) {
                     $column->setResizable(false);
                 }
             } else {
@@ -1915,7 +1904,10 @@
 
         public function setUrl($url)
         {
-            $this->_url = $url;
+            $this->_url            = $url;
+            $this->_options['url'] = $url;
+
+            return $this;
         }
 
         public function getUrl()
@@ -1958,6 +1950,56 @@
         public function getConfig()
         {
             return $this->_config;
+        }
+
+        /**
+         * @param string $entity
+         */
+        public function setEntity($entity)
+        {
+            $this->_entity = $entity;
+
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getEntity()
+        {
+            return $this->_entity;
+        }
+
+        protected function _getRelatedList($entity)
+        {
+            $items = $this->getService()->getEntityManager()->getRepository($entity)->findAll();
+
+            /*           $qb = $this->getService()->getEntityManager()->createQueryBuilder();
+         /*
+                       $items = $qb->select('e.*')
+                           ->from($entity, 'e')
+                           ->getQuery()
+                           ->execute(array(), AbstractQuery::HYDRATE_OBJECT);*/
+
+            return $items;
+        }
+
+        /**
+         * @param \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
+         */
+        public function setServiceLocator($serviceLocator)
+        {
+            $this->_serviceLocator = $serviceLocator;
+
+            return $this;
+        }
+
+        /**
+         * @return \Zend\ServiceManager\ServiceLocatorInterface
+         */
+        public function getServiceLocator()
+        {
+            return $this->_serviceLocator;
         }
 
     }

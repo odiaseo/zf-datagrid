@@ -24,10 +24,22 @@
          */
         public function __invoke(JqGridFactory $grid)
         {
-            $view     = $this->getView();
-            $html     = array();
-            $js       = array();
-            $onLoad   = array();
+            $html   = array();
+            $js     = array();
+            $onLoad = array();
+
+            $config = $grid->getConfig();
+
+            if ($grid->getIsTreeGrid()) {
+                $grid->setActionsColumn(false);
+            } else {
+                $grid->setActionsColumn($config['add_action_column']);
+            }
+            $grid->setGridColumns()
+                ->setGridDisplayOptions()
+                ->setAllowEditForm(true);
+
+
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
 
             if (!$grid->getEditurl()) {
@@ -154,17 +166,23 @@
                 $grid->getId());
 
 
-            $onLoad[] = $grid->getJsCode()->renderActionsFormatter();
+            //$onLoad[] = $grid->getJsCode()->renderActionsFormatter();
 
             $html   = array_merge($html, $grid->getHtml());
             $js     = array_merge($js, $grid->getJs());
             $onLoad = array_merge($onLoad, $grid->getOnload());
 
-            $onLoadScript = 'jQuery(function(){' . implode("\n", $onLoad) . '});';
+            $onLoadScript = ';jQuery(function(){' . implode("\n", $onLoad) . '});';
 
-            $view->headScript()->appendScript($onLoadScript);
-            $view->headScript()->appendScript(implode("\n", $js));
-
+            if ($config['render_script_as_template']) {
+                $this->getView()->headScript()
+                    ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
+                    ->appendScript(implode("\n", $js));
+            } else {
+                $this->getView()->headScript()
+                    ->appendScript($onLoadScript)
+                    ->appendScript(implode("\n", $js));
+            }
             return implode("\n", $html);
         }
 

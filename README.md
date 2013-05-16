@@ -17,9 +17,9 @@ Dependencies .
 ---------------
     Zend Framework 2 (http://framework.zend.com/),
     Doctrine 2.0 (http://www.doctrine-project.org/),
-    jQuery 1.4.2 (http://jquery.com),
+    jQuery >= 1.4.2 (http://jquery.com),
     jQuery UI 1.8.9 (http://jqueryui.com/),
-    jqGrid plugin 4.3.1 (http://www.trirand.com/blog/),
+    jqGrid plugin >= 4.3.1 (http://www.trirand.com/blog/),
 
 Installation - manual
 ---------------------
@@ -52,25 +52,57 @@ Usage.
         public function gridAction()
         {
 			//replace {Entity_Name} with your entity name e.g. 'Application\Entity\User'
-
             $serviceManager = $this->getServiceLocator() ;
-            $grid = $serviceManager->get('jqgrid')
-                                   ->create({Entity_Name}, {grid_id});
-
-            $grid->toolbar = array(true, 'bottom'); //optional
-            $grid->toppager = true;
-            $grid->altRows  = true;
-            $grid->gridview = true;
-
-            $grid->prepareGrid();
+            $grid = $serviceManager->get('jqgrid')->setGridIdentity({Entity_Name});
+            /**
+             * this is the url where CRUD operations would be done via ajax
+             * :entity in the editurl could be any identifier or id.  You would need to
+             * retrieve this and get the FQCN for use by the entity manager
+             * e.g. :entity = $this->getEntityKey({Entity_Name});
+             * @ see crudAction()
+             */
+            $url  = /ajax/:entity;
+            $grid->setUrl($url);
+            $grid->setCaption('My Caption'); //optional
 
 			return array('grid' => $grid);
 
+        }
+         public function crudAction()
+         {
+            $response  = '';
+            /**
+             * Assumes that the entity can be retrieved from the ajax request
+             * e.g /ajax/:entity
+             * implement function to get the FQCN from :entity
+             */
+            $entity = $this->params()->fromRoute('entity', null);
+            $className = $this->getClassname($entity);
+
+            if ( $className) {
+                $serviceManager = $this->getServiceLocator();
+                $grid = $serviceManager->get('jqgrid')->setGridIdentity( $className);
+                $response = $grid->prepareGridData();
+            }
+
+            return new JsonModel($response);
+        }
+
+        public function getEntityClassname($entityKey){
+            //@TODO implement as required
+            //return $entityClassname ;
+        }
+
+        public function getEntityKey($className){
+         //@TODO implement as required ;
+         //return $entity;
         }
      ?>
 
      In your view script:
      <?php echo $this->displayGrid($this->grid); ?>
+
+
 
     In head section of your layout:
     <?php

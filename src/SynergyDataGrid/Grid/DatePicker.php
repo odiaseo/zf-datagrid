@@ -68,7 +68,7 @@ class DatePicker extends Property
      * Set DatePicker javascript function name
      * @param string $functionName DatePicker javaqscript function name
      * 
-     * @return \SynergyDataGrid\DatePicker
+     * @return \SynergyDataGrid\Grid\DatePicker
      */
     public function setFunctionName($functionName)
     {
