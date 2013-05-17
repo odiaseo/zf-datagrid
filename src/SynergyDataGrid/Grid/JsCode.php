@@ -50,7 +50,7 @@
                      'fixed'         => true,
                      'sortable'      => false,
                      'resize'        => false,
-                     'formatter'     => new Expr('gridUtil.mactions'),
+                     'formatter'     => 'actions',
                      'formatoptions' => array(
                          'keys'           => false,
                          'viewbutton'     => $options['nav_grid']['view'],
