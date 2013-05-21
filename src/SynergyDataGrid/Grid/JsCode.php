@@ -53,9 +53,8 @@
                      'formatter'     => 'actions',
                      'formatoptions' => array(
                          'keys'           => false,
-                         'viewbutton'     => $options['nav_grid']['view'],
                          'editbutton'     => $options['nav_grid']['edit'],
-                         'editformbutton' => true, //$this->grid->getAllowEditForm(),
+                         'editformbutton' => $this->grid->getAllowEditForm(),
                          'delbutton'      => $options['nav_grid']['del'],
                          'delOptions'     => array(
                              'afterSubmit' => new Expr("function(response, postdata) {

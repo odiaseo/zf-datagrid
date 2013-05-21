@@ -37,7 +37,7 @@
             }
             $grid->setGridColumns()
                 ->setGridDisplayOptions()
-                ->setAllowEditForm(true);
+                ->setAllowEditForm(!$config['add_action_column']);
 
 
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';

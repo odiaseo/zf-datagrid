@@ -371,6 +371,15 @@
                 $this->isTreeGrid = true;
             }
 
+            /**
+             * Merge grid specific configurations
+             */
+            $config = $this->_service->get('Config');
+            if (isset($gridConfig['jqgrid'][$gridId])) {
+                $utils         = new ArrayUtils();
+                $this->_config = $utils->arrayMergeRecursiveCustom($this->_config, $config['jqgrid'][$gridId]);
+            }
+
             return $this;
         }
 
