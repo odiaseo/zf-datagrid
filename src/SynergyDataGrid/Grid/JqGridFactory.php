@@ -1263,10 +1263,7 @@
             }
             if ($allowEditForm) {
                 $this->getNavGrid()->mergeAddparameters(array('closeOnEscape' => true));
-                $this->getNavGrid()->mergeOptions(array('add' => true));
                 $this->getInlineNav()->mergeOptions(array('add' => false));
-            } else {
-                $this->getNavGrid()->mergeOptions(array('add' => false));
             }
 
             return $this;
