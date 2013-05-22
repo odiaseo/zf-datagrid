@@ -23,7 +23,7 @@
              * If true, it adds a additional column to every row with edit/delete buttons
              */
             'add_action_column'            => true,
-
+            'allow_form_edit'              => true,
             /**
              * When the action column id added to the grid, by default the normal form buttons are not
              * displayed on the nav toolbar. If set to true, the buttons will be displayed in addition
@@ -36,7 +36,7 @@
              */
 
             /**loads the entire tree on first load. Set to false to load on the top level
-             * deeper levels would be load on click via ajax
+             * deeper levels would be loaded on click via ajax
              *
              */
             'tree_load_all'                => true,
