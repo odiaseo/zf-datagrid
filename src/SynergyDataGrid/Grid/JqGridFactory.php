@@ -375,7 +375,7 @@
              * Merge grid specific configurations
              */
             $config = $this->_serviceLocator->get('Config');
-            if (isset($gridConfig['jqgrid'][$gridId])) {
+            if (isset($config['jqgrid'][$gridId])) {
                 $utils         = new ArrayUtils();
                 $this->_config = $utils->arrayMergeRecursiveCustom($this->_config, $config['jqgrid'][$gridId]);
             }
@@ -758,7 +758,7 @@
                     $grid['rows'][$k]['cell'][] = $row->lft; //lft
                     $grid['rows'][$k]['cell'][] = $row->rgt; //rgt
                     $grid['rows'][$k]['cell'][] = (($row->rgt - $row->lft) == 1); //isLeaf
-                    $grid['rows'][$k]['cell'][] = 0; //($row->level == 0); //expanded
+                    $grid['rows'][$k]['cell'][] = ($row->level <= 1);
                 }
             }
 
