@@ -374,7 +374,7 @@
             /**
              * Merge grid specific configurations
              */
-            $config = $this->_service->get('Config');
+            $config = $this->_serviceLocator->get('Config');
             if (isset($gridConfig['jqgrid'][$gridId])) {
                 $utils         = new ArrayUtils();
                 $this->_config = $utils->arrayMergeRecursiveCustom($this->_config, $config['jqgrid'][$gridId]);
