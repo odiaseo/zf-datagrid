@@ -697,7 +697,7 @@
                         'parent' => $node
                     );
 
-                } else {
+                } elseif (!$this->_config['tree_load_all']) {
                     $treeFilter = array(
                         'level' => 1
                     );

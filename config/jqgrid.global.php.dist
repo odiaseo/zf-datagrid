@@ -28,7 +28,13 @@
              * These are options specific to tree grids
              * The gedmo/doctrine-extensions module is required for this to work
              */
-            'tree_grid_options'            => array(
+
+             /**loads the entire tree on first load. Set to false to load on the top level
+              * deeper levels would be load on click via ajax
+              *
+              */
+             'tree_load_all =>  true,
+             'tree_grid_options'            => array(
                 'gridview'      => false,
                 'treeGridModel' => 'nested',
                 'ExpandColumn'  => 'title',
