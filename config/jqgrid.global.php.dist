@@ -23,7 +23,7 @@
              * displayed on the nav toolbar. If set to true, the buttons will be displayed in addition
              * to the
              */
-            'allow_edit_form' => false,
+
             /**
              * These are options specific to tree grids
              * The gedmo/doctrine-extensions module is required for this to work
