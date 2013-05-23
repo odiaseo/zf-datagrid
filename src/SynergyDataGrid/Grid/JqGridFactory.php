@@ -422,7 +422,7 @@
                         }
                     }
 
-                    if ((isset($map['length']) and $map['length'] > 255) or $map['type'] == 'text') {
+                    if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
                         $columnData[$title]['edittype'] = 'textarea';
                     } elseif ('boolean' == $map['type']) {
                         $columnData[$title]['edittype']              = 'checkbox';
@@ -531,6 +531,13 @@
 
             //Set navigation options
             $navGrid = isset($this->_config['nav_grid']) ? $this->_config['nav_grid'] : array();
+
+            if ($this->getActionsColumn()) {
+                $this->getJsCode()->addActionsColumn();
+                $navGrid['edit'] = false;
+                $navGrid['del']  = false;
+            }
+
             $this->setNavGrid($navGrid);
 
             //Add parameters
@@ -571,14 +578,6 @@
             }
 
             $this->setLastSelectVariable($this->getId() . '_lastSel');
-
-            if ($this->getActionsColumn()) {
-                $this->getJsCode()->addActionsColumn();
-                $this->_config['nav_grid']['edit'] = false;
-                $this->_config['nav_grid']['del']  = false;
-                $this->setNavGrid($this->_config['nav_grid']);
-            }
-
 
             $this->setOnSortCol(new Expr($this->getJsCode()->prepareSetSortingCookie()));
             $this->setOnPaging(new Expr($this->getJsCode()->prepareSetPagingCookie()));
@@ -1166,7 +1165,7 @@
          */
         public function setId($id)
         {
-            $this->_id = self::ID_PREFIX . $id . count(self::$gridRegistry);
+            $this->_id = self::ID_PREFIX . preg_replace('/[^a-z0-9]/i', '', $id) . count(self::$gridRegistry);
 
             return $this;
         }

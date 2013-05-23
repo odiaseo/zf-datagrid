@@ -36,7 +36,7 @@
              */
 
             /**loads the entire tree on first load. Set to false to load on the top level
-             * deeper levels would be loaded on click via ajax
+             * deeper levels would be load on click via ajax
              *
              */
             'tree_load_all'                => true,
@@ -106,16 +106,11 @@
              * Add configuration in the specific section. Change table_name_here to the table name
              */
             'toolbar_buttons'              => array(
-                'global'   => array(),
-                'specific' => array(
-                    'table_name_here' => array(
-                        array(
-                            'title' => 'Test',
-                            'icon'  => 'icon-edit',
-                            // 'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
-                        )
-                    )
-                )
+/*                'example' => array(
+                    'title'    => 'Test',
+                    'icon'     => 'icon-edit',
+                    'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
+                )*/
             ),
 
             /**

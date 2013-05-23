@@ -5,11 +5,16 @@
 
     class Toolbar extends Property
     {
-        const TOOLBAR_PREFIX_BUTTOM = 'tb_';
+        const TOOLBAR_PREFIX_BOTTOM = 'tb_';
         const TOOLBAR_PREFIX_TOP    = 't_';
+        const POSITION_BOTH         = 'both';
+        const POSITION_TOP          = 'top';
+        const POSITION_BOTTOM       = 'bottom';
+        public static $toolbarItemCount = 0;
         protected $_items = array();
         protected $_grid;
         private $_id;
+        private $_position;
 
         /**
          * Set up base NavGrid options
@@ -18,18 +23,21 @@
          *
          * @return void
          */
-        public function __construct($grid, $buttons = array())
+        public function __construct($grid, $buttons = array(), $position = self::POSITION_BOTTOM)
         {
-            $this->_id = self::TOOLBAR_PREFIX_TOP . $grid->getId();
+            switch ($position) {
+                case self::POSITION_BOTTOM:
+                    $prefix = self::TOOLBAR_PREFIX_BOTTOM;
+                    break;
+                default:
+                    $prefix = self::TOOLBAR_PREFIX_TOP;
+            }
+
+            $this->_position = $position;
+            $this->_id       = $prefix . $grid->getId();
             $this->setGrid($grid);
 
-            $gridIdentity = str_replace(JqGridFactory::ID_PREFIX, '', $grid->getId());
-            $global       = isset($buttons['global']) ? $buttons['global'] : array();
-            $specific     = isset($buttons['specific'][$gridIdentity]) ? $buttons['specific'][$gridIdentity] : array();
-
-            $tools = array_merge($global, $specific);
-
-            foreach ($tools as $item) {
+            foreach ($buttons as $item) {
                 $this->addToolbarItem($item);
             }
         }
@@ -61,8 +69,23 @@
             return $this->_id;
         }
 
+        public function setPosition($position)
+        {
+            $this->_position = $position;
+            return $this;
+        }
+
+        public function getPosition()
+        {
+            return $this->_position;
+        }
+
         public function addToolbarItem($data)
         {
+            if (!isset($data['id'])) {
+                $data['id'] = self::$toolbarItemCount;
+            }
+            self::$toolbarItemCount++;
             $this->_items[] = new Item($data);
         }
     }
