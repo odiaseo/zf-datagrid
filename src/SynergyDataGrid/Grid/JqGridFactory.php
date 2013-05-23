@@ -462,6 +462,10 @@
                         foreach ($list as $item) {
                             $values[] = $item['id'] . ':' . $item['title'];
                         }
+
+                    }
+
+                    if (is_array($values)) {
                         $values = implode(';', $values);
                     }
 

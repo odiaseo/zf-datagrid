@@ -179,7 +179,7 @@
                 return array(
                     'column-chooser' => array(
                         'icon'     => 'icon-folder-open icon-white',
-                        // 'action'   => new \Zend\Json\Expr("function (){ jQuery('#" . $gridId . "').jqGrid('columnChooser');  }"),
+                        'action'   => new \Zend\Json\Expr("function (){ jQuery('#" . $gridId . "').jqGrid('columnChooser');  }"),
                         'title'    => "Reorder Columns",
                         'caption'  => "Columns",
                         'position' => 'last'
