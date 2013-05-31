@@ -23,7 +23,7 @@
          *
          * @return void
          */
-        public function __construct($grid, $buttons = array(), $position = self::POSITION_BOTTOM)
+        public function __construct(JqGridFactory $grid, $buttons = array(), $position = self::POSITION_BOTTOM)
         {
             switch ($position) {
                 case self::POSITION_BOTTOM:
@@ -37,8 +37,15 @@
             $this->_id       = $prefix . $grid->getId();
             $this->setGrid($grid);
 
-            foreach ($buttons as $item) {
+            $entityId = $grid->getEntityId();
+            foreach ($buttons['global'] as $item) {
                 $this->addToolbarItem($item);
+            }
+
+            if (isset($buttons['specific'][$entityId])) {
+                foreach ($buttons['specific'][$entityId] as $item) {
+                    $this->addToolbarItem($item);
+                }
             }
         }
 
@@ -83,9 +90,9 @@
         public function addToolbarItem($data)
         {
             if (!isset($data['id'])) {
-                $data['id'] = self::$toolbarItemCount;
+                $data['id'] = 'item_' . self::$toolbarItemCount;
             }
             self::$toolbarItemCount++;
-            $this->_items[] = new Item($data);
+            $this->_items[] = new Item($this->_id, $data);
         }
     }

@@ -1,4 +1,6 @@
 <?php
+
+
     //copy this file to autoload config and rename to jqgrid.global.dist
     return array(
         'view_manager' => array(
@@ -78,24 +80,30 @@
 
             ),
             /**
-             * When rendering the grid, columns with these attributes would not be displayed
-             * e.g. password
+             * When rendering the grid, columns with these attributes would not be displayed at all
+             *
              */
             'excluded_columns'             => array(),
 
             /**
              * These columns would not be editable
+             *
+             * @deprecated see column_model option
              */
             'non_editable_columns'         => array(),
 
             /**
              * These columns would be hidden in the grid
+             *
+             * @deprecated see column_model option
              */
             'hidden_columns'               => array(),
 
             /**
              * Use these configuration to map columns to input types
              * e.g. 'description' => 'textarea'
+             *
+             * @deprecated see column_model option
              */
             'column_type_mapping'          => array(),
 
@@ -105,12 +113,58 @@
              * Configure toolbars buttons to be added to all grids or to specific grids
              * Add configuration in the specific section. Change table_name_here to the table name
              */
-            'toolbar_buttons'              => array(
-/*                'example' => array(
+            'toolbar_buttons'              => array( /*                'example' => array(
                     'title'    => 'Test',
                     'icon'     => 'icon-edit',
                     'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
                 )*/
+            ),
+
+            /**
+             *
+             * Specify column models for columns. This will overwrite the default settings
+             *
+             * @since 27-05-2013
+             * @see   http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options
+             */
+            'column_model'                 => array(
+                'actions'  => array(
+                    'viewable' => false
+                ),
+                'id'       => array(
+                    'editable'  => false,
+                    'editrules' => array(
+                        'edithidden' => false
+                    ),
+                    'formatter' => 'integer'
+                ),
+                'password' => array(
+                    'editable' => false,
+                    'viewable' => false
+                ),
+                'email'    => array(
+                    'formatter' => 'email',
+                    'editrules' => array(
+                        'email' => true,
+                    ),
+                ),
+                'url'      => array(
+                    'formatter' => 'link',
+                    'editrules' => array(
+                        'url' => true,
+                    ),
+                )
+            ),
+            /**
+             * @See http://www.trirand.com/jqgridwiki/doku.php?id=wiki:toolbar_searching&s[]=filtertoolbar
+             */
+            'filter_toolbar'               => array(
+                'enabled' => true,
+                'options' => array(
+                    'autosearch'    => true,
+                    'stringResult'  => true,
+                    'defaultSearch' => 'cn'
+                )
             ),
 
             /**
@@ -133,16 +187,41 @@
              * e.g.  'afterSubmit' => new \Zend\Json\Expr("function() { alert('test'); }"),
              * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
              */
-            'edit_parameters'              => array( //'afterSubmit' => new Expr("function() { alert('test'); }"),
+            'edit_parameters'              => array(
+                'reloadAfterSubmit' => true,
+                'jqModal'           => true,
+                'closeOnEscape'     => false,
+                'recreateForm'      => true,
+                'bottominfo '       => 'Fields marked with (*) are required'
             ),
 
-            'add_parameters'               => array(),
+            'add_parameters'               => array(
+                'reloadAfterSubmit' => true,
+                'jqModal'           => true,
+                'closeOnEscape'     => false,
+                'recreateForm'      => true,
+                'checkOnSubmit'     => true,
+                'closeAfterAdd'     => true,
 
-            'view_parameters'              => array(),
+            ),
 
-            'search_parameters'            => array(),
+            'view_parameters'              => array(
+                'reloadAfterSubmit' => true,
+                'modal'             => true,
+                'jqModal'           => true,
+                'closeOnEscape'     => false
+            ),
 
-            'delete_parameters'            => array(),
+            'search_parameters'            => array(
+                'closeOnEscape'  => false,
+                'sFilter'        => 'filters',
+                'multipleSearch' => true
+
+            ),
+
+            'delete_parameters'            => array(
+                'height' => 'auto'
+            ),
 
             'inline_nav'                   => array(
                 'add'       => false,
@@ -178,12 +257,21 @@
             'custom_nav_buttons'           => function ($gridId) {
                 return array(
                     'column-chooser' => array(
-                        'icon'     => 'icon-folder-open icon-white',
+                        'id'       => 'column_chooser',
+                        'icon'     => 'ui-icon-folder-open',
                         'action'   => new \Zend\Json\Expr("function (){ jQuery('#" . $gridId . "').jqGrid('columnChooser');  }"),
                         'title'    => "Reorder Columns",
-                        'caption'  => "Columns",
+                        'caption'  => "",
                         'position' => 'last'
-                    )
+                    ),
+                    'filter-toolbar' => array(
+                        'id'      => 'search_filter',
+                        'caption' => "",
+                        'title'   => "Toggle Search Toolbar",
+                        'icon'    => 'ui-icon-pin-s',
+                        'action'  => new \Zend\Json\Expr("jQuery('#" . $gridId . "')[0].toggleToolbar(); ")
+                    ),
+
                 );
             },
 

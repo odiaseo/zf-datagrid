@@ -46,11 +46,13 @@
                 'Actions',
                 array(
                      'name'          => 'myac',
-                     'width'         => 120,
+                     'width'         => 80,
                      'fixed'         => true,
                      'sortable'      => false,
-                     'resize'        => false,
+                     'resizable'        => false,
                      'formatter'     => 'actions',
+                     'search' => false,
+                     'viewable' => false,
                      'formatoptions' => array(
                          'keys'           => false,
                          'editbutton'     => $options['nav_grid']['edit'],

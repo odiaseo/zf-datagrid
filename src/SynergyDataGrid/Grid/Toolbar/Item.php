@@ -7,33 +7,34 @@
     {
         protected $_id;
         protected $_title;
-        protected $_icon;
+        protected $_icon = 'ui-icon-document';
         protected $_callback;
         protected $_position;
         protected $_class = 'toolbar-item';
         protected $_attributes = '';
+        protected $_onLoad;
 
-        public function __construct(array $options)
+        public function __construct($parentId, array $options)
         {
-            $this->_title    = isset($options['title']) ? $options['title'] : '';
-            $this->_icon     = isset($options['icon']) ? $options['icon'] : 'ui-icon-document';
-            $this->_callback = isset($options['callback']) ? $options['callback'] : '';
-            $this->_position = isset($options['position']) ? $options['position'] : '';
-            $this->_class .= isset($options['class']) ? ' ' . $options['class'] : '';
-
 
             if (!isset($options['id'])) {
-                $this->_id = 'btn_' . md5(json_encode($options));
+                $this->_id = 'btn_' . md5($parentId . json_encode($options));
             } else {
-                $this->_id = 'btn_' . $options['id'];
+                $this->_id = 'btn_' . $parentId . '_' . $options['id'];
             }
 
-            if (isset($options['attributes'])) {
-                foreach ($options['attributes'] as $k => $v) {
-                    $attr[] = "{$k}='{$v}'";
+            $this->setOptions($options);
+        }
+
+        public function setOptions(array $options = null)
+        {
+            foreach ($options as $key => $value) {
+                $method = 'set' . ucfirst($key);
+                if (method_exists($this, $method)) {
+                    $this->$method($value);
                 }
-                $this->_attributes = implode(' ', $attr);
             }
+            return $this;
         }
 
         public function setCallback($callback)
@@ -79,7 +80,12 @@
 
         public function setAttributes($attributes)
         {
-            $this->_attributes = $attributes;
+            $attr = array();
+            foreach ($attributes as $k => $v) {
+                $attr[] = "{$k}='{$v}'";
+            }
+            $this->_attributes = implode(' ', $attr);
+
             return $this;
         }
 
@@ -90,7 +96,8 @@
 
         public function setClass($class)
         {
-            $this->_class = $class;
+            $this->_class = trim($class . ' ' . 'toolbar-item');
+
             return $this;
         }
 
@@ -108,6 +115,21 @@
         public function getPosition()
         {
             return $this->_position;
+        }
+
+        public function setOnLoad($onLoad)
+        {
+            if (is_callable($onLoad)) {
+                $this->_onLoad = $onLoad($this->_id);
+            } else {
+                $this->_onLoad = $onLoad;
+            }
+            return $this;
+        }
+
+        public function getOnLoad()
+        {
+            return $this->_onLoad;
         }
 
 

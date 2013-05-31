@@ -83,13 +83,13 @@
          *
          * @var string
          */
-        const DEFAULT_TEXT_SIZE = 30;
+        const DEFAULT_TEXT_SIZE = 150;
         /**
          * Default field maximum edit length for "text" editype
          *
          * @var string
          */
-        const DEFAULT_TEXT_MAXLENGTH = 30;
+        const DEFAULT_TEXT_MAXLENGTH = 150;
         /**
          * Default source format for date formatter (for use with integrated datepicker)
          *
@@ -146,7 +146,7 @@
          */
         protected function _setDefaultOptions()
         {
-            $this->setWidth(200);
+            //$this->setWidth(200);
 
             // "editable" option is FALSE by default in jqGrid, but
             // we will change it to TRUE by default,
@@ -225,7 +225,7 @@
             if ($this->getEdittype() == 'select') {
                 $value = $this->getEditoptions()->getValue();
                 $retv  = htmlentities($cellValue);
-                if ($value) {
+                if ($value and $retv) {
                     $allPairs = explode(';', $value);
                     if (is_array($allPairs) && count($allPairs)) {
                         foreach ($allPairs as $singlePair) {

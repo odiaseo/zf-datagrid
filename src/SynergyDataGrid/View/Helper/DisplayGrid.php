@@ -3,6 +3,7 @@
 
     use SynergyDataGrid\Grid\Toolbar;
     use Zend\Http\Request;
+    use Zend\Json\Expr;
     use Zend\View\Helper\AbstractHelper;
     use SynergyDataGrid\Grid\JqGridFactory;
     use Zend\Json\Json;
@@ -91,6 +92,14 @@
                     Json::encode($prmView, false, array('enableJsonExprFinder' => true))
                 );
 
+
+                //display filter toolbar
+                if ($config['filter_toolbar']['enabled']) {
+                    $onLoad[] = sprintf('grid.jqGrid("filterToolbar",%s)',
+                        Json::encode($config['filter_toolbar']['options'], false, array('enableJsonExprFinder' => true))
+                    );
+                }
+
                 $navButtons = $grid->getNavButtons();
 
                 if (is_array($navButtons)) {
@@ -124,6 +133,7 @@
             $onLoad[] = $jsPager;
             $html[]   = $htmlPager;
 
+            //setup inline navigation
             if ($grid->getInlineNavEnabled() and $grid->getInlineNav()) {
                 $jsInline = sprintf('grid.jqGrid("inlineNav", "#%s",%s)',
                     $grid->getPager(),
@@ -137,9 +147,8 @@
                 }
             }
 
+            //add custom toolbar buttons
             list($toolbarEnabled, $toolbarPosition) = $grid->toolbar;
-            $config = $grid->getConfig();
-
             if ($toolbarEnabled and $config['toolbar_buttons']) {
 
                 if ($toolbarPosition == Toolbar::POSITION_BOTH) {
@@ -160,7 +169,7 @@
                         if ($buttonPosition == Toolbar::POSITION_BOTH
                             or $buttonPosition == $toolbarPosition
                         ) {
-                            $onLoad[] = sprintf("jQuery('#%s').append(\"<span id='%s' title='%s' class='%s' %s><i class='icon %s'></i></span>\");
+                            $onLoad[] = sprintf("jQuery('#%s').append(\"<button id='%s' title='%s' class='%s' %s><i class='icon %s'></i></button>\");
                                         jQuery('#%s', '#%s').bind('click', %s);",
                                 $toolbar->getId(),
                                 $toolbarButton->getId(),
@@ -172,12 +181,17 @@
                                 $toolbar->getId(),
                                 Json::encode($toolbarButton->getCallback(), false, array('enableJsonExprFinder' => true))
                             );
+
+                            if ($init = $toolbarButton->getOnLoad()) {
+                                $onLoad[] = Json::encode($init, false, array('enableJsonExprFinder' => true));
+                            }
                         }
                     }
                 }
             }
 
             $onLoad   = array_filter($onLoad);
+           // $onLoad[] = ";grid.jqGrid('setGridWidth', grid.parents('.grid-data').width());";
             $onLoad[] = ";jQuery(window).bind('resize', function(){  var gw = grid.parents('.grid-data').width();  grid.jqGrid('setGridWidth',gw)  });  ";
 
             //$onLoad[] = $grid->getJsCode()->renderActionsFormatter();
