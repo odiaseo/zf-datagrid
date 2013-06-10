@@ -244,6 +244,8 @@
                  * @var \DateTime $cellValue
                  */
                 $retv = $cellValue->format(self::DEFAULT_DATETIME_SRCFORMAT);
+            } elseif (is_array($cellValue)) {
+                $retv = serialize($cellValue);
             } else {
                 $retv = htmlentities($cellValue);
             }

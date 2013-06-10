@@ -791,7 +791,7 @@
                     $grid['rows'][$k]['cell'][] = $row->lft; //lft
                     $grid['rows'][$k]['cell'][] = $row->rgt; //rgt
                     $grid['rows'][$k]['cell'][] = (($row->rgt - $row->lft) == 1); //isLeaf
-                    $grid['rows'][$k]['cell'][] = ($row->level <= 1);
+                    $grid['rows'][$k]['cell'][] = ($row->level < 1);
                 }
             }
 

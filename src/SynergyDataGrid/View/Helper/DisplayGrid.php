@@ -30,6 +30,7 @@
             $onLoad = array();
 
             $config = $grid->getConfig();
+            $gridId = $grid->getId() ;
 
             if ($grid->getIsTreeGrid()) {
                 $grid->setActionsColumn(false);
@@ -62,14 +63,14 @@
             $onLoad[] = $grid->getJsCode()->prepareSetColumnsOrderingCookie();
             $grid->reorderColumns();
 
-            $onLoad[] = sprintf('var grid = jQuery("#%s");', $grid->getId());
-            $onLoad[] = sprintf('grid.jqGrid(%s);',
+            $onLoad[] = sprintf('jQuery("#%s").jqGrid(%s);',
+                $gridId,
                 Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true)));
 
             $datePicker = $grid->getDatePicker()->prepareDatepicker();
             $js         = array_merge($js, $datePicker);
 
-            $html[] = '<table id="' . $grid->getId() . '"></table>';
+            $html[] = '<table id="' . $gridId . '"></table>';
             if ($grid->getNavGridEnabled()) {
                 if ($grid->getIsDetailGrid()) {
                     $grid->getNavGrid()->setSearch(false);
@@ -82,7 +83,8 @@
                 $prmSearch = $grid->getNavGrid()->getSearchParameters() ? : new \stdClass();
                 $prmView   = $grid->getNavGrid()->getViewParameters() ? : new \stdClass();
 
-                $jsPager = sprintf('grid.jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s)',
+                $jsPager = sprintf('jQuery("#%s").jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s)',
+                    $gridId,
                     $grid->getPager(),
                     Json::encode($options, false, array('enableJsonExprFinder' => true)),
                     Json::encode($prmEdit, false, array('enableJsonExprFinder' => true)),
@@ -95,7 +97,8 @@
 
                 //display filter toolbar
                 if ($config['filter_toolbar']['enabled']) {
-                    $onLoad[] = sprintf('grid.jqGrid("filterToolbar",%s)',
+                    $onLoad[] = sprintf('jQuery("#%s").jqGrid("filterToolbar",%s)',
+                        $gridId,
                         Json::encode($config['filter_toolbar']['options'], false, array('enableJsonExprFinder' => true))
                     );
                 }
@@ -135,7 +138,8 @@
 
             //setup inline navigation
             if ($grid->getInlineNavEnabled() and $grid->getInlineNav()) {
-                $jsInline = sprintf('grid.jqGrid("inlineNav", "#%s",%s)',
+                $jsInline = sprintf('jQuery("#%s").jqGrid("inlineNav", "#%s",%s)',
+                    $gridId,
                     $grid->getPager(),
                     Json::encode($grid->getInlineNav()->getOptions(), false, array('enableJsonExprFinder' => true))
                 );
@@ -164,13 +168,15 @@
                 /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
                 foreach ($toolbars as $toolbar) {
                     $toolbarPosition = $toolbar->getPosition();
+                    $onLoad[] = sprintf(";jQuery('#%s').data('grid', jQuery('#%s'));", $toolbar->getId(), $gridId);
                     foreach ($toolbar->getItems() as $toolbarButton) {
                         $buttonPosition = $toolbarButton->getPosition();
                         if ($buttonPosition == Toolbar::POSITION_BOTH
                             or $buttonPosition == $toolbarPosition
                         ) {
-                            $onLoad[] = sprintf("jQuery('#%s').append(\"<button id='%s' title='%s' class='%s' %s><i class='icon %s'></i></button>\");
+                            $onLoad[] = sprintf("jQuery('#%s').append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i></button>\");
                                         jQuery('#%s', '#%s').bind('click', %s);",
+                                $toolbar->getId(),
                                 $toolbar->getId(),
                                 $toolbarButton->getId(),
                                 $toolbarButton->getTitle(),
@@ -190,9 +196,12 @@
                 }
             }
 
-            $onLoad   = array_filter($onLoad);
-           // $onLoad[] = ";grid.jqGrid('setGridWidth', grid.parents('.grid-data').width());";
-            $onLoad[] = ";jQuery(window).bind('resize', function(){  var gw = grid.parents('.grid-data').width();  grid.jqGrid('setGridWidth',gw)  });  ";
+            $onLoad = array_filter($onLoad);
+            // $onLoad[] = ";grid.jqGrid('setGridWidth', grid.parents('.grid-data').width());";
+            $onLoad[] = sprintf(";jQuery(window).bind('resize', function(){  var gw = jQuery('#%s').parents('.grid-data').width();  jQuery('#%s').jqGrid('setGridWidth',gw)  });  ",
+                $gridId,
+                $gridId
+            );
 
             //$onLoad[] = $grid->getJsCode()->renderActionsFormatter();
 
