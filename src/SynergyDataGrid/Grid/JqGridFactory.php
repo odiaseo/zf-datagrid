@@ -430,6 +430,7 @@
                     if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
                         $columnData[$title]['edittype'] = 'textarea';
                         $columnData[$title]['hidden'] =  true ;
+                        $columnData[$title]['editrules']['edithidden'] = true;
                     }
 
                     if ('boolean' == $map['type']) {
