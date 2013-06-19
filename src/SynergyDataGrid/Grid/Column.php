@@ -247,7 +247,7 @@
             } elseif (is_array($cellValue)) {
                 $retv = serialize($cellValue);
             } else {
-                $retv = htmlentities($cellValue);
+                $retv = htmlentities($cellValue, ENT_QUOTES, "UTF-8");
             }
 
             return $retv;
