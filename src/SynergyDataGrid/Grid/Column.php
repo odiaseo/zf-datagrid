@@ -5,6 +5,7 @@
     use Doctrine\ORM\PersistentCollection;
     use SynergyDataGrid\Grid\Column\FormatOptions;
     use SynergyDataGrid\Grid\Column\EditRules;
+    use Zend\Filter\HtmlEntities;
 
     /**
      * Column class for single grid column implementation
@@ -60,6 +61,10 @@
          * @var \SynergyDataGrid\Grid\Column\EditOptions
          */
         protected $_editrules;
+        /**
+         * @var \ZEnd\Filter\FilterInterface
+         */
+        protected $_htmlFilter;
         /**
          * Default rows count for "textarea" editype
          *
@@ -224,7 +229,7 @@
             //$cellValue = array_key_exists($this->getName(), $row) ? $row->{$name} : '';
             if ($this->getEdittype() == 'select') {
                 $value = $this->getEditoptions()->getValue();
-                $retv  = htmlentities($cellValue);
+                $retv  = $this->getHtmlFilter()->filter($cellValue);
                 if ($value and $retv) {
                     $allPairs = explode(';', $value);
                     if (is_array($allPairs) && count($allPairs)) {
@@ -232,7 +237,8 @@
                             $pair = explode(':', $singlePair);
                             if (is_array($pair) && count($pair) == 2) {
                                 if ($pair[0] == $cellValue) {
-                                    $retv = htmlentities($pair[1]);
+                                    $retv = $this->getHtmlFilter()->filter($pair[1]);
+
                                     break;
                                 }
                             }
@@ -247,7 +253,7 @@
             } elseif (is_array($cellValue)) {
                 $retv = serialize($cellValue);
             } else {
-                $retv = htmlentities($cellValue, ENT_QUOTES, "UTF-8");
+                $retv = $this->getHtmlFilter()->filter($cellValue);
             }
 
             return $retv;
@@ -529,5 +535,13 @@
             return $this;
         }
 
+        public function getHtmlFilter()
+        {
+            if (!$this->_htmlFilter) {
+                $this->_htmlFilter = new HtmlEntities();
+            }
+
+            return $this->_htmlFilter;
+        }
 
     }

@@ -313,7 +313,7 @@
          */
         protected $_jsCode;
         /**
-         * @var Grid Url
+         * @var String $url
          */
         protected $_url;
         /**
@@ -367,17 +367,19 @@
          * @param      $entityClassName
          * @param null $gridId
          */
-        public function setGridIdentity($entityClassName, $gridId = '')
+        public function setGridIdentity($entityClassName, $gridId = '', $displayTree = true)
         {
             $this->setEntityId($gridId);
             $this->setId($gridId);
             $this->setEntity($entityClassName);
             self::$gridRegistry[] = $entityClassName;
 
-            $mapping = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
-            if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName) {
-                $this->setTreeGrid(true);
-                $this->isTreeGrid = true;
+            if ($displayTree) {
+                $mapping = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
+                if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName) {
+                    $this->setTreeGrid(true);
+                    $this->isTreeGrid = true;
+                }
             }
 
             /**
@@ -428,8 +430,8 @@
                     }
 
                     if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
-                        $columnData[$title]['edittype'] = 'textarea';
-                        $columnData[$title]['hidden'] =  true ;
+                        $columnData[$title]['edittype']                = 'textarea';
+                        $columnData[$title]['hidden']                  = true;
                         $columnData[$title]['editrules']['edithidden'] = true;
                     }
 
@@ -462,10 +464,10 @@
                 }
 
                 foreach ($mapping->associationMappings as $map) {
-           /*         if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
-                        continue;
-                    }*/
-                    if (in_array($map['fieldName'], $this->_config['excluded_columns']) ) {
+                    /*         if (in_array($map['fieldName'], $this->_config['excluded_columns']) or $map['type'] != 2) {
+                                 continue;
+                             }*/
+                    if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
                         continue;
                     }
 
@@ -552,7 +554,7 @@
             }
 
             //Set default data to be posted back to server
-            $this->setPostData(
+            $this->mergePostData(
                 array(
                      self::GRID_IDENTIFIER  => $this->getId(),
                      self::ENTITY_IDENTFIER => $this->_entity
@@ -614,6 +616,8 @@
 
             $this->setOnSortCol(new Expr($this->getJsCode()->prepareSetSortingCookie()));
             $this->setOnPaging(new Expr($this->getJsCode()->prepareSetPagingCookie()));
+
+            $this->getJsCode()->addAutoResizeScript($this->getId());
 
             return $this;
         }
@@ -1200,7 +1204,7 @@
          */
         public function setId($id)
         {
-            $this->_id = self::ID_PREFIX . preg_replace('/[^a-z0-9]/i', '', $id) . count(self::$gridRegistry);
+            $this->_id = self::ID_PREFIX . preg_replace('/[^a-z0-9]/i', '', $id);
 
             return $this;
         }
@@ -2058,5 +2062,4 @@
         {
             return $this->_entityId;
         }
-
     }

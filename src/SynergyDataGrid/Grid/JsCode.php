@@ -21,6 +21,17 @@
          * @var string
          */
         private $grid;
+        /** user defined scripts
+         *
+         * @var array
+         */
+        protected $_customScripts = array();
+        /**
+         * CSS class applied to the grids container.
+         *
+         * @var string
+         */
+        protected $_containerClass = 'grid-data';
 
         /**
          * Set up base JsCode options
@@ -31,6 +42,19 @@
         public function __construct(JqGridFactory $grid = null)
         {
             $this->grid = $grid;
+        }
+
+        public function addAutoResizeScript($gridId)
+        {
+            $this->addCustomScript(
+                new Expr(
+                    sprintf(";jQuery(window).bind('resize', function(){  var gw = jQuery('#%s').closest('.%s').width();  jQuery('#%s').jqGrid('setGridWidth',gw)  }); ",
+                        $gridId,
+                        $this->getContainerClass(),
+                        $gridId
+                    )
+                )
+            );
         }
 
         /**
@@ -49,10 +73,10 @@
                      'width'         => 80,
                      'fixed'         => true,
                      'sortable'      => false,
-                     'resizable'        => false,
+                     'resizable'     => false,
                      'formatter'     => 'actions',
-                     'search' => false,
-                     'viewable' => false,
+                     'search'        => false,
+                     'viewable'      => false,
                      'formatoptions' => array(
                          'keys'           => false,
                          'editbutton'     => $options['nav_grid']['edit'],
@@ -251,14 +275,13 @@
         public function prepareOnEditRow()
         {
             if ($actionColumn = $this->grid->getColumn('myac')) {
-                $datePickerFunctionName = $this->grid->getDatePicker()->getFunctionName();
-                // this function will work only onEdit, but not on add row
-                $actionColumn->mergeFormatOptions(
-                    array('onEdit' => new Expr("function (elem){
-            " . $datePickerFunctionName . "(elem); " .
-                        $this->getCustomButtonsHide() . "
-            }
-        ")));
+                if ($datePicker = $this->grid->getDatePicker()) {
+                    $datePickerFunctionName = $datePicker->getFunctionName();
+                    // this function will work only onEdit, but not on add row
+                    $actionColumn->mergeFormatOptions(
+                        array('onEdit' => new Expr("function (elem){ " . $datePickerFunctionName . "(elem); " .
+                            $this->getCustomButtonsHide() . " }  ")));
+                }
             }
         }
 
@@ -428,6 +451,49 @@
                         }    
                     }
                 ");
+        }
+
+        /**
+         * @param array $customScripts
+         */
+        public function setCustomScripts(array $customScripts)
+        {
+            $this->_customScripts = $customScripts;
+            return $this;
+        }
+
+        /**
+         * @param string $customScripts
+         */
+        public function addCustomScript($customScripts)
+        {
+            $this->_customScripts[] = $customScripts;
+            return $this;
+        }
+
+        /**
+         * @return array
+         */
+        public function getCustomScripts()
+        {
+            return $this->_customScripts;
+        }
+
+        /**
+         * @param string $containerClass
+         */
+        public function setContainerClass($containerClass)
+        {
+            $this->_containerClass = $containerClass;
+            return $this;
+        }
+
+        /**
+         * @return string
+         */
+        public function getContainerClass()
+        {
+            return $this->_containerClass;
         }
 
     }

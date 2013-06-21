@@ -30,7 +30,7 @@
             $onLoad = array();
 
             $config = $grid->getConfig();
-            $gridId = $grid->getId() ;
+            $gridId = $grid->getId();
 
             if ($grid->getIsTreeGrid()) {
                 $grid->setActionsColumn(false);
@@ -168,7 +168,7 @@
                 /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
                 foreach ($toolbars as $toolbar) {
                     $toolbarPosition = $toolbar->getPosition();
-                    $onLoad[] = sprintf(";jQuery('#%s').data('grid', jQuery('#%s'));", $toolbar->getId(), $gridId);
+                    $onLoad[]        = sprintf(";jQuery('#%s').data('grid', jQuery('#%s'));", $toolbar->getId(), $gridId);
                     foreach ($toolbar->getItems() as $toolbarButton) {
                         $buttonPosition = $toolbarButton->getPosition();
                         if ($buttonPosition == Toolbar::POSITION_BOTH
@@ -197,12 +197,10 @@
             }
 
             $onLoad = array_filter($onLoad);
-            // $onLoad[] = ";grid.jqGrid('setGridWidth', grid.parents('.grid-data').width());";
-            $onLoad[] = sprintf(";jQuery(window).bind('resize', function(){  var gw = jQuery('#%s').parents('.grid-data').width();  jQuery('#%s').jqGrid('setGridWidth',gw)  });  ",
-                $gridId,
-                $gridId
-            );
 
+            foreach ($grid->getJsCode()->getCustomScripts() as $script) {
+                $onLoad[] = Json::encode($script, false, array('enableJsonExprFinder' => true));
+            }
             //$onLoad[] = $grid->getJsCode()->renderActionsFormatter();
 
             $html   = array_merge($html, $grid->getHtml());
