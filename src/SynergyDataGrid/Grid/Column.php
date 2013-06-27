@@ -6,6 +6,7 @@
     use SynergyDataGrid\Grid\Column\FormatOptions;
     use SynergyDataGrid\Grid\Column\EditRules;
     use Zend\Filter\HtmlEntities;
+    use ZendTest\XmlRpc\Server\Exception;
 
     /**
      * Column class for single grid column implementation
@@ -215,18 +216,24 @@
          */
         public function cellValue($row)
         {
-            $name      = $this->getName();
+            $name   = $this->getName();
+            $method = 'get' . ucfirst($name);
+
             $cellValue = '';
             if (property_exists($row, $name)) {
-                if ($row->{$name} instanceof \DateTime) {
-                    $cellValue = $row->{$name};
-                } elseif (is_object($row->{$name})) {
-                    $cellValue = $row->{$name}->id;
-                } else {
+                if(method_exists($row, $method)){
+                    $cellValue = $row->$method();
+                }else{
                     $cellValue = $row->{$name};
                 }
+
+                if ($cellValue instanceof \DateTime) {
+                    //do nothing
+                } elseif (is_object($cellValue)) {
+                    $cellValue = $cellValue->id;
+                }
             }
-            //$cellValue = array_key_exists($this->getName(), $row) ? $row->{$name} : '';
+
             if ($this->getEdittype() == 'select') {
                 $value = $this->getEditoptions()->getValue();
                 $retv  = $this->getHtmlFilter()->filter($cellValue);
