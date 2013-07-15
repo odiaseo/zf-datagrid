@@ -1,6 +1,8 @@
 <?php
 namespace SynergyDataGrid\Grid\Column;
 
+use SynergyDataGrid\Grid\Property;
+
 /**
  * EditRules class to handle work with Column editrules property of jqGrid
  *
@@ -8,7 +10,7 @@ namespace SynergyDataGrid\Grid\Column;
  * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editrules
  * @package mvcgrid
  */
-class EditRules extends \SynergyDataGrid\Grid\Property
+class EditRules extends Property
 {
     /**
      * Set up base EditRules options

@@ -25,6 +25,26 @@
          */
         public function __invoke(JqGridFactory $grid)
         {
+            list($onLoad, $js, $html) = $this->initGrid($grid);
+            $config = $grid->getConfig();
+
+            $onLoadScript = ';jQuery(function(){' . implode("\n", $onLoad) . '});';
+
+            if ($config['render_script_as_template']) {
+                $this->getView()->headScript()
+                    ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
+                    ->appendScript(implode("\n", $js));
+            } else {
+                $this->getView()->headScript()
+                    ->appendScript($onLoadScript)
+                    ->appendScript(implode("\n", $js));
+            }
+
+            return implode("\n", $html);
+        }
+
+        public function initGrid(JqGridFactory $grid)
+        {
             $html   = array();
             $js     = array();
             $onLoad = array();
@@ -67,8 +87,8 @@
                 $gridId,
                 Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true)));
 
-            $datePicker = $grid->getDatePicker()->prepareDatepicker();
-            $js         = array_merge($js, $datePicker);
+            //$datePicker = $grid->getDatePicker()->prepareDatepicker();
+            //$js         = array_merge($js, $datePicker);
 
             $html[] = '<table id="' . $gridId . '"></table>';
             if ($grid->getNavGridEnabled()) {
@@ -97,7 +117,7 @@
 
                 //display filter toolbar
                 if ($config['filter_toolbar']['enabled']) {
-                    $onLoad[] = sprintf('jQuery("#%s").jqGrid("filterToolbar",%s)',
+                    $onLoad[] = sprintf('jQuery("#%s").jqGrid("filterToolbar",%s);',
                         $gridId,
                         Json::encode($config['filter_toolbar']['options'], false, array('enableJsonExprFinder' => true))
                     );
@@ -201,24 +221,13 @@
             foreach ($grid->getJsCode()->getCustomScripts() as $script) {
                 $onLoad[] = Json::encode($script, false, array('enableJsonExprFinder' => true));
             }
-            //$onLoad[] = $grid->getJsCode()->renderActionsFormatter();
 
             $html   = array_merge($html, $grid->getHtml());
             $js     = array_merge($js, $grid->getJs());
             $onLoad = array_merge($onLoad, $grid->getOnload());
 
-            $onLoadScript = ';jQuery(function(){' . implode("\n", $onLoad) . '});';
+            return array($onLoad, $js, $html);
 
-            if ($config['render_script_as_template']) {
-                $this->getView()->headScript()
-                    ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
-                    ->appendScript(implode("\n", $js));
-            } else {
-                $this->getView()->headScript()
-                    ->appendScript($onLoadScript)
-                    ->appendScript(implode("\n", $js));
-            }
-            return implode("\n", $html);
         }
 
 

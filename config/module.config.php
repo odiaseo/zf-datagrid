@@ -20,12 +20,12 @@
             $.globalEval(gridScript);
              * }}
              */
-            'render_script_as_template'    => false,
+            'render_script_as_template'         => false,
             /**
              * If true, it adds a additional column to every row with edit/delete buttons
              */
-            'add_action_column'            => true,
-            'allow_form_edit'              => true,
+            'add_action_column'                 => true,
+            'allow_form_edit'                   => true,
             /**
              * When the action column id added to the grid, by default the normal form buttons are not
              * displayed on the nav toolbar. If set to true, the buttons will be displayed in addition
@@ -41,8 +41,8 @@
              * deeper levels would be load on click via ajax
              *
              */
-            'tree_load_all'                => true,
-            'tree_grid_options'            => array(
+            'tree_load_all'                     => true,
+            'tree_grid_options'                 => array(
                 'gridview'      => false,
                 'treeGridModel' => 'nested',
                 'ExpandColumn'  => 'title',
@@ -61,7 +61,7 @@
              *
              * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options
              */
-            'grid_options'                 => array(
+            'grid_options'                      => array(
                 'datatype'           => 'json',
                 'mtype'              => 'POST',
                 'viewrecords'        => true,
@@ -83,21 +83,21 @@
              * When rendering the grid, columns with these attributes would not be displayed at all
              *
              */
-            'excluded_columns'             => array(),
+            'excluded_columns'                  => array(),
 
             /**
              * These columns would not be editable
              *
              * @deprecated see column_model option
              */
-            'non_editable_columns'         => array(),
+            'non_editable_columns'              => array(),
 
             /**
              * These columns would be hidden in the grid
              *
              * @deprecated see column_model option
              */
-            'hidden_columns'               => array(),
+            'hidden_columns'                    => array(),
 
             /**
              * Use these configuration to map columns to input types
@@ -105,7 +105,7 @@
              *
              * @deprecated see column_model option
              */
-            'column_type_mapping'          => array(),
+            'column_type_mapping'               => array(),
 
             /**
              * Custom toolbar buttons
@@ -113,7 +113,7 @@
              * Configure toolbars buttons to be added to all grids or to specific grids
              * Add configuration in the specific section. Change table_name_here to the table name
              */
-            'toolbar_buttons'              => array( /*                'example' => array(
+            'toolbar_buttons'                   => array( /*                'example' => array(
                     'title'    => 'Test',
                     'icon'     => 'icon-edit',
                     'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
@@ -127,7 +127,7 @@
              * @since 27-05-2013
              * @see   http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options
              */
-            'column_model'                 => array(
+            'column_model'                      => array(
                 'actions'  => array(
                     'viewable' => false
                 ),
@@ -158,12 +158,13 @@
             /**
              * @See http://www.trirand.com/jqgridwiki/doku.php?id=wiki:toolbar_searching&s[]=filtertoolbar
              */
-            'filter_toolbar'               => array(
+            'filter_toolbar'                    => array(
                 'enabled' => true,
                 'options' => array(
-                    'autosearch'    => true,
-                    'stringResult'  => true,
-                    'defaultSearch' => 'cn'
+                    'searchOperators' => true,
+                    'autosearch'      => true,
+                    'stringResult'    => true,
+                    'defaultSearch'   => 'cn',
                 )
             ),
 
@@ -172,7 +173,7 @@
              *
              * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
              */
-            'nav_grid'                     => array(
+            'nav_grid'                          => array(
                 'edit'       => true,
                 'add'        => true,
                 'del'        => true,
@@ -187,7 +188,7 @@
              * e.g.  'afterSubmit' => new \Zend\Json\Expr("function() { alert('test'); }"),
              * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
              */
-            'edit_parameters'              => array(
+            'edit_parameters'                   => array(
                 'reloadAfterSubmit' => true,
                 'jqModal'           => true,
                 'closeOnEscape'     => false,
@@ -195,7 +196,7 @@
                 'bottominfo '       => 'Fields marked with (*) are required'
             ),
 
-            'add_parameters'               => array(
+            'add_parameters'                    => array(
                 'reloadAfterSubmit' => true,
                 'jqModal'           => true,
                 'closeOnEscape'     => false,
@@ -205,25 +206,25 @@
 
             ),
 
-            'view_parameters'              => array(
+            'view_parameters'                   => array(
                 'reloadAfterSubmit' => true,
                 'modal'             => true,
                 'jqModal'           => true,
                 'closeOnEscape'     => false
             ),
 
-            'search_parameters'            => array(
+            'search_parameters'                 => array(
                 'closeOnEscape'  => false,
                 'sFilter'        => 'filters',
                 'multipleSearch' => true
 
             ),
 
-            'delete_parameters'            => array(
+            'delete_parameters'                 => array(
                 'height' => 'auto'
             ),
 
-            'inline_nav'                   => array(
+            'inline_nav'                        => array(
                 'add'       => false,
                 'del'       => false,
                 'edit'      => false,
@@ -234,12 +235,12 @@
                     'addRowParams' => array(
                         'keys'              => true,
                         'restoreAfterError' => true,
-                        //'oneditfunc'        => new Expr(" function() { dp_picker(new_row);  }")
+                        //'oneditfunc'        => new \Zend\Json\Expr(" function() { dp_picker(new_row);  }")
                     )
                 )
             ),
 
-            'form_options'                 => array(
+            'form_options'                      => array(
                 'closeAfterAdd'     => true,
                 'reloadAfterSubmit' => true,
                 'jqModal'           => true,
@@ -254,7 +255,7 @@
              * Adds custom navigation buttons
              * supports closures and Json expression finder
              */
-            'custom_nav_buttons'           => function ($gridId) {
+            'custom_nav_buttons'                => function ($gridId) {
                 return array(
                     'column-chooser' => array(
                         'id'       => 'column_chooser',
@@ -276,26 +277,48 @@
             },
 
             /**
+             * This is the default association mapping callbach function
              * Returns formatted string for rendering select options
+             *
+             * You can specify difference callback functions for each mapped field e.d. to specify a callback function for a field myField
+             * add the myfield index to the array  myField => youCallbackFunction
              *
              * @See * http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editable
              *
              */
-            'association_mapping_callback' => function ($serviceManager, $entity) {
-                $values = array(':select');
-                $em     = $serviceManager->get('doctrine.entitymanager.orm_default');
-                $qb     = $em->createQueryBuilder();
-                $list   = $qb->select('e.id, e.title')
-                    ->from($entity, 'e')
-                    ->getQuery()
-                    ->execute();
+            'association_mapping_callback'      => array(
+                '__default__' => function ($serviceManager, $entity) {
+                    $values = array(':Select');
+                    $em     = $serviceManager->get('doctrine.entitymanager.orm_default');
+                    $qb     = $em->createQueryBuilder();
+                    $list   = $qb->select('e.id, e.title')
+                        ->from($entity, 'e')
+                        ->orderBy('e.title')
+                        ->getQuery()
+                        ->execute();
 
-                foreach ($list as $item) {
-                    $values[] = $item['id'] . ':' . $item['title'];
+                    foreach ($list as $item) {
+                        $values[] = $item['id'] . ':' . $item['title'];
+                    }
+
+                    return $values;
                 }
 
-                return $values;
-            }
+            ),
+            /**
+             * This is the default ID field when displaying join table records in the selects
+             */
+            'default_association_mapping_id'    => 'id',
+            /*
+             * This is the default label/title field when displaying join table records in selects
+             */
+            'default_association_mapping_label' => 'title',
+
+            /**
+             * Generates the edit url for sub grid which returns the subgrid data
+             * Replace with a callback function, closure etc
+             */
+            'grid_url_generator'               => '',
 
         )
     );

@@ -1,6 +1,8 @@
 <?php
 namespace SynergyDataGrid\Grid\Column;
 
+use SynergyDataGrid\Grid\Property;
+
 /**
  * EditOptions class to handle work with Column edit options
  *
@@ -8,7 +10,7 @@ namespace SynergyDataGrid\Grid\Column;
  * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editoptions
  * @package mvcgrid
  */
-class EditOptions extends \SynergyDataGrid\Grid\Property
+class EditOptions extends Property
 {
     /**
      * Set up base EditOptions options

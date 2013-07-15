@@ -77,7 +77,7 @@ Usage.
              * implement function to get the FQCN from :entity
              */
             $entity = $this->params()->fromRoute('entity', null);
-            $className = $this->getClassname($entity);
+            $className = $this->getEntityClassname($entity);
 
             if ( $className) {
                 $serviceManager = $this->getServiceLocator();
@@ -116,4 +116,87 @@ Usage.
       ->appendFile('/jqGrid/js/i18n/grid.locale-en.js', 'text/javascript')
       ->appendFile('/plugins/ui.multiselect.js', 'text/javascript')
       ->appendFile('/jqGrid/js/jquery.jqGrid.min.js', 'text/javascript') ;
+    ?>
+
+
+Setting jqgrid options.
+---------------------------
+    You can use/set any of the jqgrid options (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options)
+    e.g. to set the "datatype" to local, in your controller add the code
+
+    $grid->setDatatype('local');
+
+    The logic is append 'set' to any of the options and it would be added to the grid.
+
+Adding ColModel Options.
+-------------------------
+All column model options can be added to the grid (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options)
+In your grid configuration file or module.config.php, specify the the model options e.g.
+
+    <?php
+
+        return array(
+            .......
+            'jqgrid' => array (
+                'column_model'  => array(
+                    'my_column'       => array(
+                        'align'       => 'center',
+                        'formatter'   => new Zend\Json\Expr('your code goes here'),
+                        'unformat'    => new Zend\Json\Expr('your code goes here'),
+                        'edittype'    => 'custom',
+                        'editoptions' => array(
+                            'custom_element' => new Zend\Json\Expr('your code goes here'),
+                            'custom_value'   => new Zend\Json\Expr('your code goes here')
+                        )
+                    ),
+            )
+        );
+
+    ?>
+
+Adding custom javascript.
+---------------------------
+    If you want to add additional javaScript to be rendered along with the grid script, you can do this:
+    $grid->getJsCode()->addCustomScript( new \Zend\Json\Expr(" and your script here" ));
+    or
+    $grid->getJsCode()->addCustomScript("add your script here");
+
+
+Adding subgrid.
+-----------------------------
+You can add a sub grid as either subgrid or subgrid as grid
+see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid_as_grid)
+
+1. From the Doctrine entity file, note the class attribute you want to be displayed as a subgrid. It should be an association field e.g ManyToOne etc
+2. Modify you grid configuration file or add this to your module.config.php
+
+   a. We want to display the field my_field as a subgrid
+    <?php
+
+        return array(
+            .......
+            'jqgrid' => array (
+                'column_model'  => array(
+                    'my_field'       => array(
+                        'isSubGrid' => true
+                    ),
+            )
+        );
+
+    ?>
+
+   b. We want to display  my_field as a subgrid_as_grid
+
+    <?php
+
+        return array(
+            .......
+            'jqgrid' => array (
+                'column_model'  => array(
+                    'my_field'       => array(
+                        'isSubGridAsGrid' => true
+                    ),
+            )
+        );
+
     ?>

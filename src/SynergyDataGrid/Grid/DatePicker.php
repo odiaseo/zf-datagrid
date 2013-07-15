@@ -107,6 +107,7 @@ class DatePicker extends Property
     {
         $grid = $this->getGrid();
         $columns = $grid->getColumns();
+
         $allDatesInGrid = "";
         $allDatetimesInGrid = "";
         $allDatesInForm = "'";

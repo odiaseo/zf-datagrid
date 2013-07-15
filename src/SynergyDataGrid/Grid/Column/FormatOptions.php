@@ -1,6 +1,8 @@
 <?php
 namespace SynergyDataGrid\Grid\Column;
 
+use SynergyDataGrid\Grid\Property;
+
 /**
  * FormatOptions class to handle work with Column formatoptions property of jqGrid
  *
@@ -8,7 +10,7 @@ namespace SynergyDataGrid\Grid\Column;
  * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:predefined_formatter
  * @package mvcgrid
  */
-class FormatOptions extends \SynergyDataGrid\Grid\Property
+class FormatOptions extends Property
 {
     /**
      * Set up base FormatOptions options

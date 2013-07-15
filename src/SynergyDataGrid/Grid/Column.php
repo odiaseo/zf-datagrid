@@ -221,14 +221,26 @@
 
             $cellValue = '';
             if (property_exists($row, $name)) {
-                if(method_exists($row, $method)){
+                if (method_exists($row, $method)) {
                     $cellValue = $row->$method();
-                }else{
+                } else {
                     $cellValue = $row->{$name};
                 }
 
                 if ($cellValue instanceof \DateTime) {
                     //do nothing
+                } elseif ($cellValue instanceof PersistentCollection) {
+                    $idList = array();
+                    foreach ($cellValue as $item) {
+                        $idList[] = $item->getId();
+                    }
+
+                    if (count($idList)) {
+                        $cellValue = implode(',', $idList);
+                    } else {
+                        $cellValue = '';
+                    }
+
                 } elseif (is_object($cellValue)) {
                     $cellValue = $cellValue->id;
                 }
@@ -259,8 +271,10 @@
                 $retv = $cellValue->format(self::DEFAULT_DATETIME_SRCFORMAT);
             } elseif (is_array($cellValue)) {
                 $retv = serialize($cellValue);
-            } else {
+            } elseif (is_string($cellValue)) {
                 $retv = $this->getHtmlFilter()->filter($cellValue);
+            } else {
+                $retv = $cellValue;
             }
 
             return $retv;
