@@ -194,7 +194,7 @@
                         if ($buttonPosition == Toolbar::POSITION_BOTH
                             or $buttonPosition == $toolbarPosition
                         ) {
-                            $onLoad[] = sprintf("jQuery('#%s').append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i></button>\");
+                            $onLoad[] = sprintf("jQuery('#%s').append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
                                         jQuery('#%s', '#%s').bind('click', %s);",
                                 $toolbar->getId(),
                                 $toolbar->getId(),
@@ -203,6 +203,7 @@
                                 $toolbarButton->getClass(),
                                 $toolbarButton->getAttributes(),
                                 $toolbarButton->getIcon(),
+                                $toolbarButton->getTitle(),
                                 $toolbarButton->getId(),
                                 $toolbar->getId(),
                                 Json::encode($toolbarButton->getCallback(), false, array('enableJsonExprFinder' => true))

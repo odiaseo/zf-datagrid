@@ -200,3 +200,8 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
         );
 
     ?>
+3. In the controller action that returns the grid data, you need to pass an array as the second parameter to the prepareGridData function.
+    The array should have a 'fieldName' key which points to the entity field from which to retrieve the data from.
+
+    $options = array('fieldName' => 'fieldName');
+    <?php $response = $grid->prepareGridData($this->getRequest(), $options); ?>

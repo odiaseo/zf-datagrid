@@ -248,7 +248,7 @@
 
             if ($this->getEdittype() == 'select') {
                 $value = $this->getEditoptions()->getValue();
-                $retv  = $this->getHtmlFilter()->filter($cellValue);
+                $retv  = is_string($cellValue) ? $this->getHtmlFilter()->filter($cellValue) : $cellValue;
                 if ($value and $retv) {
                     $allPairs = explode(';', $value);
                     if (is_array($allPairs) && count($allPairs)) {

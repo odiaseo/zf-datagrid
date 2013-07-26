@@ -6,6 +6,7 @@
     use SynergyDataGrid\Grid\Column;
     use SynergyDataGrid\Util\ArrayUtils;
     use SynergyDataGrid\View\Helper\DisplayGrid;
+    use Zend\Filter\Word\CamelCaseToSeparator;
     use Zend\Json\Expr;
     use Zend\Json\Json;
     use Zend\Http\Request;
@@ -46,6 +47,15 @@
         const GRID_IDENTIFIER     = 'grid';
         const ENTITY_IDENTFIER    = '_entity';
         const SUB_GRID_IDENTIFIER = 'subgridid';
+        /** form input types */
+        const TYPE_SELECT   = 'select';
+        const TYPE_TEXT     = 'text';
+        const TYPE_CHECKBOX = 'checkbox';
+        const TYPE_TEXTAREA = 'textarea';
+        const TYPE_RADIO    = 'radio';
+        const TYPE_CUSTOM   = 'custom';
+        const TYPE_IMAGE    = 'image';
+        const TYPE_FILE     = 'file';
         /**
          * Cookie prefix for column sizes
          *
@@ -386,22 +396,25 @@
             $this->setId($gridId);
             $this->setEntity($entityClassName);
             self::$gridRegistry[] = $entityClassName;
+            $utils                = new ArrayUtils();
 
             if ($displayTree) {
                 $mapping = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
                 if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName) {
                     $this->setTreeGrid(true);
                     $this->isTreeGrid = true;
+
+                    //Set tree grid options
+                    $treeOptions                   = isset($this->_config['tree_grid_options']) ? $this->_config['tree_grid_options'] : array();
+                    $this->_config['grid_options'] = $utils->arrayMergeRecursiveCustom($this->_config['grid_options'], $treeOptions);
                 }
             }
 
             /**
              * Merge grid specific configurations
              */
-            $config = $this->_serviceLocator->get('Config');
-            if (isset($config['jqgrid'][$gridId])) {
-                $utils         = new ArrayUtils();
-                $this->_config = $utils->arrayMergeRecursiveCustom($this->_config, $config['jqgrid'][$gridId]);
+            if (isset($this->_config[$gridId])) {
+                $this->_config['grid_options'] = $utils->arrayMergeRecursiveCustom($this->_config['grid_options'], $this->_config[$gridId]);
             }
 
             return $this;
@@ -420,6 +433,13 @@
             $mapping = $this->getService()->getEntityManager()->getClassMetadata($subGridMap['targetEntity']);
 
             foreach ($mapping->fieldMappings as $map) {
+                if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
+                    continue;
+                }
+                $names[] = $map['fieldName'];
+            }
+
+            foreach ($mapping->associationMappings as $map) {
                 if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
                     continue;
                 }
@@ -449,7 +469,7 @@
             );
 
             if (is_callable($this->_config['grid_url_generator'])) {
-                $url = $this->_config['grid_url_generator']($this->getServiceLocator(), $this->_entity, $subGridMap['targetEntity']);
+                $url = $this->_config['grid_url_generator']($this->getServiceLocator(), $this->_entity, $subGridMap['fieldName']);
                 $subGrid->setUrl($url);
             }
             $helper = new DisplayGrid();
@@ -489,6 +509,7 @@
                 );
 
                 $excludedColumns = array_unique($excludedColumns);
+                $count           = 0;
 
                 foreach ($mapping->fieldMappings as $map) {
                     $title = ucwords($map['fieldName']);
@@ -498,13 +519,14 @@
                     }
                     $columnData[$title] = array(
                         'name'        => $map['fieldName'],
-                        'sortable'    => true,
+                        'edittype'    => self::TYPE_TEXT,
                         'editoptions' => array(
                             'data-field-type' => $map['type']
                         )
                     );
 
                     switch ($map['type']) {
+                        case 'smallint':
                         case 'integer':
                             $columnData[$title]['editrules']['number'] = true;
                             break;
@@ -512,12 +534,14 @@
 
 
                     if ($map['columnName'] == 'id') {
-                        $columnData[$title]['editable'] = false;
-                        $columnData[$title]['key']      = true;
+                        $columnData[$title]['editable']              = false;
+                        $columnData[$title]['key']                   = true;
+                        $columnData[$title]['formoptions']['rowpos'] = 1;
+                        $columnData[$title]['formoptions']['colpos'] = 1;
                     }
 
                     if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
-                        $columnData[$title]['edittype']                = 'textarea';
+                        $columnData[$title]['edittype']                = self::TYPE_TEXTAREA;
                         $columnData[$title]['hidden']                  = true;
                         $columnData[$title]['editrules']['edithidden'] = true;
                     }
@@ -526,7 +550,7 @@
                         $columnData[$title]['align']                  = 'center';
                         $columnData[$title]['formatter']              = 'checkbox';
                         $columnData[$title]['edittype']               = 'checkbox';
-                        $columnData[$title]['stype']                  = 'select';
+                        $columnData[$title]['stype']                  = self::TYPE_SELECT;
                         $columnData[$title]['searchoptions']['sopt']  = array('eq', 'ne');
                         $columnData[$title]['searchoptions']['value'] = ':;0:No;1:Yes';
                         $columnData[$title]['editoptions']['value']   = '1:0';
@@ -583,7 +607,7 @@
                     if (isset($this->_config['column_type_mapping'][$map['fieldName']])) {
                         $type = $this->_config['column_type_mapping'][$map['fieldName']];
                     } else {
-                        $type = 'select';
+                        $type = self::TYPE_SELECT;
                     }
 
                     if (isset($this->_config['association_mapping_callback'][$title])
@@ -616,7 +640,6 @@
                         'editrules'     => array(
                             'edithidden' => true,
                         ),
-                        'sortable'      => true,
                         'searchoptions' => array(
                             'value' => $values,
                             'sopt'  => array('eq', 'ne')
@@ -678,14 +701,6 @@
 
             //Set grid options
             $gridOptions = isset($this->_config['grid_options']) ? $this->_config['grid_options'] : array();
-
-            //Set tree grid options
-            if ($this->getIsTreeGrid()) {
-                $utils       = new ArrayUtils();
-                $treeOptions = isset($this->_config['tree_grid_options']) ? $this->_config['tree_grid_options'] : array();
-                $gridOptions = $utils->arrayMergeRecursiveCustom($gridOptions, $treeOptions);
-            }
-
 
             foreach ($gridOptions as $key => $val) {
                 $method = 'set' . ucfirst($key);
@@ -813,9 +828,12 @@
          */
         public function addColumns($columns = array())
         {
+            $nameFilter = new CamelCaseToSeparator();
+
             if (is_array($columns) && count($columns)) {
                 foreach ($columns as $colName => $column) {
-                    $this->addColumn($colName, $column);
+                    $title = $nameFilter->filter($colName);
+                    $this->addColumn($title, $column);
                 }
                 $this->setColNames($this->_columns);
                 $this->setColModel($this->_columns);
@@ -852,7 +870,7 @@
                 }
 
                 if ($subGridid) {
-                    $data = $this->_createSubGridData($subGridid, $options['target']);
+                    $data = $this->_createSubGridData($request, $subGridid, $options['fieldName']);
                 } else {
                     $this->setGridColumns();
                     $operation = $request->getPost('oper');
@@ -874,32 +892,110 @@
             return $data;
         }
 
-        public function _createSubGridData($id, $field)
+        /**
+         * Get data for the subgrid
+         *
+         * @param Request $request
+         * @param         $id
+         * @param         $field
+         *
+         * @return array
+         */
+        public function _createSubGridData(Request $request, $id, $field)
         {
             $columns = array();
+            $row     = $this->getService()->getEntityManager()->getRepository($this->_entity)->find($id);
 
-            $row = $this->getService()->getEntityManager()->getRepository($this->_entity)->find($id);
+            $mapping        = $row->{$field}->getMapping();
+            $targetMap      = $this->getService()->getEntityManager()->getClassMetadata($mapping['targetEntity']);
+            $subGridService = $this->_serviceLocator->get('ModelService')->getService($mapping['targetEntity']);
 
-            $mapping   = $row->{$field}->getMapping();
-            $targetMap = $this->getService()->getEntityManager()->getClassMetadata($mapping['targetEntity']);
-
-            foreach ($targetMap->fieldMappings as $map) {
-                if (!in_array($map['fieldName'], $this->_config['excluded_columns'])) {
-                    $newOptions                 = array('name' => $map['fieldName']);
-                    $columns[$map['fieldName']] = new Column($newOptions, $this);
-                }
+            if ($request->getPost('_search') == 'true') {
+                $childRows = $this->_getRecords($request, $subGridService);
+            } else {
+                $childRows = $row->$field;
             }
+            $subGrid = clone $this->getServiceLocator()->get('jqgrid');
+            $subGrid->setGridIdentity(
+                $mapping['targetEntity'],
+                $field,
+                '_sub'
+            );
 
-            $total = count($row->{$field});
+            $subGrid->reorderColumns();
+            $columns = $subGrid->setGridColumns()->getColumns();
+
+            $total = count($childRows);
 
             $grid = array(
                 'page'    => 1,
                 'total'   => $total,
                 'records' => $total,
-                'rows'    => $this->_getGridRecords($row->{$field}, $columns)
+                'rows'    => $this->_getGridRecords($childRows, $columns)
             );
 
             return $grid;
+        }
+
+        /**
+         * Get records applying request filters
+         *
+         * @param Request $request
+         * @param null    $service
+         * @param null    $isTreeGrid
+         *
+         * @return \Traversable
+         */
+        protected function _getRecords(Request $request, $service = null, $isTreeGrid = null)
+        {
+            $service    = $service ? : $this->getService();
+            $isTreeGrid = $isTreeGrid ? : $this->isTreeGrid;
+
+            $filter     = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
+            $treeFilter = array();
+
+            if ($isTreeGrid) {
+                $sort = array(
+                    'sidx' => 'lft',
+                    'sord' => 'ASC'
+                );
+                $node = $request->getPost('nodeid', false);
+                if ($node > 0) {
+                    $n_lvl      = (integer)$request->getPost("n_level");
+                    $n_lvl      = $n_lvl + 1;
+                    $treeFilter = array(
+                        'lft'    => (integer)$request->getPost("n_left"),
+                        'rgt'    => (integer)$request->getPost("n_right"),
+                        'level'  => $n_lvl,
+                        'parent' => $node
+                    );
+
+                } elseif (!$this->_config['tree_load_all']) {
+                    $treeFilter = array(
+                        'level' => 1
+                    );
+                }
+
+            } else {
+                $sort = $request->getPost('sidx') ? array('sidx' => $request->getPost('sidx'), 'sord' => $request->getPost('sord')) : false;
+            }
+
+
+            $adapter = new PaginatorAdapter($service, $filter, $sort, $this, $treeFilter);
+
+            // Instantiate Zend_Paginator with the required data source adapter
+            if (!$this->_paginator instanceof Paginator) {
+                $this->_paginator = new Paginator($adapter);
+                $this->_paginator->setDefaultItemCountPerPage($request->getPost('rows', $this->_defaultItemCountPerPage));
+            }
+
+            // Pass the current page number to paginator
+            $this->_paginator->setCurrentPageNumber($request->getPost('page', 1));
+
+            // Fetch a row of items from the adapter
+            $rows = $this->_paginator->getCurrentItems();
+
+            return $rows;
         }
 
         /**
@@ -964,9 +1060,6 @@
                 'rows'    => $this->_getGridRecords($rows, $columns)
             );
 
-            if ($this->isTreeGrid) {
-                $this->setTreeGrid(true);
-            }
 
             return $grid;
         }
@@ -1103,7 +1196,7 @@
 
                         if ($type == 'datetime' || $type == 'date') {
                             try {
-                                $value = new \DateTime($value);
+                                $value = $value ? new \DateTime($value) : null;
                                 $entity->$method($value);
                             } catch (\Exception $e) {
                                 $pass    = false;
