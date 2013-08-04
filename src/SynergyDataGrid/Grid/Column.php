@@ -242,7 +242,7 @@
                     }
 
                 } elseif (is_object($cellValue)) {
-                    $cellValue = $cellValue->id;
+                    $cellValue = $cellValue->getId();
                 }
             }
 
@@ -250,15 +250,19 @@
                 $value = $this->getEditoptions()->getValue();
                 $retv  = is_string($cellValue) ? $this->getHtmlFilter()->filter($cellValue) : $cellValue;
                 if ($value and $retv) {
-                    $allPairs = explode(';', $value);
-                    if (is_array($allPairs) && count($allPairs)) {
-                        foreach ($allPairs as $singlePair) {
-                            $pair = explode(':', $singlePair);
-                            if (is_array($pair) && count($pair) == 2) {
-                                if ($pair[0] == $cellValue) {
-                                    $retv = $this->getHtmlFilter()->filter($pair[1]);
+                    if (is_array($value)) {
+                        $retv = isset($value[$retv]) ? $value[$retv] : $retv;
+                    } else {
+                        $allPairs = explode(';', $value);
+                        if (is_array($allPairs) && count($allPairs)) {
+                            foreach ($allPairs as $singlePair) {
+                                $pair = explode(':', $singlePair);
+                                if (is_array($pair) && count($pair) == 2) {
+                                    if ($pair[0] == $cellValue) {
+                                        $retv = $this->getHtmlFilter()->filter($pair[1]);
 
-                                    break;
+                                        break;
+                                    }
                                 }
                             }
                         }

@@ -68,7 +68,8 @@
                 'height'             => 'auto',
                 'allowResizeColumns' => true,
                 'sortable'           => true,
-                'viewsortcols'       => true,
+                'viewsortcols'       => array(true, 'vertical', true),
+                'rowList'            => array(5, 10, 25, 50, 100),
                 'rowNum'             => 25,
                 'rows'               => true,
                 'autowidth'          => false,
@@ -298,7 +299,7 @@
                         ->execute();
 
                     foreach ($list as $item) {
-                        $values[] = $item['id'] . ':' . $item['title'];
+                        $values[] = $item['id'] . ':' . str_replace(array('&amp;', '&'), ' and ', $item['title']);
                     }
 
                     return $values;
@@ -318,7 +319,7 @@
              * Generates the edit url for sub grid which returns the subgrid data
              * Replace with a callback function, closure etc
              */
-            'grid_url_generator'               => '',
+            'grid_url_generator'                => '',
 
         )
     );

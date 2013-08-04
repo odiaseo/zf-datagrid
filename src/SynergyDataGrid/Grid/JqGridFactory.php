@@ -1,7 +1,9 @@
 <?php
     namespace SynergyDataGrid\Grid;
 
+    use Doctrine\Common\Collections\ArrayCollection;
     use Doctrine\ORM\AbstractQuery;
+    use Doctrine\ORM\PersistentCollection;
     use MyProject\Proxies\__CG__\OtherProject\Proxies\__CG__\stdClass;
     use SynergyDataGrid\Grid\Column;
     use SynergyDataGrid\Util\ArrayUtils;
@@ -503,6 +505,9 @@
             $utils = new ArrayUtils();
             if (!$this->_columns) {
                 $mapping         = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
+                $reflectionClass = new \ReflectionClass($this->_entity);
+                $defaultValues   = $reflectionClass->getDefaultProperties();
+
                 $excludedColumns = array_merge(
                     array_values($this->_config['tree_grid_options']['treeReader']),
                     $this->_config['excluded_columns']
@@ -521,7 +526,9 @@
                         'name'        => $map['fieldName'],
                         'edittype'    => self::TYPE_TEXT,
                         'editoptions' => array(
-                            'data-field-type' => $map['type']
+                            'data-field-type' => $map['type'],
+                            'defaultValue'    => isset($defaultValues[$map['fieldName']]) ? $defaultValues[$map['fieldName']] : '',
+                            'NullIfEmpty'     => $map['nullable']
                         )
                     );
 
@@ -710,8 +717,8 @@
             //Set default data to be posted back to server
             $this->mergePostData(
                 array(
-                     self::GRID_IDENTIFIER  => $this->getId(),
-                     self::ENTITY_IDENTFIER => $this->_entity
+                    self::GRID_IDENTIFIER  => $this->getId(),
+                    self::ENTITY_IDENTFIER => $this->_entity
                 )
             );
 
@@ -903,21 +910,32 @@
          */
         public function _createSubGridData(Request $request, $id, $field)
         {
-            $columns = array();
-            $row     = $this->getService()->getEntityManager()->getRepository($this->_entity)->find($id);
+            $columns   = array();
+            $row       = $this->getService()->getEntityManager()->getRepository($this->_entity)->find($id);
+            $method    = 'get' . ucfirst($field);
+            $refObject = $row->$method();
 
-            $mapping        = $row->{$field}->getMapping();
-            $targetMap      = $this->getService()->getEntityManager()->getClassMetadata($mapping['targetEntity']);
-            $subGridService = $this->_serviceLocator->get('ModelService')->getService($mapping['targetEntity']);
+            if ($refObject instanceof PersistentCollection) {
+                $mapping      = $refObject->getMapping();
+                $targetEntity = $mapping['targetEntity'];
+            } else {
+                $targetEntity = get_class($refObject);
+            }
+            $targetMap      = $this->getService()->getEntityManager()->getClassMetadata($targetEntity);
+            $subGridService = $this->_serviceLocator->get('ModelService')->getService($targetEntity);
 
             if ($request->getPost('_search') == 'true') {
                 $childRows = $this->_getRecords($request, $subGridService);
+            } elseif ($refObject instanceof PersistentCollection) {
+                $childRows = $refObject;
             } else {
-                $childRows = $row->$field;
+                $childRows = new ArrayCollection();
+                $childRows->add($refObject);
             }
+
             $subGrid = clone $this->getServiceLocator()->get('jqgrid');
             $subGrid->setGridIdentity(
-                $mapping['targetEntity'],
+                $targetEntity,
                 $field,
                 '_sub'
             );
@@ -2371,6 +2389,7 @@
         public function setEntityId($entityId)
         {
             $this->_entityId = $entityId;
+
             return $this;
         }
 

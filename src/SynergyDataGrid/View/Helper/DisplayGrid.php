@@ -189,6 +189,7 @@
                 foreach ($toolbars as $toolbar) {
                     $toolbarPosition = $toolbar->getPosition();
                     $onLoad[]        = sprintf(";jQuery('#%s').data('grid', jQuery('#%s'));", $toolbar->getId(), $gridId);
+                    $onLoad[]        = sprintf(";jQuery('#%s').addClass('grid-toolbar btn-group grid-toolbar-%s');", $toolbar->getId(), $toolbarPosition);
                     foreach ($toolbar->getItems() as $toolbarButton) {
                         $buttonPosition = $toolbarButton->getPosition();
                         if ($buttonPosition == Toolbar::POSITION_BOTH
