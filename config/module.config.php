@@ -294,7 +294,7 @@
                     $qb     = $em->createQueryBuilder();
                     $list   = $qb->select('e.id, e.title')
                         ->from($entity, 'e')
-                        ->orderBy('e.title')
+                        //->orderBy('e.title')
                         ->getQuery()
                         ->execute();
 

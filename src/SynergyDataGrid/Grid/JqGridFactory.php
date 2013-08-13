@@ -537,6 +537,12 @@
                         case 'integer':
                             $columnData[$title]['editrules']['number'] = true;
                             break;
+                        case 'string' :
+                            if (isset($map['length'])) {
+                                $columnData[$title]['editoptions']['maxlength'] = $map['length'];
+                                $columnData[$title]['editoptions']['size']      = $map['length'];
+                                break;
+                            }
                     }
 
 
@@ -574,12 +580,15 @@
                     }
 
                     if (isset($this->_config['column_type_mapping'][$map['fieldName']])) {
-                        $columnData[$title]['edittype'] = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$map['fieldName']];
+                        $columnData[$title]['edittype']
+                            = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$map['fieldName']];
                     }
 
 
                     if (isset($this->_config['column_model'][$map['fieldName']])) {
-                        $columnData[$title] = $utils->arrayMergeRecursiveCustom($columnData[$title], $this->_config['column_model'][$map['fieldName']]);
+                        $columnData[$title] = $utils->arrayMergeRecursiveCustom(
+                            $columnData[$title], $this->_config['column_model'][$map['fieldName']]
+                        );
                     }
 
                     if (!isset($columnData[$title]['searchoptions']['sopt'])) {
