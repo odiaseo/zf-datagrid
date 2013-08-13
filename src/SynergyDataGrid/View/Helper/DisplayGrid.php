@@ -4,6 +4,7 @@
     use SynergyDataGrid\Grid\Toolbar;
     use Zend\Http\Request;
     use Zend\Json\Expr;
+    use Zend\Stdlib\Parameters;
     use Zend\View\Helper\AbstractHelper;
     use SynergyDataGrid\Grid\JqGridFactory;
     use Zend\Json\Json;
@@ -45,30 +46,59 @@
 
         public function initGrid(JqGridFactory $grid)
         {
-            $html   = array();
-            $js     = array();
-            $onLoad = array();
+            $html        = array();
+            $js          = array();
+            $onLoad      = array();
+            $postCommand = array();
 
             $config = $grid->getConfig();
             $gridId = $grid->getId();
+
 
             if ($grid->getIsTreeGrid()) {
                 $grid->setActionsColumn(false);
             } else {
                 $grid->setActionsColumn($config['add_action_column']);
             }
+
             $grid->setGridColumns()
                 ->setGridDisplayOptions()
                 ->setAllowEditForm($config['allow_form_edit']);
-
 
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
 
             if (!$grid->getEditurl()) {
                 $grid->setEditurl($grid->getUrl());
-
-
             }
+
+            //load first data for main grid and not subgrids
+            if ($config['first_data_as_local'] and !$grid->getIsDetailGrid()) {
+                $grid->setDatatype('local');
+
+                $gridOptions = $grid->getOptions();
+
+                $params = array(
+                    'rows' => $gridOptions['rowNum'],
+                    'page' => 1
+                );
+
+                if ($grid->getIsTreeGrid()) {
+                    $grid->setSortname('id');
+
+                    if (isset($gridOptions['postData'])) {
+                        $params = array_merge($params, $gridOptions['postData']);
+                    }
+                }
+
+                $request    = new Request();
+                $parameters = new Parameters($params);
+                $request->setPost($parameters);
+                $initialData = $grid->getFirstDataAsLocal($request);
+
+                $postCommand[] = sprintf('jQuery("#%s").jqGrid("setGridParam", {datatype:"json"});', $gridId);
+                $postCommand[] = sprintf('jQuery("#%s")[0].addJSONData(%s); ', $gridId, Json::encode($initialData));
+            }
+
             $grid->getJsCode()->prepareAfterInsertRow();
             $grid->getJsCode()->prepareAfterSaveRow();
             $grid->getJsCode()->prepareOnEditRow();
@@ -218,6 +248,7 @@
                 }
             }
 
+            $onLoad = array_merge($onLoad, $postCommand);
             $onLoad = array_filter($onLoad);
 
             foreach ($grid->getJsCode()->getCustomScripts() as $script) {
