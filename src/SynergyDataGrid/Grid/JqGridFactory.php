@@ -1076,6 +1076,7 @@
         {
 
             $filter = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
+            $treeFilter = array();
 
             if ($this->isTreeGrid) {
                 $sort = array(
