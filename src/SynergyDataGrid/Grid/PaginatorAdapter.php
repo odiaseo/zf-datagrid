@@ -1,5 +1,6 @@
 <?php
     namespace SynergyDataGrid\Grid;
+
     use Zend\Paginator\Adapter\AdapterInterface;
     use Doctrine\ORM\Query;
 
@@ -163,12 +164,20 @@
             }
 
             $sort = $this->getSort();
-            if (!$countOnly
-                && is_array($sort)
-                && array_key_exists('sidx', $sort)
-                && array_key_exists('sord', $sort)
-            ) {
-                $this->sort($sort['sidx'], $sort['sord']);
+            if (!$countOnly && is_array($sort)) {
+                $c = 0;
+                foreach ($sort as $s) {
+                    if (isset($s['sidx'])) {
+                        $field     = $s['sidx'];
+                        $direction = isset($s['sord']) ? $s['sord'] : 'asc';
+                        if ($c) {
+                            $this->_qb->addOrderBy($this->getService()->getAlias() . '.' . $field, $direction);
+                        } else {
+                            $this->_qb->orderBy($this->getService()->getAlias() . '.' . $field, $direction);
+                        }
+                        $c++;
+                    }
+                }
             }
 
 

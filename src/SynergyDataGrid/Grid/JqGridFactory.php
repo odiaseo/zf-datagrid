@@ -495,7 +495,7 @@
             $subGrid->setIsDetailGrid(true);
             $subGrid->setMasterGridId($this->getId());
 
-            $jsCode  = new JsCode($subGrid);
+            $jsCode = new JsCode($subGrid);
             $jsCode->setContainerClass('subgrid-data');
             $subGrid->setJsCode($jsCode);
 
@@ -588,6 +588,10 @@
                             $columnData[$title]['key']                   = true;
                             $columnData[$title]['formoptions']['rowpos'] = 1;
                             $columnData[$title]['formoptions']['colpos'] = 1;
+
+                            if ($this->isTreeGrid) {
+                                $this->_config['column_model'][$fieldName]['width'] = $this->_config['tree_grid_options']['ExpandColumnWidth'];
+                            }
                         }
 
                         if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
@@ -752,8 +756,19 @@
         {
 
             $this->setPager($this->getId() . '_pager');
-            $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
-            $this->setPrmNames($this->_prmNames);
+            if (!isset($this->_config['grid_options']['rowList'])) {
+                $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
+            }
+
+            //merge prmNames
+            $userPrmNames = $this->getPrmNames();
+            if ($userPrmNames and is_array($userPrmNames)) {
+                $prmNames = array_merge($this->_prmNames, $this->_config['prmNames'], $userPrmNames);
+            } else {
+                $prmNames = array_merge($this->_prmNames, $this->_config['prmNames']);
+            }
+
+            $this->setPrmNames($prmNames);
 
             //Set grid options
             $gridOptions = isset($this->_config['grid_options']) ? $this->_config['grid_options'] : array();
@@ -762,6 +777,7 @@
                 $method = 'set' . ucfirst($key);
                 $this->$method($val);
             }
+
 
             //Set default data to be posted back to server
             $this->mergePostData(
@@ -1074,16 +1090,16 @@
          */
         protected function _createGridData(Request $request)
         {
-
-            $filter = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
             $treeFilter = array();
+            $sort       = array();
+            $filter     = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
 
             if ($this->isTreeGrid) {
-                $sort = array(
+                $sort[] = array(
                     'sidx' => 'lft',
                     'sord' => 'ASC'
                 );
-                $node = $request->getPost('nodeid', false);
+                $node   = $request->getPost('nodeid', false);
                 if ($node > 0) {
                     $n_lvl      = (integer)$request->getPost("n_level");
                     $n_lvl      = $n_lvl + 1;
@@ -1100,17 +1116,31 @@
                     );
                 }
 
-            } else {
-                $sort = $request->getPost('sidx') ? array('sidx' => $request->getPost('sidx'), 'sord' => $request->getPost('sord')) : false;
             }
 
+            if ($idx = $request->getPost('sidx')) {
+                $sort[] = array(
+                    'sidx' => $idx,
+                    'sord' => $request->getPost('sord')
+                );
+            } else {
+                if ($f = $this->getSortname() and $o = $this->getSortorder()) {
+                    $sort[] = array(
+                        'sidx' => $f,
+                        'sord' => $o
+                    );
+                }
+            }
 
             $adapter = new PaginatorAdapter($this->getService(), $filter, $sort, $this, $treeFilter);
 
             // Instantiate Zend_Paginator with the required data source adapter
             if (!$this->_paginator instanceof Paginator) {
                 $this->_paginator = new Paginator($adapter);
-                $this->_paginator->setDefaultItemCountPerPage($request->getPost('rows', $this->_defaultItemCountPerPage));
+                if (!$rowNum = $request->getPost('rows')) {
+                    $rowNum = $this->getRowNum() ? : $this->_defaultItemCountPerPage;
+                }
+                $this->_paginator->setDefaultItemCountPerPage($rowNum);
             }
 
             // Pass the current page number to paginator
@@ -1353,7 +1383,7 @@
         {
             $id            = $this->getId();
             $url           = $this->getUrl();
-            $sortingCookie = str_replace('/', '_', strtolower(self::COOKIE_SORTING_PREFIX . $url . '_' . $id));
+            $sortingCookie = str_replace('/', '_', strtolower(self::COOKIE_SORTING_PREFIX . $id));
             if (isset($_COOKIE[$sortingCookie])) {
                 list($name, $order) = explode(':', $_COOKIE[$sortingCookie]);
                 if ($name && $order) {
@@ -1374,7 +1404,7 @@
         {
             $id           = $this->getId();
             $url          = $this->getUrl();
-            $pagingCookie = str_replace('/', '_', strtolower(self::COOKIE_PAGING_PREFIX . $url . '_' . $id));
+            $pagingCookie = str_replace('/', '_', strtolower(self::COOKIE_PAGING_PREFIX . $id));
             if (isset($_COOKIE[$pagingCookie])) {
                 $rowNum = $_COOKIE[$pagingCookie];
                 if ($rowNum) {
@@ -1395,7 +1425,7 @@
             if ($this->getSortable()) {
                 $id             = $this->getId();
                 $url            = $this->getUrl();
-                $orderingCookie = str_replace('/', '_', strtolower(self::COOKIE_COLUMNS_ORDERING_PREFIX . $url . '_' . $id));
+                $orderingCookie = str_replace('/', '_', strtolower(self::COOKIE_COLUMNS_ORDERING_PREFIX . $id));
                 if (isset($_COOKIE[$orderingCookie])) {
                     $ordering = explode(':', $_COOKIE[$orderingCookie]);
                     if (count($ordering) == count($this->_columns)) {

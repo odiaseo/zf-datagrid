@@ -69,34 +69,34 @@
             $this->grid->addColumn(
                 'Actions',
                 array(
-                     'name'          => 'myac',
-                     'width'         => 80,
-                     'fixed'         => true,
-                     'sortable'      => false,
-                     'resizable'     => false,
-                     'formatter'     => 'actions',
-                     'search'        => false,
-                     'viewable'      => false,
-                     'formatoptions' => array(
-                         'keys'           => false,
-                         'editbutton'     => $options['nav_grid']['edit'],
-                         'editformbutton' => $this->grid->getAllowEditForm(),
-                         'delbutton'      => $options['nav_grid']['del'],
-                         'delOptions'     => array(
-                             'afterSubmit' => new Expr("function(response, postdata) {
+                    'name'          => 'myac',
+                    'width'         => 80,
+                    'fixed'         => true,
+                    'sortable'      => false,
+                    'resizable'     => false,
+                    'formatter'     => 'actions',
+                    'search'        => false,
+                    'viewable'      => false,
+                    'formatoptions' => array(
+                        'keys'           => false,
+                        'editbutton'     => $options['nav_grid']['edit'],
+                        'editformbutton' => $this->grid->getAllowEditForm(),
+                        'delbutton'      => $options['nav_grid']['del'],
+                        'delOptions'     => array(
+                            'afterSubmit' => new Expr("function(response, postdata) {
                                                     var json = eval('(' + response.responseText + ')');
                                                     return [json.success, json.message];
                                                }                                              ")
-                         ),
-                         'editOptions'    => $options['edit_parameters'],
-                         'onError'        => new Expr("function(rowid,response) {
+                        ),
+                        'editOptions'    => $options['edit_parameters'],
+                        'onError'        => new Expr("function(rowid,response) {
                                                                     var json = eval('(' + response.responseText + ')');
                                                                    alert('Error saving row: ' + json.message);
                                                                    jQuery('#" . $this->grid->getGridId() . "').restoreAfterError = false;
                                                                          return true;
                                                                    }
                                                                    ")
-                     )));
+                    )));
         }
 
         /**
@@ -172,6 +172,7 @@
                     ";
                 }
             }
+
             return $customButtonsShow;
         }
 
@@ -198,6 +199,7 @@
                     ";
                 }
             }
+
             return $customButtonsHide;
         }
 
@@ -314,7 +316,8 @@
           function(newwidth, index) {
                 colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
                 columnName = colModel[index].name;
-                columnSizesCookieName = '" . JqGridFactory::COOKIE_COLUMNS_SIZES_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                columnSizesCookieName = '" . JqGridFactory::COOKIE_COLUMNS_SIZES_PREFIX .
+                $this->grid->getId() . "';
                 columnSizesCookieName = columnSizesCookieName.toLowerCase().replace(/\//g,'_');
                 currentValues = jQuery.cookie(columnSizesCookieName);
                 found = false;
@@ -351,9 +354,9 @@
         {
             return new Expr("
           function(index,iCol,sortorder) {
-                sortingCookieName = '" . JqGridFactory::COOKIE_SORTING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                var sortingCookieName = '" . JqGridFactory::COOKIE_SORTING_PREFIX . $this->grid->getId() . "';
                 sortingCookieName = sortingCookieName.toLowerCase().replace(/\//g,'_');
-                newValue = index + ':' + sortorder;
+                var newValue = index + ':' + sortorder;
                 jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
@@ -368,9 +371,9 @@
         {
             return new Expr("
           function(pgButton) {
-                pagingCookieName = '" . JqGridFactory::COOKIE_PAGING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                var pagingCookieName = '" . JqGridFactory::COOKIE_PAGING_PREFIX . $this->grid->getId() . "';
                 pagingCookieName = pagingCookieName.toLowerCase().replace(/\//g,'_');
-                newValue = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','rowNum');
+                var newValue = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','rowNum');
                 jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
@@ -386,10 +389,10 @@
             return new Expr("
          jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop', 
             function(event, ui) {
-                orderingCookieName = '" . JqGridFactory::COOKIE_COLUMNS_ORDERING_PREFIX . "' + window.location.pathname + '_' + '" . $this->grid->getId() . "';
+                var orderingCookieName = '" . JqGridFactory::COOKIE_COLUMNS_ORDERING_PREFIX . $this->grid->getId() . "';
                 orderingCookieName = orderingCookieName.toLowerCase().replace(/\//g,'_');
-                colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
-                newValue = '';
+                var colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
+                var newValue = '';
                 for (i = 0; i < colModel.length; i++) {
                     newValue += colModel[i].name + ':';
                 }
@@ -433,6 +436,7 @@
              ");
 
             }
+
             return $retv;
         }
 
@@ -459,6 +463,7 @@
         public function setCustomScripts(array $customScripts)
         {
             $this->_customScripts = $customScripts;
+
             return $this;
         }
 
@@ -468,6 +473,7 @@
         public function addCustomScript($customScripts)
         {
             $this->_customScripts[] = $customScripts;
+
             return $this;
         }
 
@@ -485,6 +491,7 @@
         public function setContainerClass($containerClass)
         {
             $this->_containerClass = $containerClass;
+
             return $this;
         }
 

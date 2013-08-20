@@ -11,6 +11,29 @@
 
         'jqgrid'       => array(
             /**
+             * The default value of this property is:
+             * {page:“page”,rows:“rows”, sort:“sidx”, order:“sord”, search:“_search”, nd:“nd”, id:“id”, oper:“oper”, editoper:“edit”, addoper:“add”, deloper:“del”, subgridid:“id”, npage:null, totalrows:“totalrows”}
+             * This customizes names of the fields sent to the server on a POST request. For example, with this setting, you can change the sort order element from sidx to mysort by setting prmNames: {sort: “mysort”}. The string that will be POST-ed to the server will then be myurl.php?page=1&rows=10&mysort=myindex&sord=asc rather than myurl.php?page=1&rows=10&sidx=myindex&sord=asc
+             * So the value of the column on which to sort upon can be obtained by looking at $POST['mysort'] in PHP. When some parameter is set to null, it will be not sent to the server. For example if we set prmNames: {nd:null} the nd parameter will not be sent to the server. For npage option see the scroll option.
+             * These options have the following meaning and default values:
+             *  page: the requested page (default value page)
+             * rows: the number of rows requested (default value rows)
+             * sort: the sorting column (default value sidx)
+             * order: the sort order (default value sord)
+             * search: the search indicator (default value _search)
+             * nd: the time passed to the request (for IE browsers not to cache the request) (default value nd)
+             * id: the name of the id when POST-ing data in editing modules (default value id)
+             * oper: the operation parameter (default value oper)
+             * editoper: the name of operation when the data is POST-ed in edit mode (default value edit)
+             * addoper: the name of operation when the data is posted in add mode (default value add)
+             * deloper: the name of operation when the data is posted in delete mode (default value del)
+             * totalrows: the number of the total rows to be obtained from server - see rowTotal (default value totalrows)
+             * subgridid: the name passed when we click to load data in the subgrid (default value id)
+             *
+             *  override the default by adding your params to this options in your config
+             */
+            'prmNames'                          => array(),
+            /**
              * If set to true, the grid will be loaded with data from the database onload.
              * If false, the grid will be loaded with data after page load via ajax
              */
@@ -27,8 +50,14 @@
              */
             'render_script_as_template'         => false,
             /**
+             * If set to true, whitespaces would be remove from the generated javascript code
+             * experimental!
+             */
+            'compress_script'                   => false,
+            /**
              * If true, it adds a additional column to every row with edit/delete buttons
              */
+
             'add_action_column'                 => true,
             'allow_form_edit'                   => true,
             /**
@@ -48,10 +77,11 @@
              */
             'tree_load_all'                     => true,
             'tree_grid_options'                 => array(
-                'gridview'      => false,
-                'treeGridModel' => 'nested',
-                'ExpandColumn'  => 'title',
-                'treeReader'    => array(
+                'gridview'          => false,
+                'treeGridModel'     => 'nested',
+                'ExpandColumn'      => 'title',
+                'ExpandColumnWidth' => 120,
+                'treeReader'        => array(
                     'level_field'    => 'level',
                     'left_field'     => 'lft',
                     'right_field'    => 'rgt',
