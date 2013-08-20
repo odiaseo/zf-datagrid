@@ -1328,7 +1328,7 @@
                 if ($pass) {
                     try {
                         $entity  = $this->getService()->save($entity);
-                        $id      = $entity->id;
+                        $id      = $entity->getId();
                         $message = '';
                     } catch (\Exception $e) {
                         $message = $e->getMessage();
