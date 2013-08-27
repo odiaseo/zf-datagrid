@@ -124,6 +124,9 @@
             $onLoad[] = sprintf('%s.jqGrid(%s);', $gridId,
                 Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true)));
 
+            $datePicker = $grid->getDatePicker()->prepareDatepicker();
+            $js = array_merge($js, $datePicker);
+
             $html[] = '<table id="' . $gridId . '"></table>';
             if ($grid->getNavGridEnabled()) {
                 if ($grid->getIsDetailGrid()) {
