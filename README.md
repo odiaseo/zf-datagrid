@@ -21,6 +21,9 @@ Dependencies .
     jQuery UI 1.8.9 (http://jqueryui.com/),
     jqGrid plugin >= 4.3.1 (http://www.trirand.com/blog/),
 
+    ### Optional
+    Doctrine2 Behavioural Extensions (https://github.com/l3pp4rd/DoctrineExtensions)
+
 Installation - manual
 ---------------------
 
@@ -201,7 +204,57 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
 
     ?>
 3. In the controller action that returns the grid data, you need to pass an array as the second parameter to the prepareGridData function.
-    The array should have a 'fieldName' key which points to the entity field from which to retrieve the data from.
+    The array should have a 'fieldName' key which points to the entity field from which to retrieve the data from. The fieldName is the
+    name of the joinColumn on the main entity class.
+<?php
 
-    $options = array('fieldName' => 'fieldName');
-    <?php $response = $grid->prepareGridData($this->getRequest(), $options); ?>
+
+        public function crudAction()
+        {
+             ......
+            $className = ''; // retrieve classname from the route or other means
+
+            $options['fieldName'] = $this->params()->fromRoute('fieldName', null);
+
+            $serviceManager = $this->getServiceLocator();
+
+            $grid = $serviceManager->get('jqgrid');
+            $grid->setGridIdentity($className);
+            $response = $grid->prepareGridData($this->getRequest(), $options);
+
+             ..........
+
+   ?>
+
+Grid Specific Options (Multiple Grids).
+--------------------------------------
+If you have multiple grids with different config requirements you can have grid specific option set for each grid.
+
+1. Add a unique ID for the grid by specifying the second parameter to the setGridIdentity() method in your controller action e.g.
+  <?php
+    ........
+    $gridId = 'my_unique_id ;
+    $grid = $serviceManager->get('jqgrid')->setGridIdentity( $className, $gridId);
+   ......
+  ?>
+2. In your module.config.php file add the grid specific options as follows:
+    <?php
+
+        return array(
+            .......
+            'jqgrid' => array (
+                 ......
+                 'my_unique_id' => array(
+                    .............
+
+                 )
+            )
+        );
+
+    ?>
+    The grid specific options would be merged into the main grid options for grids with that ID.
+
+Tree Grid
+------------
+To render the tree grid, set the third parameter of the setGridIdentity() method to true in your controller action. This depends on the [Gedmo extension
+for doctrine] (https://github.com/l3pp4rd/DoctrineExtensions). The entity class should implement the required Gedmo tree annotations for this to work;
