@@ -259,7 +259,7 @@
                                 $pair = explode(':', $singlePair);
                                 if (is_array($pair) && count($pair) == 2) {
                                     if ($pair[0] == $cellValue) {
-                                       $retv = $this->getHtmlFilter()->filter($pair[1]);
+                                        $retv = $this->getHtmlFilter()->filter($pair[1]);
                                         break;
                                     }
                                 }

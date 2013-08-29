@@ -532,6 +532,24 @@
 
         }
 
+
+        public function isRequired($map, $columnData, $fieldName, $default)
+        {
+            if (isset($columnData['editrules']['required'])) {
+                return $columnData['editrules']['required'];
+            } elseif (
+                $columnData['editable']
+                and (!$columnData['hidden'] or $columnData['editrules']['edithidden'])
+                and (isset($map['nullable']) and !$map['nullable'])
+                and $default === null
+                and $fieldName != 'id'
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+
         public function setGridColumns()
         {
             if (!$this->_columnsSet) {
@@ -555,6 +573,7 @@
                     foreach ($mapping->fieldMappings as $map) {
                         $fieldName = $map['fieldName'];
                         $title     = ucwords($fieldName);
+                        $default   = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
 
                         if (in_array($fieldName, $excludedColumns)) {
                             continue;
@@ -562,10 +581,15 @@
                         $columnData[$title] = array(
                             'name'        => $fieldName,
                             'edittype'    => self::TYPE_TEXT,
+                            'editable'    => true,
+                            'hidden'      => false,
                             'editoptions' => array(
                                 'data-field-type' => $map['type'],
-                                'defaultValue'    => isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : '',
+                                'defaultValue'    => $default,
                                 'NullIfEmpty'     => $map['nullable']
+                            ),
+                            'editrules'   => array(
+                                'edithidden' => false
                             )
                         );
 
@@ -635,10 +659,20 @@
                         if (!isset($columnData[$title]['searchoptions']['sopt'])) {
                             $columnData[$title]['searchoptions']['sopt'] = array_keys($this->_expression);
                         }
+
+                        if ($this->isRequired($map, $columnData[$title], $fieldName, $default)) {
+                            $columnData[$title]['editrules']['required']    = true;
+                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-req">*</span>';
+                        } else {
+                            $columnData[$title]['editrules']['required']    = false;
+                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-notreq">&nbsp;</span>';
+                        }
                     }
 
                     foreach ($mapping->associationMappings as $map) {
                         $fieldName = $map['fieldName'];
+                        $default   = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
+
                         if (in_array($fieldName, $this->_config['excluded_columns'])) {
                             continue;
                         }
@@ -695,6 +729,8 @@
                             'name'          => $fieldName,
                             'edittype'      => $type,
                             'stype'         => $type,
+                            'editable'      => true,
+                            'hidden'        => false,
                             'editrules'     => array(
                                 'edithidden' => true,
                             ),
@@ -706,6 +742,7 @@
                                 'value' => $values,
                             )
                         );
+
 
                         if ($map['type'] == 8) {
                             $columnData[$title]['editoptions']['multiple'] = true;
@@ -720,6 +757,13 @@
                             $columnData[$title] = $utils->arrayMergeRecursiveCustom($columnData[$title], $this->_config['column_model'][$fieldName]);
                         }
 
+                        if ($this->isRequired($map, $columnData[$title], $fieldName, $default)) {
+                            $columnData[$title]['editrules']['required']    = true;
+                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-req">*</span>';
+                        } else {
+                            $columnData[$title]['editrules']['required']    = false;
+                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-notreq">&nbsp;</span>';
+                        }
 
                     }
 
@@ -787,7 +831,7 @@
                 )
             );
 
-            $this->setDatePicker(new DatePicker($this));
+            $this->setDatePicker(new DatePicker($this, $this->_config['plugins']['date_picker']));
             $datePickerFunctionName = $this->getDatePicker()->getFunctionName();
 
             //Set navigation options
@@ -833,6 +877,10 @@
             }
 
             $inlineNavOptions = isset($this->_config['inline_nav']) ? $this->_config['inline_nav'] : array();
+
+            $funcName                                       = $this->getDatePicker()->getFunctionName();
+            $inlineNavOptions['addRowParams']['oneditfunc'] = new \Zend\Json\Expr(" function() { {$funcName}(new_row);  }");
+
             if ($inlineNavOptions) {
                 $this->setInlineNav($inlineNavOptions);
             }
@@ -1291,10 +1339,14 @@
                     if (array_key_exists($param, $mapping->fieldMappings) or array_key_exists($param, $mapping->associationMappings)) {
                         $type   = $this->getColumn($param)->getDbColumnType();
                         $method = 'set' . ucfirst($param);
+                        $value  = ($value == 'null') ? null : $value;
 
                         if ($type == 'datetime' || $type == 'date') {
                             try {
-                                $value = $value ? new \DateTime($value) : null;
+                                //attempt to ensure date is in acceptable format for datetime object
+                                $ts    = strtotime($value);
+                                $ds    = $ts ? date(\DateTime::ISO8601, $ts) : null;
+                                $value = $ds ? new \DateTime($ds) : null;
                                 $entity->$method($value);
                             } catch (\Exception $e) {
                                 $pass    = false;
@@ -1305,7 +1357,11 @@
                             $target = $mapping->associationMappings[$param]['targetEntity'];
 
                             if ($mapping->associationMappings[$param]['type'] == 8) {
-                                $entity->$param->clear();
+                                if ($entity->$param) {
+                                    $entity->$param->clear();
+                                } else {
+                                    $entity->$param = new ArrayCollection();
+                                }
                                 $value = explode(',', $value);
                                 $value = array_unique(array_filter($value));
 

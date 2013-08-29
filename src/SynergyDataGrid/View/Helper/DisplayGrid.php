@@ -64,7 +64,7 @@
             $grid->setGridColumns()
                 ->setGridDisplayOptions()
                 ->setAllowEditForm($config['allow_form_edit']);
-
+            $onLoad[] = 'var synergyDataGrid = {};';
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
             $onLoad[] = sprintf('var %s = jQuery("#%s");', $gridId, $gridId);
             $onLoad[] = sprintf('%s.data("lastsel", 0);', $gridId);

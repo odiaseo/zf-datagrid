@@ -11,6 +11,15 @@
 
         'jqgrid'       => array(
             /**
+             * settings for customising plugins e.g. jquery datepicker
+             */
+            'plugins'                           => array(
+                'date_picker' => array(
+                    'dateFormat' => 'D, d M yy',
+                    'timeFormat' => 'hh:mm'
+                )
+            ),
+            /**
              * The default value of this property is:
              * {page:“page”,rows:“rows”, sort:“sidx”, order:“sord”, search:“_search”, nd:“nd”, id:“id”, oper:“oper”, editoper:“edit”, addoper:“add”, deloper:“del”, subgridid:“id”, npage:null, totalrows:“totalrows”}
              * This customizes names of the fields sent to the server on a POST request. For example, with this setting, you can change the sort order element from sidx to mysort by setting prmNames: {sort: “mysort”}. The string that will be POST-ed to the server will then be myurl.php?page=1&rows=10&mysort=myindex&sord=asc rather than myurl.php?page=1&rows=10&sidx=myindex&sord=asc
@@ -271,7 +280,6 @@
                     'addRowParams' => array(
                         'keys'              => true,
                         'restoreAfterError' => true,
-                        //'oneditfunc'        => new \Zend\Json\Expr(" function() { dp_picker(new_row);  }")
                     )
                 )
             ),
@@ -356,8 +364,29 @@
 
             /**
              * Generates the edit url for sub grid which returns the subgrid data
-             * Replace with a callback function, closure etc
+             * Replace with a callback function, closure etc where
+             *
+             *      $sm = servicelLocator;
+             *      $entity = The current entity (FQCN)
+             *      $fieldName = the field name of the join column
+             *
+             *  'grid_url_generator'           => function ($sm, $entity, $fieldName) {
+             *
+             *  @var $helper \Zend\View\Helper\Url
+             *
+             *  $helper = $sm->get('viewhelpermanager')->get('url');
+             *  $url    = $helper('your_route_name',
+             *                     array(
+             *                        'your_parameters',
+             *                         'fieldName' => $fieldName
+             *                    )
+             *                );
+             *
+             *                 return new \Zend\Json\Expr("'$url?subgridid='+row_id");
+             *        }
+             *  )
              */
+
             'grid_url_generator'                => '',
 
         )

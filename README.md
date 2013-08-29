@@ -225,6 +225,34 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
              ..........
 
    ?>
+4. You  would need to specify a callback function to return the subgrid editUrl to that grid e.g. the arguments passed to the callback function are:
+
+    $sm = servicelLocator;
+    $entity = The current entity (FQCN)
+    $fieldName = the field name of the join column
+
+    Your route should cater for the fieldName parameter which would be picked up in your CRUD action.
+    Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript variable that
+    would be replaced in the script when the subgrid editUrl is returned so just append it as shown in the example.
+
+    <?php
+    'jqgrid' => array(
+         ........
+
+          'grid_url_generator'           => function ($sm, $entity, $fieldName) {
+                    /** @var $helper \Zend\View\Helper\Url */
+                    $helper = $sm->get('viewhelpermanager')->get('url');
+                    $url    = $helper(''your_route_name'',
+                        array(
+                         'your_parameters',
+                         'fieldName' => $fieldName
+                        )
+                    );
+
+                    return new Expr("'$url?subgridid='+row_id");
+           }
+    )
+?>
 
 Grid Specific Options (Multiple Grids).
 --------------------------------------
