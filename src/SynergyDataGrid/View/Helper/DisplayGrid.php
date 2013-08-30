@@ -85,13 +85,15 @@
 
                 $gridOptions = $grid->getOptions();
                 $params      = array(
-                    'page' => 1,
-                    'rows' => $gridOptions['rowNum']
+                    'page'                  => 1,
+                    'rows'                  => $gridOptions['rowNum'],
+                    $grid::GRID_IDENTIFIER  => $grid->getId(),
+                    $grid::ENTITY_IDENTFIER => $grid->getEntity()
                 );
 
                 if ($grid->getIsTreeGrid()) {
                     $grid->setSortname('lft');
-
+                    $params['displayTree'] = true;
                     if (isset($gridOptions['postData'])) {
                         $params = array_merge($params, $gridOptions['postData']);
                     }
@@ -125,7 +127,7 @@
                 Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true)));
 
             $datePicker = $grid->getDatePicker()->prepareDatepicker();
-            $js = array_merge($js, $datePicker);
+            $js         = array_merge($js, $datePicker);
 
             $html[] = '<table id="' . $gridId . '"></table>';
             if ($grid->getNavGridEnabled()) {

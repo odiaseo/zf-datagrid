@@ -225,7 +225,8 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
              ..........
 
    ?>
-4. You  would need to specify a callback function to return the subgrid editUrl to that grid e.g. the arguments passed to the callback function are:
+4. You  would need to specify a callback function to return the subgrid editUrl to that grid.
+   The default is blank. Thee arguments passed to the callback function are:
 
     $sm = servicelLocator;
     $entity = The current entity (FQCN)
@@ -242,7 +243,7 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
           'grid_url_generator'           => function ($sm, $entity, $fieldName) {
                     /** @var $helper \Zend\View\Helper\Url */
                     $helper = $sm->get('viewhelpermanager')->get('url');
-                    $url    = $helper(''your_route_name'',
+                    $url    = $helper('your_route_name',
                         array(
                          'your_parameters',
                          'fieldName' => $fieldName

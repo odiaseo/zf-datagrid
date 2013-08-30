@@ -494,6 +494,7 @@
             $subGrid = clone $this->getServiceLocator()->get('jqgrid');
             $subGrid->setIsDetailGrid(true);
             $subGrid->setMasterGridId($this->getId());
+            $subGrid->setCaption($subGridMap['fieldName']);
 
             $jsCode = new JsCode($subGrid);
             $jsCode->setContainerClass('subgrid-data');
@@ -512,26 +513,38 @@
             $helper = new DisplayGrid();
             list($onLoad, $js, $html) = $helper->initGrid($subGrid);
 
+            return array(
+                implode("\n", $onLoad),
+                implode("\n", $js),
+                implode("", $html)
+            );
+
+        }
+
+
+        protected function _getRowExpandFunction($data)
+        {
+            $onLoad = $js = $html = array();
+
+            foreach ($data as $arr) {
+                list($onLoad[], $js[], $html[]) = $arr;
+            }
+
             $expandFunction = new Expr(
                 sprintf("function(subgrid_id, row_id) {
-                       var subgrid_table_id = '%s_t';
-
                        jQuery('#'+subgrid_id).html('%s');
                        %s
                        %s
                 }"
                     ,
-                    $subGrid->getId(),
-                    implode("", $html),
+                    implode("<hr />", $html),
                     implode("\n", $onLoad),
                     implode("\n", $js)
                 )
             );
 
             return $expandFunction;
-
         }
-
 
         public function isRequired($map, $columnData, $fieldName, $default)
         {
@@ -553,7 +566,7 @@
         public function setGridColumns()
         {
             if (!$this->_columnsSet) {
-                $subGrids = array();
+                $subGrids = $subGridsAsGrid = array();
                 $target   = '';
 
                 $utils = new ArrayUtils();
@@ -572,13 +585,12 @@
 
                     foreach ($mapping->fieldMappings as $map) {
                         $fieldName = $map['fieldName'];
-                        $title     = ucwords($fieldName);
                         $default   = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
 
                         if (in_array($fieldName, $excludedColumns)) {
                             continue;
                         }
-                        $columnData[$title] = array(
+                        $data = array(
                             'name'        => $fieldName,
                             'edittype'    => self::TYPE_TEXT,
                             'editable'    => true,
@@ -596,22 +608,22 @@
                         switch ($map['type']) {
                             case 'smallint':
                             case 'integer':
-                                $columnData[$title]['editrules']['number'] = true;
+                                $data['editrules']['number'] = true;
                                 break;
                             case 'string' :
                                 if (isset($map['length'])) {
-                                    $columnData[$title]['editoptions']['maxlength'] = $map['length'];
-                                    $columnData[$title]['editoptions']['size']      = $map['length'];
+                                    $data['editoptions']['maxlength'] = $map['length'];
+                                    $data['editoptions']['size']      = $map['length'];
                                     break;
                                 }
                         }
 
 
                         if ($map['columnName'] == 'id') {
-                            $columnData[$title]['editable']              = false;
-                            $columnData[$title]['key']                   = true;
-                            $columnData[$title]['formoptions']['rowpos'] = 1;
-                            $columnData[$title]['formoptions']['colpos'] = 1;
+                            $data['editable']              = false;
+                            $data['key']                   = true;
+                            $data['formoptions']['rowpos'] = 1;
+                            $data['formoptions']['colpos'] = 1;
 
                             if ($this->isTreeGrid) {
                                 $this->_config['column_model'][$fieldName]['width'] = $this->_config['tree_grid_options']['ExpandColumnWidth'];
@@ -619,57 +631,64 @@
                         }
 
                         if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
-                            $columnData[$title]['edittype']                = self::TYPE_TEXTAREA;
-                            $columnData[$title]['hidden']                  = true;
-                            $columnData[$title]['editrules']['edithidden'] = true;
+                            $data['edittype']                = self::TYPE_TEXTAREA;
+                            $data['hidden']                  = true;
+                            $data['editrules']['edithidden'] = true;
                         }
 
                         if ('boolean' == $map['type']) {
-                            $columnData[$title]['align']                  = 'center';
-                            $columnData[$title]['formatter']              = 'checkbox';
-                            $columnData[$title]['edittype']               = 'checkbox';
-                            $columnData[$title]['stype']                  = self::TYPE_SELECT;
-                            $columnData[$title]['searchoptions']['sopt']  = array('eq', 'ne');
-                            $columnData[$title]['searchoptions']['value'] = ':;0:No;1:Yes';
-                            $columnData[$title]['editoptions']['value']   = '1:0';
+                            $data['align']                  = 'center';
+                            $data['formatter']              = 'checkbox';
+                            $data['edittype']               = 'checkbox';
+                            $data['stype']                  = self::TYPE_SELECT;
+                            $data['searchoptions']['sopt']  = array('eq', 'ne');
+                            $data['searchoptions']['value'] = ':;0:No;1:Yes';
+                            $data['editoptions']['value']   = '1:0';
                         }
 
                         if (in_array($fieldName, $this->_config['hidden_columns'])) {
-                            $columnData[$title]['hidden']                  = true;
-                            $columnData[$title]['editrules']['edithidden'] = true;
+                            $data['hidden']                  = true;
+                            $data['editrules']['edithidden'] = true;
                         }
 
                         if (in_array($fieldName, $this->_config['non_editable_columns'])) {
-                            $columnData[$title]['editable'] = false;
-                            $columnData[$title]['hidden']   = true;
+                            $data['editable'] = false;
+                            $data['hidden']   = true;
                         }
 
                         if (isset($this->_config['column_type_mapping'][$fieldName])) {
-                            $columnData[$title]['edittype']
-                                = $columnData[$title]['stype'] = $this->_config['column_type_mapping'][$fieldName];
+                            $data['edittype']
+                                = $data['stype'] = $this->_config['column_type_mapping'][$fieldName];
                         }
 
 
                         if (isset($this->_config['column_model'][$fieldName])) {
-                            $columnData[$title] = $utils->arrayMergeRecursiveCustom(
-                                $columnData[$title], $this->_config['column_model'][$fieldName]
+                            $data = $utils->arrayMergeRecursiveCustom(
+                                $data, $this->_config['column_model'][$fieldName]
                             );
                         }
 
-                        if (!isset($columnData[$title]['searchoptions']['sopt'])) {
-                            $columnData[$title]['searchoptions']['sopt'] = array_keys($this->_expression);
+                        if (!isset($data['searchoptions']['sopt'])) {
+                            $data['searchoptions']['sopt'] = array_keys($this->_expression);
                         }
 
-                        if ($this->isRequired($map, $columnData[$title], $fieldName, $default)) {
-                            $columnData[$title]['editrules']['required']    = true;
-                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-req">*</span>';
+                        if ($this->isRequired($map, $data, $fieldName, $default)) {
+                            $data['editrules']['required']    = true;
+                            $data['formoptions']['elmprefix'] = '<i class="req">*</i>';
                         } else {
-                            $columnData[$title]['editrules']['required']    = false;
-                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-notreq">&nbsp;</span>';
+                            $data['editrules']['required']    = false;
+                            $data['formoptions']['elmprefix'] = '<i class="nq"></i>';
                         }
+
+                        //@todo temporary fix to tree expand column when hidden elements appear before it
+                        $colIndex              = $data['hidden'] ? ($count + 99) : $count;
+                        $columnData[$colIndex] = $data;
+
+                        $count++;
                     }
 
                     foreach ($mapping->associationMappings as $map) {
+                        $data      = array();
                         $fieldName = $map['fieldName'];
                         $default   = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
 
@@ -677,22 +696,27 @@
                             continue;
                         }
 
-                        $title              = ucwords($fieldName);
-                        $columnData[$title] = array();
+                        if ($this->_isSubGridAsGrid($fieldName)) {
+                            $subGridsAsGrid[] = $this->_getSubGridAsGrid($map);
+                            $this->setSubGrid(true);
+                            $data['hidden'] = true;
+                        } else if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
+                            $subGrid        = $this->_getSubGridModel($map);
+                            $target         = $fieldName;
+                            $data['hidden'] = true;
 
-                        if (!$this->_hasSubGrid) {
-                            if ($this->_isSubGrid($fieldName)) {
-                                $subGrids[]                   = $this->_getSubGridModel($map);
-                                $target                       = $fieldName;
-                                $columnData[$title]['hidden'] = true;
-                                $this->_hasSubGrid            = true;
-                                $this->setSubGrid(true);
-                            } elseif ($this->_isSubGridAsGrid($fieldName)) {
-                                $expandFunction = $this->_getSubGridAsGrid($map);
-                                $this->setSubGridRowExpanded($expandFunction);
-                                $this->_hasSubGrid = true;
-                                $this->setSubGrid(true);
+                            $subGridUrl = $this->getSubGridUrl();
+                            if (strpos($subGridUrl, '?') === false) {
+                                $subGridUrl .= '?fieldName=' . $target;
+                            } else {
+                                $subGridUrl .= '&fieldName=' . $target;
                             }
+
+                            $this->setSubGridModel(array($subGrid));
+                            $this->setSubGridUrl($subGridUrl);
+
+                            $this->_hasSubGrid = true;
+                            $this->setSubGrid(true);
                         }
 
 
@@ -725,59 +749,60 @@
                             $values = implode(';', $values);
                         }
 
-                        $columnData[$title] += array(
-                            'name'          => $fieldName,
-                            'edittype'      => $type,
-                            'stype'         => $type,
-                            'editable'      => true,
-                            'hidden'        => false,
-                            'editrules'     => array(
-                                'edithidden' => true,
-                            ),
-                            'searchoptions' => array(
-                                'value' => $values,
-                                'sopt'  => array('eq', 'ne')
-                            ),
-                            'editoptions'   => array(
-                                'value' => $values,
+                        $data = array_merge($data, array(
+                                'name'          => $fieldName,
+                                'edittype'      => $type,
+                                'stype'         => $type,
+                                'editable'      => true,
+                                'hidden'        => false,
+                                'editrules'     => array(
+                                    'edithidden' => true,
+                                ),
+                                'searchoptions' => array(
+                                    'value' => $values,
+                                    'sopt'  => array('eq', 'ne')
+                                ),
+                                'editoptions'   => array(
+                                    'value' => $values,
+                                )
                             )
                         );
 
 
                         if ($map['type'] == 8) {
-                            $columnData[$title]['editoptions']['multiple'] = true;
-                            $columnData[$title]['hidden']                  = true;
+                            $data['editoptions']['multiple'] = true;
+                            $data['hidden']                  = true;
                         }
 
-                        if (!isset($columnData[$title]['searchoptions']['sopt'])) {
-                            $columnData[$title]['searchoptions']['sopt'] = array_keys($this->_expression);
+                        if (!isset($data['searchoptions']['sopt'])) {
+                            $data['searchoptions']['sopt'] = array_keys($this->_expression);
                         }
 
                         if (isset($this->_config['column_model'][$fieldName])) {
-                            $columnData[$title] = $utils->arrayMergeRecursiveCustom($columnData[$title], $this->_config['column_model'][$fieldName]);
+                            $data = $utils->arrayMergeRecursiveCustom($data, $this->_config['column_model'][$fieldName]);
                         }
 
-                        if ($this->isRequired($map, $columnData[$title], $fieldName, $default)) {
-                            $columnData[$title]['editrules']['required']    = true;
-                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-req">*</span>';
+                        if ($this->isRequired($map, $data, $fieldName, $default)) {
+                            $data['editrules']['required']    = true;
+                            $data['formoptions']['elmprefix'] = '<i class="req">*</i>';
                         } else {
-                            $columnData[$title]['editrules']['required']    = false;
-                            $columnData[$title]['formoptions']['elmprefix'] = '<span class="field-notreq">&nbsp;</span>';
+                            $data['editrules']['required']    = false;
+                            $data['formoptions']['elmprefix'] = '<i class="nq"></i>';
                         }
 
+                        $columnData[$count] = $data;
+                        $count++;
                     }
 
-
+                    ksort($columnData);
                     $this->addColumns($columnData);
 
-                    if ($subGrids) {
-                        $this->setSubGridModel($subGrids);
-
-                        $subGridUrl = $this->getSubGridUrl();
-
-                        $subGridUrl .= '/' . $target;
-                        $this->setSubGridUrl($subGridUrl);
+                    //set subgrid expand function
+                    if ($subGridsAsGrid) {
+                        $expandFunction = $this->_getRowExpandFunction($subGridsAsGrid);
+                        $this->setSubGridRowExpanded($expandFunction);
                     }
+
                     // close form after edit
                     if ($actionColumn = $this->getColumn('myac')) {
                         $actionColumn->mergeFormatoptions(array('editOptions' => array('closeAfterEdit' => true)));
@@ -951,8 +976,8 @@
             $nameFilter = new CamelCaseToSeparator();
 
             if (is_array($columns) && count($columns)) {
-                foreach ($columns as $colName => $column) {
-                    $title = $nameFilter->filter($colName);
+                foreach ($columns as $column) {
+                    $title = ucwords($nameFilter->filter($column['name']));
                     $this->addColumn($title, $column);
                 }
                 $this->setColNames($this->_columns);
