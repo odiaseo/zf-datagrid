@@ -35,7 +35,9 @@ Installation
 > `require` section.
    3. Run `php composer.phar install` (or `php composer.phar update`).
    4. Follow the Post installation steps bellow
-##Post Installation steps
+
+Post Installation steps
+-----------------------
  Currently, this module supports only  Doctrine ORM entities so ensure that DoctrineORM is configured correctly.
 
 Usage
@@ -56,6 +58,7 @@ Usage
               $url  = /ajax/:entity;
               $grid->setUrl($url);
               $grid->setCaption('My Caption'); //optional
+              
               return array('grid' => $grid);
          }
 

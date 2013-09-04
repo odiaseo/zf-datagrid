@@ -284,8 +284,7 @@
                         if ($buttonPosition == Toolbar::POSITION_BOTH
                             or $buttonPosition == $toolbarPosition
                         ) {
-                            $onLoad[] = sprintf("%s.append(\"<button data-toolbar-id='%s' id='%s'
-                                         title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
+                            $onLoad[] = sprintf("%s.append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
                                         jQuery('#%s', '#%s').bind('click', %s);",
                                 $toolbarId,
                                 $toolbarId,
