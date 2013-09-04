@@ -4,7 +4,7 @@ Introduction
 ------------
 SynergyDataGrid is a [Zend Framework 2](http://framework.zend.com/zf2) module facilitating usage of [JqGrid](http://www.trirand.com/blog/) in ZF2 applications.
 It provides basic CRUD functions for editing  database tables as an AJAX-based grid.
-For use all available jqGrid plugin and library features please see jqGrid documentation at http://www.trirand.com/jqgridwiki/doku.php
+For use all available jqGrid plugin and library features please see jqGrid documentation at <http://www.trirand.com/jqgridwiki/doku.php>
 
 Dependencies
 -------------
@@ -32,17 +32,14 @@ Installation
 > `require` section.
    3. Run `php composer.phar install` (or `php composer.phar update`).
    4. Follow the Post installation steps bellow
-Post Installation steps
-------------------------------
+##Post Installation steps
 Ensure that DoctrineORM is configured correctly
 
 Usage
 -----
 + In your controller class:
 
-	 use  SynergyDataGrid\Grid\JqGridFactory ;
-
-        public function gridAction() {
+            public function gridAction() {
                //replace {Entity_Name} with your entity name e.g. 'Application\Entity\User'
                $serviceManager = $this->getServiceLocator() ;
                $grid = $serviceManager->get('jqgrid')->setGridIdentity({Entity_Name});
@@ -57,7 +54,7 @@ Usage
               $grid->setUrl($url);
               $grid->setCaption('My Caption'); //optional
               return array('grid' => $grid);
-       }
+         }
 
         public function crudAction() {
             $response  = '';
@@ -74,7 +71,7 @@ Usage
                   $response = $grid->prepareGridData();
              }
              return new JsonModel($response);
-        }
+           }
 
         public function getEntityClassname($entityKey){
            //@TODO implement as required
@@ -175,12 +172,12 @@ Modify you grid configuration file or add this to your module.config.php
                                        ),
                                  )
                          );
+
 2. In the controller action that returns the grid data, you need to pass an array as the second parameter to the prepareGridData function.
 The array should have a 'fieldName' key which points to the entity field from which to retrieve the data from. The fieldName is the
 name of the joinColumn on the main entity class.
 
-           public function crudAction(){
-              ......
+           public function crudAction(){              ......
                $className = 'your_class_name';
                $options['fieldName'] = $this->params()->fromRoute('fieldName', null);
                $serviceManager = $this->getServiceLocator();
@@ -191,15 +188,15 @@ name of the joinColumn on the main entity class.
            }
 3. You  would need to specify a callback function to return the subgrid editUrl to that grid. The default is blank. Thee arguments passed to the callback function are:
 
-        $sm = servicelLocator;
-        $entity = The current entity (FQCN)
-        $fieldName = the field name of the join column
-        $targetEntity = FQCN of the target entity
-        $urlTypes:
-             const DYNAMIC_URL_TYPE_GRID       = 1; //this is the url to get data for the main
-             const DYNAMIC_URL_TYPE_EDIT       = 2; // the editurl for main grid
-             const DYNAMIC_URL_TYPE_SUBGRID    = 3; // th edit url for the subgrid for CRUD
-             const DYNAMIC_URL_TYPE_ROW_EXPAND = 4 //row expand url for subgridAsGrid to load data
+  + `$sm` = servicelLocator;
+  + ` $entity` = The current entity (FQCN)
+  + `$fieldName` = the field name of the join column
+  + `$targetEntity` = FQCN of the target entity
+  + `$urlTypes` :
+       - `const DYNAMIC_URL_TYPE_GRID = 1; `//this is the url to get data for the main
+       - `const DYNAMIC_URL_TYPE_EDIT = 2;` // the editurl for main grid
+       - `const DYNAMIC_URL_TYPE_SUBGRID = 3;` // th edit url for the subgrid for CRUD
+      - `const DYNAMIC_URL_TYPE_ROW_EXPAND = 4;` //row expand url for subgridAsGrid to load data
 
 4. Your route should cater for the fieldName parameter which would be picked up in your CRUD action.  Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript
 variable that  would be replaced in the script when the subgrid editUrl is returned so just append it as shown in the example.
@@ -245,7 +242,7 @@ If you have multiple grids with different config requirements you can have grid 
                )
          );
 
-The grid specific options would be merged into the main grid options for grids with that ID.
+> The grid specific options would be merged into the main grid options for grids with that ID.
 
 Tree Grid
 ------------
@@ -273,3 +270,5 @@ In Your controller:
 
 Other filter parameters would be added to the QueryBuilder as normal. The only difference is that instead of creating a
 new QueryBuilder, the modules uses the custom QueryBuilder.
+
+#####[Project Home](http://developer.peleodiase.com)
