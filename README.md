@@ -17,6 +17,9 @@ Dependencies
 ### Optional
 + [Doctrine2 Behavioural Extensions](https://github.com/l3pp4rd/DoctrineExtensions)
 
+####Future Development Plans include:
+- Doctrine ODM Grid
+- Zend DB Grid
 Installation
 ---------------------
 ###Manual Installation
@@ -33,7 +36,7 @@ Installation
    3. Run `php composer.phar install` (or `php composer.phar update`).
    4. Follow the Post installation steps bellow
 ##Post Installation steps
-Ensure that DoctrineORM is configured correctly
+ Currently, this module supports only  Doctrine ORM entities so ensure that DoctrineORM is configured correctly.
 
 Usage
 -----
@@ -198,7 +201,7 @@ name of the joinColumn on the main entity class.
        - `const DYNAMIC_URL_TYPE_SUBGRID = 3;` // th edit url for the subgrid for CRUD
       - `const DYNAMIC_URL_TYPE_ROW_EXPAND = 4;` //row expand url for subgridAsGrid to load data
 
-4. Your route should cater for the fieldName parameter which would be picked up in your CRUD action.  Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript
+> Your route should cater for the fieldName parameter which would be picked up in your CRUD action.  Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript
 variable that  would be replaced in the script when the subgrid editUrl is returned so just append it as shown in the example.
 
          'jqgrid' => array(
