@@ -92,8 +92,8 @@ Usage
 
         echo $this->displayGrid($this->grid);
    - By default the javaScript code would be appended to the head section of the page using the headScript view helper and executed on document ready
-   - If you do not want the script executed on load set `render_script_as_template` option to true. The code would would be wrapped in a `script` tag with type `text/x-jquery-tmpl`
-   - If you want to get access to the html and javascript pass true as the second parameter i.e. `$params = $this->displayGrid($this->grid);`. An associative array of the `html`, `js` and `onLoad` script would be returned. Useful if you are makking AJAX requests to generate the grid.
+   - If you do not want the script executed on load set `render_script_as_template` option to true. The code would be wrapped in a `script` tag with type `text/x-jquery-tmpl`
+   - If you want to get access to the html and javascript pass true as the second parameter i.e. `$params = $this->displayGrid($this->grid, true);`. An associative array of the `html`, `js` and `onLoad` script would be returned. Useful if you are makking AJAX requests to generate the grid.
 + In head section of your layout:
 
              $this->headLink()->appendStylesheet('/jqGrid/css/ui.jqgrid.css')
