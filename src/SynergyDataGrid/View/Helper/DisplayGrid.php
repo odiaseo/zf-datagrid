@@ -32,13 +32,12 @@
     class DisplayGrid extends AbstractHelper
     {
         /**
-         * Grid Instance
+         * @param BaseGrid $grid
+         * @param bool     $appendScript
          *
-         * @param $grid \SynergyDataGrid\Grid\GridType\BaseGrid
-         *
-         * @return string
+         * @return mixed
          */
-        public function __invoke(BaseGrid $grid)
+        public function __invoke(BaseGrid $grid, $appendScript = true)
         {
             list($onLoad, $js, $html) = $this->initGrid($grid);
             $config = $grid->getConfig();
@@ -46,17 +45,26 @@
             $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
             $js           = 'var synergyDataGrid = { ' . DatePicker::DATE_PICKER_FUNCTION . ' : []};' . $js;
 
-            if ($config['render_script_as_template']) {
-                $this->getView()->headScript()
-                    ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
-                    ->appendScript($js);
+            if ($appendScript) {
+                if ($config['render_script_as_template']) {
+                    $this->getView()->headScript()
+                        ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
+                        ->appendScript($js);
+                } else {
+                    $this->getView()->headScript()
+                        ->appendScript($onLoadScript)
+                        ->appendScript($js);
+                }
+
+                return $html;
             } else {
-                $this->getView()->headScript()
-                    ->appendScript($onLoadScript)
-                    ->appendScript($js);
+                return array(
+                    'html'   => $html,
+                    'js'     => $js,
+                    'onLoad' => $onLoad
+                );
             }
 
-            return $html;
         }
 
         public function initGrid(BaseGrid $grid)
