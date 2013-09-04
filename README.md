@@ -231,6 +231,12 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
     $sm = servicelLocator;
     $entity = The current entity (FQCN)
     $fieldName = the field name of the join column
+    $targetEntity = FQCN of the target entity
+    $urlTypes:
+         const DYNAMIC_URL_TYPE_GRID       = 1; //this is the url to get data for the main
+         const DYNAMIC_URL_TYPE_EDIT       = 2; // the editurl for main grid
+         const DYNAMIC_URL_TYPE_SUBGRID    = 3; // th edit url for the subgrid for CRUD
+         const DYNAMIC_URL_TYPE_ROW_EXPAND = 4 //row expand url for subgridAsGrid to load data
 
     Your route should cater for the fieldName parameter which would be picked up in your CRUD action.
     Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript variable that
@@ -240,19 +246,23 @@ see (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid, http://www.trir
     'jqgrid' => array(
          ........
 
-          'grid_url_generator'           => function ($sm, $entity, $fieldName) {
-                    /** @var $helper \Zend\View\Helper\Url */
-                    $helper = $sm->get('viewhelpermanager')->get('url');
-                    $url    = $helper('your_route_name',
-                        array(
-                         'your_parameters',
-                         'fieldName' => $fieldName
-                        )
-                    );
+         'grid_url_generator'           => function ($sm, $entity, $fieldName, $targetEntity, $urlType) {
 
-                    return new Expr("'$url?subgridid='+row_id");
-           }
-    )
+             switch($urlType){
+                .....
+                case \SynergyDataGrid\Grid\GridType\BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
+                //@var $helper \Zend\View\Helper\Url
+                 $helper = $sm->get('viewhelpermanager')->get('url');
+                 $url    = $helper('your_route_name',
+                                     array(
+                                             'your_parameters',
+                                             'fieldName' => $fieldName
+                                     )
+                             );
+
+                 return new \Zend\Json\Expr("'$url?subgridid='+row_id");
+               }
+            )
 ?>
 
 Grid Specific Options (Multiple Grids).
@@ -287,3 +297,28 @@ Tree Grid
 ------------
 To render the tree grid, set the third parameter of the setGridIdentity() method to true in your controller action. This depends on the [Gedmo extension
 for doctrine] (https://github.com/l3pp4rd/DoctrineExtensions). The entity class should implement the required Gedmo tree annotations for this to work;
+
+Custom Queries
+---------------
+The grid by default loads data into the grid from the specified entity without any WHERE clauses.
+If you want to specify a WHERE clause to be used when populating the grid, you can do so by creating
+a  custon QueryBuilder builder and setting it on the grid as shown below:
+
+In Your controller:
+<?php
+        ......
+            $grid = $serviceManager->get('jqgrid');
+
+            $qb    = $grid->getEntityManager()->createQueryBuilder();
+            $alias = $grid->getService()->getAlias();
+
+            $qb->where($alias . '.your_field', ':param')
+                ->setParameter(':param', 'your_value');
+
+            $grid->setCustomQueryBuilder($qb);
+
+        ........
+?>
+
+Other filter parameters would be added to the querybuilder as normal. The only difference is that instead of creating a
+new QueryBuilder, the modules uses tje custom QueryBuilder.

@@ -1,12 +1,26 @@
 <?php
     namespace SynergyDataGrid\View\Helper;
 
+    /**
+     * This file is part of the Synergy package.
+     *
+     * (c) Pele Odiase <info@rhemastudio.com>
+     *
+     * For the full copyright and license information, please view the LICENSE
+     * file that was distributed with this source code.
+     *
+     * @author  Pele Odiase
+     * @license http://opensource.org/licenses/BSD-3-Clause
+     *
+     */
+    use SynergyDataGrid\Grid\GridType\BaseGrid;
+    use SynergyDataGrid\Grid\Plugin\DatePicker;
+    use SynergyDataGrid\Grid\SubGridAwareInterface;
     use SynergyDataGrid\Grid\Toolbar;
-    use Zend\Http\Request;
+    use Zend\Http\PhpEnvironment\Request;
     use Zend\Json\Expr;
     use Zend\Stdlib\Parameters;
     use Zend\View\Helper\AbstractHelper;
-    use SynergyDataGrid\Grid\JqGridFactory;
     use Zend\Json\Json;
 
     /**
@@ -20,31 +34,32 @@
         /**
          * Grid Instance
          *
-         * @param $grid \SynergyDataGrid\Grid\JqGridFactory
+         * @param $grid \SynergyDataGrid\Grid\GridType\BaseGrid
          *
          * @return string
          */
-        public function __invoke(JqGridFactory $grid)
+        public function __invoke(BaseGrid $grid)
         {
             list($onLoad, $js, $html) = $this->initGrid($grid);
             $config = $grid->getConfig();
 
-            $onLoadScript = ';jQuery(function(){' . implode("\n", $onLoad) . '});';
+            $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
+            $js           = 'var synergyDataGrid = { ' . DatePicker::DATE_PICKER_FUNCTION . ' : []};' . $js;
 
             if ($config['render_script_as_template']) {
                 $this->getView()->headScript()
                     ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
-                    ->appendScript(implode("\n", $js));
+                    ->appendScript($js);
             } else {
                 $this->getView()->headScript()
                     ->appendScript($onLoadScript)
-                    ->appendScript(implode("\n", $js));
+                    ->appendScript($js);
             }
 
-            return implode("\n", $html);
+            return $html;
         }
 
-        public function initGrid(JqGridFactory $grid)
+        public function initGrid(BaseGrid $grid)
         {
             $html        = array();
             $js          = array();
@@ -53,7 +68,6 @@
 
             $config = $grid->getConfig();
             $gridId = $grid->getId();
-
 
             if ($grid->getIsTreeGrid()) {
                 $grid->setActionsColumn(false);
@@ -64,13 +78,22 @@
             $grid->setGridColumns()
                 ->setGridDisplayOptions()
                 ->setAllowEditForm($config['allow_form_edit']);
-            $onLoad[] = 'var synergyDataGrid = {};';
+
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
             $onLoad[] = sprintf('var %s = jQuery("#%s");', $gridId, $gridId);
             $onLoad[] = sprintf('%s.data("lastsel", 0);', $gridId);
 
             if (!$grid->getEditurl()) {
                 $grid->setEditurl($grid->getUrl());
+            }
+
+            //add custom toolbar buttons
+            list($toolbarEnabled, $toolbarPosition) = $grid->getToolbar();
+
+            if (!$showToolbar = ($config['toolbar_buttons']['global']
+                or isset($config['toolbar_buttons']['specific'][$grid->getEntityId()]))
+            ) {
+                $grid->setToolbar(false);
             }
 
             //get previous sort order from cookie if set
@@ -102,7 +125,8 @@
                 $request    = new Request();
                 $parameters = new Parameters($params);
                 $request->setPost($parameters);
-                $initialData = $grid->getFirstDataAsLocal($request);
+
+                $initialData = $grid->getFirstDataAsLocal($request, true);
 
                 $postCommand[] = sprintf('%s.jqGrid("setGridParam", {datatype:"json", treedatatype : "json"});',
                     $gridId, $grid->getEditurl());
@@ -119,6 +143,28 @@
                 $grid->prepareColumnSizes();
             }
 
+            //Add subgrid as grid data. This will override any subgrid
+            if ($grid instanceof SubGridAwareInterface and  $subGrids = $grid->getSubGridsAsGrid()) {
+
+                foreach ($subGrids as $subGrid) {
+                    list($l[], $s[], $h[]) = $this->initGrid($subGrid);
+                }
+
+                $expandFunction = new Expr(
+                    sprintf("function(subgrid_id, row_id) {
+                       jQuery('#'+subgrid_id).html('%s');
+                       %s
+                       %s
+                    }"
+                        ,
+                        implode("<hr />", $h),
+                        implode("\n", $l),
+                        implode("\n", $s)
+                    )
+                );
+
+                $grid->setSubGridRowExpanded($expandFunction);
+            }
 
             $onLoad[] = $grid->getJsCode()->prepareSetColumnsOrderingCookie();
             $grid->reorderColumns();
@@ -160,6 +206,10 @@
                         $gridId,
                         Json::encode($config['filter_toolbar']['options'], false, array('enableJsonExprFinder' => true))
                     );
+
+                    if (!$config['filter_toolbar']['showOnLoad']) {
+                        $onLoad[] = sprintf('%s[0].toggleToolbar();', $gridId);
+                    }
                 }
 
                 $navButtons = $grid->getNavButtons();
@@ -210,17 +260,15 @@
             }
 
             //add custom toolbar buttons
-            list($toolbarEnabled, $toolbarPosition) = $grid->toolbar;
-            if ($toolbarEnabled and $config['toolbar_buttons']) {
-
+            if ($showToolbar) {
                 if ($toolbarPosition == Toolbar::POSITION_BOTH) {
-                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM);
-                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP);
+                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM, $toolbarPosition);
+                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP, $toolbarPosition);
 
                 } elseif ($toolbarPosition == Toolbar::POSITION_BOTTOM) {
-                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM);
+                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM, $toolbarPosition);
                 } else {
-                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP);
+                    $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP, $toolbarPosition);
                 }
 
                 /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
@@ -228,14 +276,16 @@
                     $toolbarId       = $toolbar->getId();
                     $toolbarPosition = $toolbar->getPosition();
                     $onLoad[]        = sprintf("var %s = jQuery('#%s');", $toolbarId, $toolbarId);
-                    $onLoad[]        = sprintf(";%s.data('grid', %s).addClass('grid-toolbar btn-group grid-toolbar-%s');", $toolbarId, $gridId, $toolbarPosition);
+                    $onLoad[]        = sprintf(";%s.data('grid', %s).addClass('grid-toolbar btn-group grid-toolbar-%s');",
+                        $toolbarId, $gridId, $toolbarPosition);
 
                     foreach ($toolbar->getItems() as $toolbarButton) {
                         $buttonPosition = $toolbarButton->getPosition();
                         if ($buttonPosition == Toolbar::POSITION_BOTH
                             or $buttonPosition == $toolbarPosition
                         ) {
-                            $onLoad[] = sprintf("%s.append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
+                            $onLoad[] = sprintf("%s.append(\"<button data-toolbar-id='%s' id='%s'
+                                         title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
                                         jQuery('#%s', '#%s').bind('click', %s);",
                                 $toolbarId,
                                 $toolbarId,
@@ -274,8 +324,11 @@
                 $js     = $this->compressJavaScriptScript($js);
             }
 
-            return array($onLoad, $js, $html);
-
+            return array(
+                implode("\n", $onLoad),
+                implode("\n", $js),
+                implode("", $html)
+            );
         }
 
         /**

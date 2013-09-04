@@ -1,8 +1,21 @@
 <?php
     namespace SynergyDataGrid\Grid;
 
+    use SynergyDataGrid\Grid\GridType\BaseGrid;
     use SynergyDataGrid\Grid\Toolbar\Item;
 
+    /**
+     * This file is part of the Synergy package.
+     *
+     * (c) Pele Odiase <info@rhemastudio.com>
+     *
+     * For the full copyright and license information, please view the LICENSE
+     * file that was distributed with this source code.
+     *
+     * @author  Pele Odiase
+     * @license http://opensource.org/licenses/BSD-3-Clause
+     *
+     */
     class Toolbar extends Property
     {
         const TOOLBAR_PREFIX_BOTTOM = 'tb_';
@@ -19,15 +32,15 @@
         /**
          * Set up base NavGrid options
          *
-         * @param \SynergyDataGrid\Grid\JqGridFactory $grid    JqGrid instance
+         * @param \SynergyDataGrid\Grid\BaseGrid $grid    JqGrid instance
          *
          * @return void
          */
-        public function __construct(JqGridFactory $grid, $buttons = array(), $position = self::POSITION_BOTTOM)
+        public function __construct(BaseGrid $grid, $buttons = array(), $position = self::POSITION_BOTTOM, $configPosition = self::POSITION_BOTTOM)
         {
             switch ($position) {
                 case self::POSITION_BOTTOM:
-                    $prefix = self::TOOLBAR_PREFIX_BOTTOM;
+                    $prefix = ($configPosition == self::POSITION_BOTTOM) ? self::TOOLBAR_PREFIX_TOP : self::TOOLBAR_PREFIX_BOTTOM;
                     break;
                 default:
                     $prefix = self::TOOLBAR_PREFIX_TOP;
@@ -79,6 +92,7 @@
         public function setPosition($position)
         {
             $this->_position = $position;
+
             return $this;
         }
 

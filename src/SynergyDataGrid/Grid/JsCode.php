@@ -1,12 +1,23 @@
 <?php
     namespace SynergyDataGrid\Grid;
 
+    /*
+     * This file is part of the Synergy package.
+     *
+     * (c) Pele Odiase <info@rhemastudio.com>
+     *
+     * For the full copyright and license information, please view the LICENSE
+     * file that was distributed with this source code.
+     *
+     * @author Pele Odiase
+     * @license http://opensource.org/licenses/BSD-3-Clause
+     *
+     */
     use SynergyDataGrid\Grid\Column;
-    use SynergyDataGrid\Util\ArrayUtils;
-    use SynergyDataGrid\Grid\JqGridFactory;
+    use SynergyDataGrid\Grid\GridType\BaseGrid;
     use Zend\Json\Expr;
 
-    /**203
+    /**
      *
      * JsCode class is needed to prepare all javascript code for jqGrid plugin
      *
@@ -33,24 +44,33 @@
          */
         protected $_containerClass = 'grid-data';
 
+
+        protected $_padding;
+
         /**
          * Set up base JsCode options
          *
-         * @param JqGridFactory $grid
+         * @param EntityGrid $grid
          */
 
-        public function __construct(JqGridFactory $grid = null)
+        public function __construct(BaseGrid $grid = null, $padding = 6)
         {
-            $this->grid = $grid;
+            $this->grid     = $grid;
+            $this->_padding = $padding;
         }
 
         public function addAutoResizeScript($gridId)
         {
             $this->addCustomScript(
                 new Expr(
-                    sprintf(";jQuery(window).bind('resize', function(){  var gw = jQuery('#%s').closest('.%s').width();  jQuery('#%s').jqGrid('setGridWidth',gw)  }); ",
+                    sprintf(";jQuery(window).bind('resize', function(){
+                        var par = jQuery('#%s').closest('.%s');
+                        var gw = par.width() - %d;
+                        jQuery('#%s').jqGrid('setGridWidth',gw)
+                     }); ",
                         $gridId,
                         $this->getContainerClass(),
+                        $this->_padding,
                         $gridId
                     )
                 )
@@ -70,12 +90,13 @@
                 'Actions',
                 array(
                     'name'          => 'myac',
-                    'width'         => 80,
+                    'width'         => 60,
                     'fixed'         => true,
                     'sortable'      => false,
                     'resizable'     => false,
                     'formatter'     => 'actions',
                     'search'        => false,
+                    'classes'       => 'action-column',
                     'viewable'      => false,
                     'formatoptions' => array(
                         'keys'           => false,
@@ -221,6 +242,8 @@
                 }    
         }
         "));
+
+            return $this;
         }
 
         /**
@@ -267,6 +290,8 @@
                     }   
                 ")));
             }
+
+            return $this;
         }
 
         /**
@@ -285,6 +310,8 @@
                             $this->getCustomButtonsHide() . " }  ")));
                 }
             }
+
+            return $this;
         }
 
         /**
@@ -303,6 +330,8 @@
         } 
         ")));
             }
+
+            return $this;
         }
 
         /**
@@ -316,7 +345,7 @@
           function(newwidth, index) {
                 colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
                 columnName = colModel[index].name;
-                columnSizesCookieName = '" . JqGridFactory::COOKIE_COLUMNS_SIZES_PREFIX .
+                columnSizesCookieName = '" . BaseGrid::COOKIE_COLUMNS_SIZES_PREFIX .
                 $this->grid->getId() . "';
                 columnSizesCookieName = columnSizesCookieName.toLowerCase().replace(/\//g,'_');
                 currentValues = jQuery.cookie(columnSizesCookieName);
@@ -343,6 +372,7 @@
                 " . ($this->grid->getReloadAfterResize() ? "window.document.location.reload();" : "") . "
           }
             ");
+
         }
 
         /**
@@ -354,12 +384,13 @@
         {
             return new Expr("
           function(index,iCol,sortorder) {
-                var sortingCookieName = '" . JqGridFactory::COOKIE_SORTING_PREFIX . $this->grid->getId() . "';
+                var sortingCookieName = '" . BaseGrid::COOKIE_SORTING_PREFIX . $this->grid->getId() . "';
                 sortingCookieName = sortingCookieName.toLowerCase().replace(/\//g,'_');
                 var newValue = index + ':' + sortorder;
                 jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
+
         }
 
         /**
@@ -371,12 +402,13 @@
         {
             return new Expr("
           function(pgButton) {
-                var pagingCookieName = '" . JqGridFactory::COOKIE_PAGING_PREFIX . $this->grid->getId() . "';
+                var pagingCookieName = '" . BaseGrid::COOKIE_PAGING_PREFIX . $this->grid->getId() . "';
                 pagingCookieName = pagingCookieName.toLowerCase().replace(/\//g,'_');
                 var newValue = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','rowNum');
                 jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
+
         }
 
         /**
@@ -389,7 +421,7 @@
             return new Expr("
          jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop', 
             function(event, ui) {
-                var orderingCookieName = '" . JqGridFactory::COOKIE_COLUMNS_ORDERING_PREFIX . $this->grid->getId() . "';
+                var orderingCookieName = '" . BaseGrid::COOKIE_COLUMNS_ORDERING_PREFIX . $this->grid->getId() . "';
                 orderingCookieName = orderingCookieName.toLowerCase().replace(/\//g,'_');
                 var colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
                 var newValue = '';
@@ -401,6 +433,7 @@
                 " . ($this->grid->getReloadAfterChangeColumnsOrdering() ? "window.document.location.reload();" : "") . "
             });
             ");
+
         }
 
         /**
@@ -501,6 +534,18 @@
         public function getContainerClass()
         {
             return $this->_containerClass;
+        }
+
+        public function setPadding($padding)
+        {
+            $this->_padding = $padding;
+
+            return $this;
+        }
+
+        public function getPadding()
+        {
+            return $this->_padding;
         }
 
     }

@@ -1,12 +1,23 @@
 <?php
     namespace SynergyDataGrid\Grid;
 
-    use SynergyDataGrid\Grid\Column\EditOptions;
+    /*
+     * This file is part of the Synergy package.
+     *
+     * (c) Pele Odiase <info@rhemastudio.com>
+     *
+     * For the full copyright and license information, please view the LICENSE
+     * file that was distributed with this source code.
+     *
+     * @author Pele Odiase
+     * @license http://opensource.org/licenses/BSD-3-Clause
+     *
+     */
     use Doctrine\ORM\PersistentCollection;
-    use SynergyDataGrid\Grid\Column\FormatOptions;
+    use SynergyDataGrid\Grid\Column\EditOptions;
     use SynergyDataGrid\Grid\Column\EditRules;
+    use SynergyDataGrid\Grid\Column\FormatOptions;
     use Zend\Filter\HtmlEntities;
-    use ZendTest\XmlRpc\Server\Exception;
 
     /**
      * Column class for single grid column implementation
@@ -71,7 +82,7 @@
          *
          * @var string
          */
-        const DEFAULT_TEXTAREA_ROWS = 3;
+        const DEFAULT_TEXTAREA_ROWS = 2;
         /**
          * Default columns count for "textarea" editype
          *

@@ -1,6 +1,19 @@
 <?php
-    namespace SynergyDataGrid\Grid;
+    namespace SynergyDataGrid\Grid\Plugin;
 
+    /*
+     * This file is part of the Synergy package.
+     *
+     * (c) Pele Odiase <info@rhemastudio.com>
+     *
+     * For the full copyright and license information, please view the LICENSE
+     * file that was distributed with this source code.
+     *
+     * @author Pele Odiase
+     * @license http://opensource.org/licenses/BSD-3-Clause
+     *
+     */
+    use SynergyDataGrid\Grid\Property;
     use Zend\Json\Encoder;
 
     /**
@@ -12,6 +25,7 @@
      */
     class DatePicker extends Property
     {
+        const DATE_PICKER_FUNCTION = 'initDatePicker';
         /**
          * Javascript function name to attach DatePicker to fields
          *
@@ -45,8 +59,8 @@
         /**
          * Set up base DatePicker options
          *
-         * @param \SynergyDataGrid\Grid\JqGridFactory $grid    JqGrid instance
-         * @param array                               $options array of options
+         * @param \SynergyDataGrid\Grid\GridType\BaseGrid $grid    JqGrid instance
+         * @param array                                   $options array of options
          *
          * @return void
          */
@@ -54,7 +68,7 @@
         {
             $this->setGrid($grid);
             //$this->setFunctionName('dp_' . $this->getGrid()->getId());
-            $this->setFunctionName('initDatePicker');
+            $this->setFunctionName('synergyDataGrid.' . self::DATE_PICKER_FUNCTION . '["' . $grid->getId() . '"]');
             $this->setDateFormat(self::DATE_DEFAULTFORMAT);
             $this->setTimeFormat(self::TIME_DEFAULTFORMAT);
             $this->setOptions($options);
@@ -97,7 +111,7 @@
         /**
          * Set JqGrid instance
          *
-         * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance
+         * @param \SynergyDataGrid\Grid\GridType\BaseGrid $grid JqGrid instance
          *
          * @return \SynergyDataGrid\DatePicker
          */
@@ -172,14 +186,15 @@
         {
             $datePicker = array();
             list($allDatesInGrid, $allDatetimesInGrid, $allDatesInForm, $allDatetimesInForm) = $this->_getAllDatesInGrid();
-            $datePickerFunctionName = $this->getFunctionName();
-            $id                     = $this->getGrid()->getId();
-            $datePicker[]           =
-                "if(typeof synergyDataGrid == 'undefined'){ synergyDataGrid =  {};  }
-                 synergyDataGrid.{$datePickerFunctionName} = function(id) {  ";
-            if ($allDatesInGrid) {
-                $datePicker[] =
-                    sprintf('
+
+            if ($allDatesInGrid or $allDatetimesInGrid) {
+                $datePickerFunctionName = $this->getFunctionName();
+                $id                     = $this->getGrid()->getId();
+                $datePicker[]           =
+                    "; {$datePickerFunctionName} = function(id) {  ";
+                if ($allDatesInGrid) {
+                    $datePicker[] =
+                        sprintf('
                     if (typeof id != "object") {
                         jQuery(%s, "#%s").datepicker(%s);
                         if (jQuery(%s).is(":focus")) {
@@ -187,28 +202,28 @@
                         }
                     }
                     ',
-                        $allDatesInGrid,
-                        $id,
-                        Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
-                        $allDatesInGrid,
-                        $allDatesInGrid
-                    );
-                $datePicker[] =
-                    sprintf('
+                            $allDatesInGrid,
+                            $id,
+                            Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
+                            $allDatesInGrid,
+                            $allDatesInGrid
+                        );
+                    $datePicker[] =
+                        sprintf('
                     jQuery(%s).datepicker(%s);
                     if (jQuery(%s).is(":focus")) {
                         jQuery(%s).datepicker("show");
                     }
                     ',
-                        $allDatesInForm,
-                        Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
-                        $allDatesInForm,
-                        $allDatesInForm
-                    );
-            }
-            if ($allDatetimesInGrid) {
-                $datePicker[] =
-                    sprintf('
+                            $allDatesInForm,
+                            Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
+                            $allDatesInForm,
+                            $allDatesInForm
+                        );
+                }
+                if ($allDatetimesInGrid) {
+                    $datePicker[] =
+                        sprintf('
                     if (typeof id != "object") {
                         jQuery(%s, "#%s").datetimepicker(%s);
                         if (jQuery(%s).is(":focus")) {
@@ -216,29 +231,30 @@
                         }
                     }
                     ',
-                        $allDatetimesInGrid,
-                        $id,
-                        Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
-                        $allDatetimesInGrid,
-                        $allDatetimesInGrid
-                    );
-                $datePicker[] =
-                    sprintf('
+                            $allDatetimesInGrid,
+                            $id,
+                            Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
+                            $allDatetimesInGrid,
+                            $allDatetimesInGrid
+                        );
+                    $datePicker[] =
+                        sprintf('
                     jQuery(%s).datetimepicker(%s);
                     if (jQuery(%s).is(":focus")) {
                         jQuery(%s).datetimepicker("show");
                     }
                     ',
-                        $allDatetimesInForm,
-                        Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
-                        $allDatetimesInForm,
-                        $allDatetimesInForm
-                    );
+                            $allDatetimesInForm,
+                            Encoder::encode($this->getOptions(), false, array('enableJsonExprFinder' => true)),
+                            $allDatetimesInForm,
+                            $allDatetimesInForm
+                        );
+                }
+                $datePicker[] =
+                    "
+                        }
+                    ";
             }
-            $datePicker[] =
-                "
-                    }
-                ";
 
             return $datePicker;
         }
