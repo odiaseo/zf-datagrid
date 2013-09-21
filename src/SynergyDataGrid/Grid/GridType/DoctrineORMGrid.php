@@ -104,15 +104,17 @@
             $subGridService = $this->_serviceLocator->get('ModelService')->getService($subGridMap['targetEntity']);
             $subGrid        = new SubGrid($subGridMap['targetEntity'], $subGridService);
 
-            $params[] = $subGridMap['fieldName'];
-
             $mapping = $subGrid->getService()->getEntityManager()->getClassMetadata($subGridMap['targetEntity']);
+
+            $params[] = $subGridMap['fieldName'];
+            $id       = current($mapping->identifier);
 
             foreach ($mapping->fieldMappings as $map) {
                 if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
                     continue;
                 }
                 $names[] = $map['fieldName'];
+                $width[] = ($id == $map['fieldName']) ? '60px' : '100px';
             }
 
             foreach ($mapping->associationMappings as $map) {
@@ -120,11 +122,12 @@
                     continue;
                 }
                 $names[] = $map['fieldName'];
+                $width[] = '100px';
             }
 
             $subGrid->name = $names;
 
-            //$subGrid->width  = $width; //@todo get width from column model
+            $subGrid->width  = $width; //@todo get width from column model
             $subGrid->params = $params;
 
 
@@ -265,28 +268,34 @@
                         continue;
                     }
 
-                    //if (!$dataOnly) {
-
                     if ($this->_isSubGridAsGrid($fieldName)) {
                         $this->_subGridsAsGrid[] = $this->createSubGridAsGrid($map);
                         $this->setSubGrid(true);
-                        $data['hidden'] = true;
+
+                        $data['editrules']['edithidden'] = false;
                     } else if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
                         $this->_subGrid = $this->getSubGridModel($map);
                         $target         = $fieldName;
-                        $data['hidden'] = true;
 
                         if (is_callable($this->_config['grid_url_generator'])) {
                             $subGridUrl = $this->_config['grid_url_generator'](
                                 $this->getServiceLocator(),
                                 $this->getEntity(),
                                 $fieldName,
-                                $map['targetEneity'],
+                                $map['targetEntity'],
                                 self::DYNAMIC_URL_TYPE_SUBGRID
                             );
 
-                            $this->_subGrid->setUrl($url);
-                            $this->_subGrid->setEditurl($url);
+                            $editUrl = $this->_config['grid_url_generator'](
+                                $this->getServiceLocator(),
+                                $map['targetEntity'],
+                                $fieldName,
+                                null,
+                                self::DYNAMIC_URL_TYPE_GRID
+                            );
+
+                            $this->_subGrid->setUrl($subGridUrl);
+                            $this->_subGrid->setEditurl($editUrl);
                         } else {
                             $subGridUrl = $this->getSubGridUrl();
                         }
@@ -302,7 +311,6 @@
                         $this->_hasSubGrid = true;
                         $this->setSubGrid(true);
                     }
-                    // }
 
                     if (isset($this->_config['column_type_mapping'][$fieldName])) {
                         $type = $this->_config['column_type_mapping'][$fieldName];
@@ -316,7 +324,7 @@
                         $values = implode(';', $values);
                     }
 
-                    $data = array_merge($data, array(
+                    $data = array_merge_recursive(array(
                             'name'          => $fieldName,
                             'edittype'      => $type,
                             'stype'         => $type,
@@ -332,7 +340,8 @@
                             'editoptions'   => array(
                                 'value' => $values,
                             )
-                        )
+                        ),
+                        $data
                     );
 
 
@@ -452,16 +461,17 @@
             } else {
                 $targetEntity = get_class($refObject);
             }
-            $targetMap      = $this->getService()->getEntityManager()->getClassMetadata($targetEntity);
+
+            $parentMeta     = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
             $subGridService = $this->_serviceLocator->get('ModelService')->getService($targetEntity);
 
-            if ($request->getPost('_search') == 'true') {
-                $childRows = $this->getPaginator($request, $subGridService)->getIterator();
-            } elseif ($refObject instanceof PersistentCollection) {
-                $childRows = $refObject;
-            } else {
+            $mappedBy      = $parentMeta->associationMappings[$field]['mappedBy'];
+            $subGridFilter = array($mappedBy => $id);
+            $paginator     = $this->getPaginator($request, $subGridService, $subGridFilter);
+            $childRows     = $paginator->getIterator();
+
+            if (!$childRows) {
                 $childRows = new ArrayCollection();
-                $childRows->add($refObject);
             }
 
             $subGrid = $this->getServiceLocator()
@@ -475,11 +485,12 @@
             $subGrid->reorderColumns();
             $columns = $subGrid->setGridColumns()->getColumns();
 
-            $total = count($childRows);
+            $total  = $paginator->count();
+            $rowNum = $paginator->getQuery()->getMaxResults();
 
             $grid = array(
-                'page'    => 1,
-                'total'   => $total,
+                'page'    => $request->getPost('page', 1),
+                'total'   => ceil($total / $rowNum),
                 'records' => $total,
                 'rows'    => $this->_formatGridData($childRows, $columns)
             );
@@ -569,7 +580,7 @@
                     if (array_key_exists($param, $mapping->fieldMappings) or array_key_exists($param, $mapping->associationMappings)) {
 
                         $method = 'set' . ucfirst($param);
-                        $value  = ($value == 'null') ? null : $value;
+                        $value  = ($value == 'null' or empty($value)) ? null : $value;
 
                         if (isset($mapping->associationMappings[$param])) {
                             $target = $mapping->associationMappings[$param]['targetEntity'];
@@ -593,7 +604,7 @@
                                         $message = "Unable to update join table: {$target} " . $param . '"';
                                     }
                                 }
-                            } else {
+                            } elseif ($value) {
                                 if ($foreignEntity = $service->getEntityManager()->find($target, $value)) {
                                     $entity->$method($foreignEntity);
                                 } else {
@@ -676,13 +687,17 @@
         /**
          * Binds the grid to the database entity and assigns an ID to the grid
          *
-         * @param      $entityClassName
-         * @param null $gridId
+         * @param        $entityClassName
+         * @param string $gridId
+         * @param null   $idSuffix When display multiple grids on the same entity, use to make the gridId unique
+         * @param bool   $displayTree
+         *
+         * @return $this
          */
-        public function setGridIdentity($entityClassName, $gridId = '', $displayTree = true)
+        public function setGridIdentity($entityClassName, $gridId = '', $idSuffix = null, $displayTree = true)
         {
             $this->setEntityId($gridId);
-            $this->setId($gridId);
+            $this->setId($gridId . $idSuffix);
             $this->setEntity($entityClassName);
             $this->setService($this->getServiceLocator());
             $this->setObjectManager($this->getServiceLocator());
@@ -721,21 +736,16 @@
             /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
             $subGrid = $this->getServiceLocator()->setShared('jqgrid', false)->get('jqgrid');
 
-            //$config = $this->getServiceLocator()->get('Config');
-            //$subGrid  = new DoctrineORMGrid($config['jqgrid'], $this->getServiceLocator());
-
-
             $subGrid->setUrl($this->getUrl());
             $subGrid->setIsDetailGrid(true);
             $subGrid->setMasterGridId($this->getId());
             $subGrid->setCaption($subGridMap['fieldName']);
             $subGrid->getJsCode()
-                ->setContainerClass('subgrid-data')
-                ->setPadding(20);
+                ->setContainerClass(SubGrid::WRAPPER_CLASS)
+                ->setPadding(SubGrid::GRID_PADDING);
 
             //disable hide grid
             $subGrid->setHidegrid(false);
-
 
             $subGrid->setGridIdentity(
                 $subGridMap['targetEntity'],
@@ -747,8 +757,8 @@
                     $subGridMap['fieldName'], $subGridMap['targetEntity'], self::DYNAMIC_URL_TYPE_ROW_EXPAND);
 
                 //subgrid edit url
-                $editUrl = $this->_config['grid_url_generator']($subGrid->getServiceLocator(), $this->getEntity(),
-                    $subGridMap['fieldName'], $subGridMap['targetEntity'], self::DYNAMIC_URL_TYPE_SUBGRID);
+                $editUrl = $this->_config['grid_url_generator']($subGrid->getServiceLocator(), $subGridMap['targetEntity'],
+                    $subGridMap['fieldName'], null, self::DYNAMIC_URL_TYPE_GRID);
 
                 $subGrid->setUrl($url);
                 $subGrid->setEditurl($editUrl);
@@ -894,26 +904,24 @@
         }
 
         /**
-         * @param       $perPage
-         * @param int   $page
-         * @param array $filter
-         * @param array $sort
-         * @param array $treeFilter
+         * @param       $request
+         * @param null  $service
+         * @param array $subGridFilter
          *
-         * @return Paginator
+         * @return Paginator|\Zend\Paginator\Paginator
          */
-        protected function getPaginator($request, $service = null)
+        protected function getPaginator($request, $service = null, $subGridFilter = array())
         {
             $treeFilter = array();
             $sort       = array();
             $filter     = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
 
             if ($this->isTreeGrid) {
-                $sort[] = array(
+                $sort['lft'] = array(
                     'sidx' => 'lft',
                     'sord' => 'ASC'
                 );
-                $node   = $request->getPost('nodeid', false);
+                $node        = $request->getPost('nodeid', false);
                 if ($node > 0) {
                     $n_lvl      = (integer)$request->getPost("n_level");
                     $n_lvl      = $n_lvl + 1;
@@ -929,14 +937,14 @@
                 }
             }
 
-            if ($idx = $request->getPost('sidx')) {
-                $sort[] = array(
+            if ($idx = $request->getPost('sidx') and !isset($sort[$idx])) {
+                $sort[$idx] = array(
                     'sidx' => $idx,
                     'sord' => $request->getPost('sord')
                 );
             } else {
                 if ($f = $this->getSortname() and $o = $this->getSortorder()) {
-                    $sort[] = array(
+                    $sort[$f] = array(
                         'sidx' => $f,
                         'sord' => $o
                     );
@@ -952,6 +960,18 @@
             $service = $service ? : $this->getService();
             $adapter = new ORMQueryAdapter($this, $service, $filter, $sort, $treeFilter);
             $query   = $adapter->createQuery($offset, $perPage);
+
+            //filter result if subgrid
+            if ($subGridFilter) {
+                foreach ($subGridFilter as $field => $value) {
+                    $query->andWhere(
+                        $query->expr()->eq(
+                            $service->getAlias() . '.' . $field,
+                            $value
+                        )
+                    );
+                }
+            }
 
             $paginator = new Paginator($query);
 

@@ -43,7 +43,14 @@
             $config = $grid->getConfig();
 
             $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
-            $js           = 'var synergyDataGrid = { ' . DatePicker::DATE_PICKER_FUNCTION . ' : []};' . $js;
+            $js           = 'function synergyResizeGrid(grid, parentSelector){
+                                var g = jQuery(grid);
+                                var par = g.closest(parentSelector);
+                                var padding = g.data("padding");
+                                var gw = par.innerWidth() - padding;
+                                g.jqGrid("setGridWidth",gw);
+                            }
+                            var synergyDataGrid = { ' . DatePicker::DATE_PICKER_FUNCTION . ' : []}; ' . $js;
 
             if ($appendScript) {
                 if ($config['render_script_as_template']) {
@@ -77,18 +84,16 @@
             $config = $grid->getConfig();
             $gridId = $grid->getId();
 
-            if ($grid->getIsTreeGrid()) {
-                $grid->setActionsColumn(false);
-            } else {
-                $grid->setActionsColumn($config['add_action_column']);
-            }
+            $grid->setActionsColumn($config['add_action_column']);
 
             $grid->setGridColumns()
                 ->setGridDisplayOptions()
                 ->setAllowEditForm($config['allow_form_edit']);
 
             $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
-            $onLoad[] = sprintf('var %s = jQuery("#%s");', $gridId, $gridId);
+            $onLoad[] = sprintf('var %s = jQuery("#%s").addClass("synergy-grid").data("padding", %d);',
+                $gridId, $gridId, $grid->getJsCode()->getPadding());
+            $onLoad[] = sprintf('%s.parent().addClass("%s");', $gridId, $grid->getJsCode()->getContainerClass());
             $onLoad[] = sprintf('%s.data("lastsel", 0);', $gridId);
 
             if (!$grid->getEditurl()) {
@@ -321,6 +326,8 @@
             foreach ($grid->getJsCode()->getCustomScripts() as $script) {
                 $onLoad[] = Json::encode($script, false, array('enableJsonExprFinder' => true));
             }
+
+            $onLoad[] = sprintf("; synergyResizeGrid('#%s', '.%s');", $grid->getId(), $grid->getJsCode()->getContainerClass());
 
             $html   = array_merge($html, $grid->getHtml());
             $js     = array_merge($js, $grid->getJs());

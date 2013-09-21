@@ -53,29 +53,29 @@
          * @param EntityGrid $grid
          */
 
-        public function __construct(BaseGrid $grid = null, $padding = 6)
+        public function __construct(BaseGrid $grid = null, $padding = 0)
         {
             $this->grid     = $grid;
             $this->_padding = $padding;
         }
 
+
         public function addAutoResizeScript($gridId)
         {
-            $this->addCustomScript(
+            return $this->addCustomScript(
                 new Expr(
-                    sprintf(";jQuery(window).bind('resize', function(){
-                        var par = jQuery('#%s').closest('.%s');
-                        var gw = par.width() - %d;
-                        jQuery('#%s').jqGrid('setGridWidth',gw)
-                     }); ",
+                    sprintf("jQuery(window).on('resize', function(){
+                            jQuery('#%s:visible').each(function(){
+                                synergyResizeGrid(this, '.%s');
+                            });
+                    }); ",
                         $gridId,
-                        $this->getContainerClass(),
-                        $this->_padding,
-                        $gridId
+                        $this->getContainerClass()
                     )
                 )
             );
         }
+
 
         /**
          * Add actions column to the grid with base controls (edit or editform, delete)
@@ -343,16 +343,17 @@
         {
             return new Expr("
           function(newwidth, index) {
-                colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
-                columnName = colModel[index].name;
-                columnSizesCookieName = '" . BaseGrid::COOKIE_COLUMNS_SIZES_PREFIX .
+                var colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
+                var columnName = colModel[index].name;
+                var columnSizesCookieName = '" . BaseGrid::COOKIE_COLUMNS_SIZES_PREFIX .
                 $this->grid->getId() . "';
                 columnSizesCookieName = columnSizesCookieName.toLowerCase().replace(/\//g,'_');
-                currentValues = jQuery.cookie(columnSizesCookieName);
-                found = false;
-                newValue = '';
+                var currentValues = jQuery.cookie(columnSizesCookieName);
+                var found = false;
+                var newValue = '';
+                var colInfo = [];
                 if (currentValues) {
-                    valuesArray = currentValues.split(';');
+                    var valuesArray = currentValues.split(';');
                     for (i = 0; i < valuesArray.length; i++) {
                         colInfo = valuesArray[i].split(':');
                         if (colInfo[0] == columnName) {

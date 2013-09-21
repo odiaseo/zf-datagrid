@@ -438,7 +438,6 @@
          */
         public function setGridDisplayOptions()
         {
-
             $this->setPager($this->getId() . '_pager');
             if (!isset($this->_config['grid_options']['rowList'])) {
                 $this->setRowList(range($this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5, $this->_defaultItemCountPerPage));
@@ -547,6 +546,7 @@
 
             $this->getJsCode()->addAutoResizeScript($this->getId());
 
+
             return $this;
         }
 
@@ -610,8 +610,8 @@
 
             foreach ($rows as $k => $row) {
 
-                if (isset($row->id)) {
-                    $records[$k]['id'] = $row->id;
+                if ($rowId = $row->getId()) {
+                    $records[$k]['id'] = $rowId;
                 }
 
                 $records[$k]['cell'] = array();
@@ -628,12 +628,13 @@
 
                 ksort($records[$k]['cell']);
 
-                if ($this->isTreeGrid) {
-                    $records[$k]['cell'][] = $row->level; //level
-                    $records[$k]['cell'][] = $row->lft; //lft
-                    $records[$k]['cell'][] = $row->rgt; //rgt
-                    $records[$k]['cell'][] = (($row->rgt - $row->lft) == 1); //isLeaf
-                    $records[$k]['cell'][] = ($row->level < 1);
+                if ($this->getIsTreeGrid()) {
+                    $isLeaf                = (($row->getRgt() - $row->getLft()) == 1);
+                    $records[$k]['cell'][] = $row->getLevel(); //level
+                    $records[$k]['cell'][] = $row->getLft(); //lft
+                    $records[$k]['cell'][] = $row->getRgt(); //rgt
+                    $records[$k]['cell'][] = $isLeaf;
+                    $records[$k]['cell'][] = false;
                 }
             }
 

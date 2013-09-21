@@ -18,6 +18,9 @@
 
     class SubGrid extends Base
     {
+        const GRID_PADDING  = 20;
+        const WRAPPER_CLASS = 'subgrid-data';
+
         public $name = array();
         public $width = array();
         public $align = array();

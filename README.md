@@ -6,6 +6,8 @@ SynergyDataGrid is a [Zend Framework 2](http://framework.zend.com/zf2) module fa
 It provides basic CRUD functions for editing  database tables as an AJAX-based grid.
 For use all available jqGrid plugin and library features please see jqGrid documentation at <http://www.trirand.com/jqgridwiki/doku.php>
 
+###[See SynergyDataGrid Project Home Page](http://developer.peleodiase.com/synergy-data-grid)
+
 Dependencies
 -------------
 + [Zend Framework 2](http://framework.zend.com/),
@@ -43,7 +45,7 @@ Post Installation steps
 Usage
 -----
 + In your controller class:
-
+```php
             public function gridAction() {
                //replace {Entity_Name} with your entity name e.g. 'Application\Entity\User'
                $serviceManager = $this->getServiceLocator() ;
@@ -88,6 +90,7 @@ Usage
            //@TODO implement as required ;
            //return $entity;
         }
+```
 + In your view script:
 
         echo $this->displayGrid($this->grid);
@@ -95,7 +98,7 @@ Usage
    - If you do not want the script executed on load set `render_script_as_template` option to true. The code would be wrapped in a `script` tag with type `text/x-jquery-tmpl`
    - If you want to get access to the html and javascript pass false as the second parameter i.e. `$params = $this->displayGrid($this->grid, false);`. An associative array of the `html`, `js` and `onLoad` script would be returned. Useful if you are makking AJAX requests to generate the grid.
 + In head section of your layout:
-
+```php
              $this->headLink()->appendStylesheet('/jqGrid/css/ui.jqgrid.css')
                      ->appendStylesheet('/css/jquery.ui.datepicker.css')
                      ->appendStylesheet('/plugins/ui.multiselect.css') ;
@@ -107,20 +110,21 @@ Usage
                 ->appendFile('/jqGrid/js/i18n/grid.locale-en.js', 'text/javascript')
                 ->appendFile('/plugins/ui.multiselect.js', 'text/javascript')
                 ->appendFile('/jqGrid/js/jquery.jqGrid.min.js', 'text/javascript') ;
-
+```
 Setting grid options
 ----------------------
 You can use/set any of the jqgrid options (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options)
 e.g. to set the "datatype" to local, in your controller add the code
-
+```php
           $grid->setDatatype('local');
+```
 > The logic is append 'set' to any of the options and it would be added to the grid.
 
 Adding ColModel Options
 -----------------------
 All column model options can be added to the grid (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options)
 In your grid configuration file or module.config.php, specify the the model options e.g.
-
+```php
     return array(
         .......
         'jqgrid' => array (
@@ -137,16 +141,17 @@ In your grid configuration file or module.config.php, specify the the model opti
                 ),
         )
     );
-
+```
 Adding Custom Javascript.
 ---------------------------
 If you want to add additional javaScript to be rendered along with the grid script, you can do this:
-
+```php
              $grid->getJsCode()->addCustomScript( new \Zend\Json\Expr(" and your script here" ));
+```
 or
-
+```php
              $grid->getJsCode()->addCustomScript("add your script here");
-
+```
 
 Adding Subgrid
 ---------------
@@ -158,7 +163,7 @@ You can add a sub grid as either
 Modify you grid configuration file or add this to your module.config.php
 
  * We want to display the field my_field as a subgrid
-
+```php
              return array(
                  .......
                  'jqgrid' => array (
@@ -168,9 +173,9 @@ Modify you grid configuration file or add this to your module.config.php
                              ),
                         )
                   );
-
+```
  * We want to display  my_field as a subgrid_as_grid
-
+```php
                   return array(
                                  .......
                          'jqgrid' => array (
@@ -180,11 +185,11 @@ Modify you grid configuration file or add this to your module.config.php
                                        ),
                                  )
                          );
-
+```
 2. In the controller action that returns the grid data, you need to pass an array as the second parameter to the prepareGridData function.
 The array should have a 'fieldName' key which points to the entity field from which to retrieve the data from. The fieldName is the
 name of the joinColumn on the main entity class.
-
+```php
            public function crudAction(){              ......
                $className = 'your_class_name';
                $options['fieldName'] = $this->params()->fromRoute('fieldName', null);
@@ -194,6 +199,7 @@ name of the joinColumn on the main entity class.
                $response = $grid->prepareGridData($this->getRequest(), $options);
              .....
            }
+```
 3. You  would need to specify a callback function to return the subgrid editUrl to that grid. The default is blank. Thee arguments passed to the callback function are:
 
   + `$sm` = servicelLocator;
@@ -208,7 +214,7 @@ name of the joinColumn on the main entity class.
 
 > Your route should cater for the fieldName parameter which would be picked up in your CRUD action.  Note that the "subgridid" is appended as a query parameter to the url. the "row_id" is a javaScript
 variable that  would be replaced in the script when the subgrid editUrl is returned so just append it as shown in the example.
-
+```php
          'jqgrid' => array(
               ........
               'grid_url_generator'  => function ($sm, $entity, $fieldName, $targetEntity, $urlType) {
@@ -226,20 +232,20 @@ variable that  would be replaced in the script when the subgrid editUrl is retur
                           return new \Zend\Json\Expr("'$url?subgridid='+row_id");
                       }
                 )
-
+```
 Grid Specific Options (Multiple Grids).
 --------------------------------------
 If you have multiple grids with different config requirements you can have grid specific option set for each grid.
 
 1. Add a unique ID for the grid by specifying the second parameter to the setGridIdentity() method in your controller action e.g.
-
+```php
           ........
           $gridId = 'my_unique_id ;
           $grid = $serviceManager->get('jqgrid')->setGridIdentity( $className, $gridId);
           ......
-
+```
 2. In your module.config.php file add the grid specific options as follows:
-
+```php
          return array(
               .......
               'jqgrid' => array (
@@ -249,7 +255,7 @@ If you have multiple grids with different config requirements you can have grid 
                       )
                )
          );
-
+```
 > The grid specific options would be merged into the main grid options for grids with that ID.
 
 Tree Grid
@@ -263,7 +269,7 @@ If you want to specify a WHERE clause to be used when populating the grid, you c
 a  custom QueryBuilder builder and setting it on the grid as shown below:
 
 In Your controller:
-
+```php
            ......
            $grid  = $serviceManager->get('jqgrid');
 
@@ -275,8 +281,6 @@ In Your controller:
 
            $grid->setCustomQueryBuilder($qb);
            ........
-
+```
 Other filter parameters would be added to the QueryBuilder as normal. The only difference is that instead of creating a
 new QueryBuilder, the modules uses the custom QueryBuilder.
-
-#####[Project Home](http://developer.peleodiase.com)
