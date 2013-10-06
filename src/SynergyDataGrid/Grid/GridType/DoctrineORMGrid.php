@@ -271,8 +271,7 @@
                     if ($this->_isSubGridAsGrid($fieldName)) {
                         $this->_subGridsAsGrid[] = $this->createSubGridAsGrid($map);
                         $this->setSubGrid(true);
-
-                        $data['editrules']['edithidden'] = false;
+                        continue;
                     } else if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
                         $this->_subGrid = $this->getSubGridModel($map);
                         $target         = $fieldName;
@@ -370,6 +369,7 @@
 
                     $columnData[$count - $adjustment] = $data;
                     $count++;
+
                 }
 
                 ksort($columnData);
@@ -414,19 +414,23 @@
                 }
 
                 $fieldName = isset($options['fieldName']) ? $options['fieldName'] : null;
-
                 $operation = $request->getPost('oper');
 
-                if ($operation == 'del') {
-                    $data = $this->delete($request);
-                } elseif ($operation == 'edit' || $operation == 'add') {
-                    //$this->setGridColumns(true);
-                    $data = $this->edit($request);
-                } else {
-                    if ($request->getPost(self::GRID_IDENTIFIER) == $this->getId()) {
-                        $data = $this->_createGridData($request, $subGridid, $options['fieldName']);
-                    } elseif ($subGridid) {
+                if ($subGridid) {
+                    if ($operation == 'del') {
+                        $data = $this->delete($request, $subGridid, $options['fieldName']);
+                    } elseif ($operation == 'edit' || $operation == 'add') {
+                        $data = $this->editSubGrid($request, $subGridid, $options['fieldName']);
+                    } else {
                         return $this->createSubGridData($request, $subGridid, $fieldName);
+                    }
+                } else {
+                    if ($operation == 'del') {
+                        $data = $this->delete($request);
+                    } elseif ($operation == 'edit' || $operation == 'add') {
+                        $data = $this->edit($request);
+                    } elseif ($request->getPost(self::GRID_IDENTIFIER) == $this->getId()) {
+                        $data = $this->_createGridData($request);
                     }
                 }
 
@@ -465,10 +469,17 @@
             $parentMeta     = $this->getService()->getEntityManager()->getClassMetadata($this->_entity);
             $subGridService = $this->_serviceLocator->get('ModelService')->getService($targetEntity);
 
-            $mappedBy      = $parentMeta->associationMappings[$field]['mappedBy'];
-            $subGridFilter = array($mappedBy => $id);
-            $paginator     = $this->getPaginator($request, $subGridService, $subGridFilter);
-            $childRows     = $paginator->getIterator();
+            if ($mappedBy = $parentMeta->associationMappings[$field]['mappedBy']) {
+                $subGridFilter = array($mappedBy => $id);
+                $paginator     = $this->getPaginator($request, $subGridService, $subGridFilter);
+                $childRows     = $paginator->getIterator();
+                $total         = $paginator->count();
+                $rowNum        = $paginator->getQuery()->getMaxResults();
+            } else {
+                $childRows = $refObject;
+                $total     = count($refObject);
+                $rowNum    = $request->getPost('rows');
+            }
 
             if (!$childRows) {
                 $childRows = new ArrayCollection();
@@ -484,9 +495,6 @@
 
             $subGrid->reorderColumns();
             $columns = $subGrid->setGridColumns()->getColumns();
-
-            $total  = $paginator->count();
-            $rowNum = $paginator->getQuery()->getMaxResults();
 
             $grid = array(
                 'page'    => $request->getPost('page', 1),
@@ -550,26 +558,29 @@
         }
 
         /**
-         * Edit record based on passed id and return result
+         * @param      $request
+         * @param null $entity
          *
-         * @param $request
-         *
-         * @return string
+         * @return \Doctrine\ORM\Mapping\Entity|null
          */
-        public function edit($request)
+        protected function createEntity($request, $entity = null, $service = null)
         {
             $params      = $request->getPost();
             $pass        = true;
             $id          = 0;
             $message     = '';
-            $service     = $this->getService();
+            $service     = $service ? : $this->getService();
             $entityClass = $service->getEntityClass();
 
-            if (array_key_exists('id', $params) && $params['id'] && $params['id'] != 'new_row' && $params['id'] != '_empty') {
-                $entity = $this->getService()->findObject($params['id']);
-            } else {
-                $entity = new $entityClass();
+
+            if (!$entity) {
+                if (array_key_exists('id', $params) && $params['id'] && $params['id'] != 'new_row' && $params['id'] != '_empty') {
+                    $entity = $this->getService()->findObject($params['id']);
+                } else {
+                    $entity = new $entityClass();
+                }
             }
+
             if ($entity) {
                 unset($params['oper']);
                 unset($params['id']);
@@ -633,22 +644,86 @@
                         }
                     }
                 }
-
-                if ($pass) {
-                    try {
-                        $entity  = $this->getService()->save($entity);
-                        $id      = $entity->getId();
-                        $message = '';
-                    } catch (\Exception $e) {
-                        $message = $e->getMessage();
-                        $pass    = false;
-                    }
-                }
-
-                if (!$pass) {
-                    header('HTTP/1.1 400 Error Saving Data');
-                }
             }
+
+            return $pass ? $entity : null;
+        }
+
+        /**
+         * @param $request
+         * @param $gridId
+         * @param $fieldName
+         *
+         * @return array
+         */
+        public function editSubGrid($request, $id, $field)
+        {
+            $pass    = true;
+            $message = '';
+
+            $columns = array();
+
+            $mapping = $this->getService()->getEntityManager()->getClassMetadata($this->getEntity());
+
+            $target     = $mapping->associationMappings[$field]['targetEntity'];
+            $subService = $this->getServiceLocator()->get('ModelService')->getService($target);
+            $subGridId  = $request->getPost('id', null);
+
+            if (is_numeric($subGridId)) {
+                $entity = $subService->getEntityManager()->getRepository($target)->find($subGridId);
+            } else {
+                $row    = $this->getService()->getEntityManager()->getRepository($this->_entity)->find($id);
+                $entity = new $target;
+            }
+
+            if ($entity = $this->createEntity($request, $entity, $subService)) {
+                try {
+                    if (is_numeric($subGridId)) {
+                        $this->getService()->save($entity);
+                        $id = $entity->getId();
+                    } else {
+                        $row->$field->add($entity);
+                        $this->getService()->save($row);
+                        $id = $row->getId();
+                    }
+                    $message = '';
+                } catch (\Exception $e) {
+                    $message = $e->getMessage();
+                    $pass    = false;
+                }
+            } else {
+                header('HTTP/1.1 400 Error Saving Data');
+            }
+
+
+            return array('success' => $pass, 'message' => $message, 'id' => $id);
+        }
+
+        /**
+         * Edit record based on passed id and return result
+         *
+         * @param $request
+         *
+         * @return string
+         */
+        public function edit($request)
+        {
+            $pass    = true;
+            $message = '';
+
+            if ($entity = $this->createEntity($request)) {
+                try {
+                    $entity  = $this->getService()->save($entity);
+                    $id      = $entity->getId();
+                    $message = '';
+                } catch (\Exception $e) {
+                    $message = $e->getMessage();
+                    $pass    = false;
+                }
+            } else {
+                header('HTTP/1.1 400 Error Saving Data');
+            }
+
 
             return array('success' => $pass, 'message' => $message, 'id' => $id);
         }
@@ -757,8 +832,8 @@
                     $subGridMap['fieldName'], $subGridMap['targetEntity'], self::DYNAMIC_URL_TYPE_ROW_EXPAND);
 
                 //subgrid edit url
-                $editUrl = $this->_config['grid_url_generator']($subGrid->getServiceLocator(), $subGridMap['targetEntity'],
-                    $subGridMap['fieldName'], null, self::DYNAMIC_URL_TYPE_GRID);
+                $editUrl = $this->_config['grid_url_generator']($subGrid->getServiceLocator(), $this->getEntity(),
+                    $subGridMap['fieldName'], $subGridMap['targetEntity'], self::DYNAMIC_URL_TYPE_SUBGRID);
 
                 $subGrid->setUrl($url);
                 $subGrid->setEditurl($editUrl);

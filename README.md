@@ -6,7 +6,7 @@ SynergyDataGrid is a [Zend Framework 2](http://framework.zend.com/zf2) module fa
 It provides basic CRUD functions for editing  database tables as an AJAX-based grid.
 For use all available jqGrid plugin and library features please see jqGrid documentation at <http://www.trirand.com/jqgridwiki/doku.php>
 
-###[See SynergyDataGrid Project Home Page](http://developer.peleodiase.com/synergy-data-grid)
+[**SynergyDataGrid Project Home Page**](http://developer.peleodiase.com/synergy-data-grid)
 
 Dependencies
 -------------
@@ -24,6 +24,7 @@ Dependencies
 - Zend DB Grid
 Installation
 ---------------------
+
 ###Manual Installation
    1. Go to your project's directory.
    2. Clone this project into your `./vendor/synergy/` directory as a `synergydatagrid` module:
