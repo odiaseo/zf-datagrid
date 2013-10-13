@@ -710,6 +710,7 @@
         {
             $pass    = true;
             $message = '';
+            $id      = '';
 
             if ($entity = $this->createEntity($request)) {
                 try {
