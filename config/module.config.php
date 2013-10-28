@@ -12,12 +12,6 @@
      *
      */
     return array(
-        'view_manager' => array(
-            'template_path_stack' => array(
-                __DIR__ . '/../view',
-            ),
-        ),
-
         'jqgrid'       => array(
             /**
              * settings for customising plugins e.g. jquery datepicker
