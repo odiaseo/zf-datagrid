@@ -1,32 +1,34 @@
 {
-    "name": "synergy/synergydatagrid",
+    "name"       : "synergy/synergydatagrid",
     "description": "Module to display data in grid using the jqGrid javascript plugin",
-    "type": "synergy-module",
-    "license": "BSD-3-Clause",
-    "keywords": [
+    "type"       : "synergy-module",
+    "license"    : "BSD-3-Clause",
+    "keywords"   : [
         "data grid",
         "jqgrid",
         "zf2",
         "module"
     ],
-    "homepage": "http://developer.peleodiase.com/synergy-data-grid",
-    "authors": [
+    "homepage"   : "http://developer.peleodiase.com/synergy-data-grid",
+    "authors"    : [
         {
-            "name": "Pele Odiase",
+            "name" : "Pele Odiase",
             "email": "peleodiase@yahoo.co.uk"
         }
     ],
-    "require": {
-        "php": ">=5.3.3",
-        "zendframework/zendframework": ">=2.0",
-        "doctrine/doctrine-orm-module": ">=0.5",
-        "doctrine/doctrine-module": ">=0.7"
+    "require"    : {
+        "php"                               : ">=5.3.3",
+        "zendframework/zendframework"       : ">=2.0",
+        "doctrine/doctrine-orm-module"      : ">=0.5",
+        "doctrine/doctrine-module"          : ">=0.7",
+        "doctrine/mongodb-odm"              : ">=1.0.0-BETA9",
+        "doctrine/doctrine-mongo-odm-module": "dev-master"
     },
-    "suggest": {
+    "suggest"    : {
         "gedmo/doctrine-extensions": ">=v2.2.0"
     },
-    "autoload": {
-        "psr-0": {
+    "autoload"   : {
+        "psr-0"   : {
             "SynergyDataGrid": "src/"
         },
         "classmap": [
