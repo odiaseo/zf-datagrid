@@ -15,6 +15,7 @@
      */
     use SynergyDataGrid\Grid\Column;
     use SynergyDataGrid\Grid\GridType\BaseGrid;
+    use Zend\Json\Encoder;
     use Zend\Json\Expr;
 
     /**
@@ -85,16 +86,17 @@
         public function addActionsColumn()
         {
             $options = $this->grid->getConfig();
+            $width = 60 + count($this->grid->getRowActionButtons()) * 15;
 
             $this->grid->addColumn(
                 'Actions',
                 array(
                     'name'          => 'myac',
-                    'width'         => 60,
+                    'width'         => $width,
                     'fixed'         => true,
                     'sortable'      => false,
                     'resizable'     => false,
-                    'formatter'     => 'actions',
+                    'formatter'     => new Expr($this->getActionFunctioName()),
                     'search'        => false,
                     'classes'       => 'action-column',
                     'viewable'      => false,
@@ -120,6 +122,18 @@
                     )));
         }
 
+
+        public function getActionFunctioName()
+        {
+            return $this->grid->getId() . '_actions';
+        }
+
+
+        protected function getCustomButtons($rowId)
+        {
+
+        }
+
         /**
          * Prepare formatter and attach standard buttons for every row, as well as custom buttons, if needed
          * Code partially taken from jquery.jqGrid.src.js and must be updated if switching to next jqGrid verison
@@ -128,44 +142,41 @@
          */
         public function renderActionsFormatter()
         {
-            $formatterCode    = '
-            jQuery.extend($.fn.fmatter , {
-                mactions : function(cellval,opts, rwd) {
-                            var op ={keys:false, editbutton:true, delbutton:true, editformbutton: false};
-                            if(!$.fmatter.isUndefined(opts.colModel.formatoptions)) {
-                                    op = $.extend(op,opts.colModel.formatoptions);
-                            }
-                            var rowid = opts.rowId, str="",ocl;
-                            if(typeof(rowid) ==\'undefined\' || $.fmatter.isEmpty(rowid)) {return "";}
-                            if(op.editformbutton){
-                                    ocl = "onclick=jQuery.fn.fmatter.rowactions(\'"+rowid+"\',\'"+opts.gid+"\',\'formedit\',"+opts.pos+"); onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\'); "
-                                    str =str+ "<div title=\'"+$.jgrid.nav.edittitle+"\' style=\'float:left;cursor:pointer;\' class=\'ui-pg-div ui-inline-edit\' "+ocl+"><span class=\'ui-icon ui-icon-pencil\'></span></div>";
-                            } else 	if(op.editbutton){
-                                    ocl = "onclick=jQuery.fn.fmatter.rowactions(\'"+rowid+"\',\'"+opts.gid+"\',\'edit\',"+opts.pos+"); onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\') ";
-                                    str =str+ "<div title=\'"+$.jgrid.nav.edittitle+"\' style=\'float:left;cursor:pointer;\' class=\'ui-pg-div ui-inline-edit\' "+ocl+"><span class=\'ui-icon ui-icon-pencil\'></span></div>";
-                            }
-                            if(op.delbutton) {
-                                    ocl = "onclick=jQuery.fn.fmatter.rowactions(\'"+rowid+"\',\'"+opts.gid+"\',\'del\',"+opts.pos+"); onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\'); ";
-                                    str = str+"<div title=\'"+$.jgrid.nav.deltitle+"\' style=\'float:left;margin-left:5px;\' class=\'ui-pg-div ui-inline-del\' "+ocl+"><span class=\'ui-icon ui-icon-trash\'></span></div>";
-                            }
-        ';
-            $rowActionButtons = $this->grid->getRowActionButtons();
-            foreach ($rowActionButtons as $button) {
-                $formatterCode .= '
-                ocl = "onclick=\"' . $button['action'] . '\"; onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\'); ";
-                str = str+"<div title=\'' . $button['name'] . '\' style=\'float:left;margin-left:5px;\' class=\'ui-pg-div ' . $button['class'] . '\' "+ocl+"><span class=\'ui-icon ' . $button['icon'] . '\'></span></div>";
-                ';
+            $btns    = $this->grid->getRowActionButtons() ? : new \stdClass();
+            $btns    = Encoder::encode($btns);
+            $str     = '';
+            $fncName = $this->grid->getId() . '_actions';
+
+            foreach ($btns as $btn) {
+                $ocl = sprintf("id='jEditButton_%s' onclick=%s; onmouseover=jQuery(this).addClass('ui-state-hover');
+                onmouseout=jQuery(this).removeClass('ui-state-hover'); ", $rowId, $btn['action']);
+
+                $str .= sprintf("<div title='%s' style='float:left;cursor:pointer;' class='%s' %s>
+                <span class='%s'></span></div>", $btn['name'], $btn['class'], $ocl, $btn['icon']);
             }
 
-            $formatterCode .= '
-                            ocl = "onclick=jQuery.fn.fmatter.rowactions(\'"+rowid+"\',\'"+opts.gid+"\',\'save\',"+opts.pos+"); onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\'); ";
-                            str = str+"<div title=\'"+$.jgrid.edit.bSubmit+"\' style=\'float:left;display:none\' class=\'ui-pg-div ui-inline-save\' "+ocl+"><span class=\'ui-icon ui-icon-disk\'></span></div>";
-                            ocl = "onclick=jQuery.fn.fmatter.rowactions(\'"+rowid+"\',\'"+opts.gid+"\',\'cancel\',"+opts.pos+"); onmouseover=jQuery(this).addClass(\'ui-state-hover\'); onmouseout=jQuery(this).removeClass(\'ui-state-hover\'); ";
-                            str = str+"<div title=\'"+$.jgrid.edit.bCancel+"\' style=\'float:left;display:none;margin-left:5px;\' class=\'ui-pg-div ui-inline-cancel\' "+ocl+"><span class=\'ui-icon ui-icon-cancel\'></span></div>";
-                            return "<div style=\'margin-left:8px;\'>" + str + "</div>";
+            $formatterCode = <<<ACTION
+
+                function {$this->getActionFunctioName()}(cellval,opts, rwd) {
+                    var rowid = opts.rowId ;
+                    if(rowid === undefined || $.fmatter.isEmpty(rowid)) {
+                        return "";
                     }
-            });
-        ';
+                    var ctm = {$btns};
+                    var str = $.fn.fmatter.actions(cellval,opts) ;
+                    var res = $(str);
+
+                    if(ctm){
+                        var saveBtn = res.find('[id^="jSaveButton"]');
+                        var addStr = '';
+                        for(var b in ctm){
+                            addStr += "<div title='"+ctm[b]['name']+"' style='float:left;cursor:pointer;' class='"+ctm[b]['class']+"' id='jButton_"+rowid+"' onmouseover=jQuery(this).addClass('ui-state-hover');  onmouseout=jQuery(this).removeClass('ui-state-hover'); onclick="+ctm[b]['action']+"><span class='"+ctm[b]['icon']+"'></span></div>"
+                        }
+                        saveBtn.before(addStr);
+                    }
+                    return res.wrap('<div />').html() ;
+                 }
+ACTION;
 
             return $formatterCode;
         }

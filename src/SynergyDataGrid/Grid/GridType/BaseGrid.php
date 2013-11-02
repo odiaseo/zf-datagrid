@@ -1418,7 +1418,9 @@
         public function setRowActionButton($options = array())
         {
             if (array_key_exists('name', $options) && array_key_exists('icon', $options)) {
-                $options['class']                          = !array_key_exists('class', $options) ? 'ui-inline-' . strtolower(str_replace(' ', '-', $options['name'])) : $options['class'];
+                if (!isset($options['class']) or empty($options['class'])) {
+                    $options['class'] = 'ui-inline-' . strtolower(str_replace(' ', '-', $options['name']));
+                }
                 $this->_rowActionButtons[$options['name']] = !array_key_exists($options['name'], $this->_rowActionButtons) ? $options : array_merge($this->_rowActionButtons[$options['name']], $options);
             }
 

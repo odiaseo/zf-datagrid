@@ -55,12 +55,12 @@
             if ($appendScript) {
                 if ($config['render_script_as_template']) {
                     $this->getView()->headScript()
-                        ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true))
-                        ->appendScript($js);
+                        ->appendScript($js)
+                        ->appendScript($onLoadScript, 'text/x-jquery-tmpl', array("id='grid-script'", 'noescape' => true));
                 } else {
                     $this->getView()->headScript()
-                        ->appendScript($onLoadScript)
-                        ->appendScript($js);
+                        ->appendScript($js)
+                        ->appendScript($onLoadScript);
                 }
 
                 return $html;
@@ -331,6 +331,8 @@
 
             $html   = array_merge($html, $grid->getHtml());
             $js     = array_merge($js, $grid->getJs());
+            $js[]   = $grid->getJsCode()->renderActionsFormatter();
+
             $onLoad = array_merge($onLoad, $grid->getOnload());
 
             if ($config['compress_script']) {

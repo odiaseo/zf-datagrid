@@ -12,13 +12,7 @@
      *
      */
     return array(
-        'view_manager' => array(
-            'template_path_stack' => array(
-                __DIR__ . '/../view',
-            ),
-        ),
-
-        'jqgrid'       => array(
+        'jqgrid' => array(
             /**
              * settings for customising plugins e.g. jquery datepicker
              */
@@ -146,6 +140,8 @@
                 'multiselect'        => true,
                 'multiboxonly'       => false,
                 'rownumbers'         => false,
+                //add buttons to display on each row (action column)
+                'rowActionButtons'   => array()
 
             ),
             /**
