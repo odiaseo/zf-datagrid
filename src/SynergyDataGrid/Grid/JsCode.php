@@ -170,7 +170,7 @@
                         var saveBtn = res.find('[id^="jSaveButton"]');
                         var addStr = '';
                         for(var b in ctm){
-                            addStr += "<div title='"+ctm[b]['name']+"' style='float:left;cursor:pointer;' class='"+ctm[b]['class']+"' id='jButton_"+rowid+"' onmouseover=jQuery(this).addClass('ui-state-hover');  onmouseout=jQuery(this).removeClass('ui-state-hover'); onclick="+ctm[b]['action']+"><span class='"+ctm[b]['icon']+"'></span></div>"
+                            addStr += "<div title='"+ctm[b]['name']+"' style='float:left;cursor:pointer;' class='"+ctm[b]['class']+"' id='jButton_"+rowid+"' onmouseover=jQuery(this).addClass('ui-state-hover');  onmouseout=jQuery(this).removeClass('ui-state-hover'); onclick="+ctm[b]['action']+" data-rowid='"+rowid+"'><span class='"+ctm[b]['icon']+"'></span></div>"
                         }
                         saveBtn.before(addStr);
                     }
