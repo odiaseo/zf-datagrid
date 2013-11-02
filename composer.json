@@ -9,7 +9,6 @@
         "zf2",
         "module"
     ],
-    "minimum-stability": "alpha",
     "homepage"         : "http://developer.peleodiase.com/synergy-data-grid",
     "authors"          : [
         {
