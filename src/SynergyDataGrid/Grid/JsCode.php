@@ -1,153 +1,157 @@
 <?php
-    namespace SynergyDataGrid\Grid;
+namespace SynergyDataGrid\Grid;
 
-    /*
-     * This file is part of the Synergy package.
+/*
+ * This file is part of the Synergy package.
+ *
+ * (c) Pele Odiase <info@rhemastudio.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author Pele Odiase
+ * @license http://opensource.org/licenses/BSD-3-Clause
+ *
+ */
+use SynergyDataGrid\Grid\Column;
+use SynergyDataGrid\Grid\GridType\BaseGrid;
+use Zend\Json\Encoder;
+use Zend\Json\Expr;
+
+/**
+ *
+ * JsCode class is needed to prepare all javascript code for jqGrid plugin
+ *
+ * @author  Pele Odiase
+ * @package mvcgrid
+ */
+class JsCode extends Base
+{
+    /**
+     * JqGrid instance
      *
-     * (c) Pele Odiase <info@rhemastudio.com>
-     *
-     * For the full copyright and license information, please view the LICENSE
-     * file that was distributed with this source code.
-     *
-     * @author Pele Odiase
-     * @license http://opensource.org/licenses/BSD-3-Clause
-     *
+     * @var string
      */
-    use SynergyDataGrid\Grid\Column;
-    use SynergyDataGrid\Grid\GridType\BaseGrid;
-    use Zend\Json\Encoder;
-    use Zend\Json\Expr;
+    private $grid;
+    /** user defined scripts
+     *
+     * @var array
+     */
+    protected $_customScripts = array();
+    /**
+     * CSS class applied to the grids container.
+     *
+     * @var string
+     */
+    protected $_containerClass = 'grid-data';
+
+
+    protected $_padding;
 
     /**
+     * Set up base JsCode options
      *
-     * JsCode class is needed to prepare all javascript code for jqGrid plugin
-     *
-     * @author  Pele Odiase
-     * @package mvcgrid
+     * @param EntityGrid $grid
      */
-    class JsCode extends Base
+
+    public function __construct(BaseGrid $grid = null, $padding = 0)
     {
-        /**
-         * JqGrid instance
-         *
-         * @var string
-         */
-        private $grid;
-        /** user defined scripts
-         *
-         * @var array
-         */
-        protected $_customScripts = array();
-        /**
-         * CSS class applied to the grids container.
-         *
-         * @var string
-         */
-        protected $_containerClass = 'grid-data';
+        $this->grid     = $grid;
+        $this->_padding = $padding;
+    }
 
 
-        protected $_padding;
-
-        /**
-         * Set up base JsCode options
-         *
-         * @param EntityGrid $grid
-         */
-
-        public function __construct(BaseGrid $grid = null, $padding = 0)
-        {
-            $this->grid     = $grid;
-            $this->_padding = $padding;
-        }
-
-
-        public function addAutoResizeScript($gridId)
-        {
-            return $this->addCustomScript(
-                new Expr(
-                    sprintf("jQuery(window).on('resize', function(){
-                            jQuery('#%s:visible').each(function(){
-                                synergyResizeGrid(this, '.%s');
-                            });
-                    }); ",
-                        $gridId,
-                        $this->getContainerClass()
-                    )
+    public function addAutoResizeScript($gridId)
+    {
+        return $this->addCustomScript(
+            new Expr(
+                sprintf(
+                    "jQuery(window).on('resize', function(){
+                                                jQuery('#%s:visible').each(function(){
+                                                    synergyResizeGrid(this, '.%s');
+                                                });
+                                        }); ",
+                    $gridId,
+                    $this->getContainerClass()
                 )
-            );
-        }
+            )
+        );
+    }
 
 
-        /**
-         * Add actions column to the grid with base controls (edit or editform, delete)
-         *
-         * @return void
-         */
-        public function addActionsColumn()
-        {
-            $options = $this->grid->getConfig();
-            $width = 60 + count($this->grid->getRowActionButtons()) * 15;
+    /**
+     * Add actions column to the grid with base controls (edit or editform, delete)
+     *
+     * @return void
+     */
+    public function addActionsColumn()
+    {
+        $options   = $this->grid->getConfig();
+        $numCustom = count($this->grid->getRowActionButtons());
+        $width     = 60 + ($numCustom * 15);
 
-            $this->grid->addColumn(
-                'Actions',
-                array(
-                    'name'          => 'myac',
-                    'width'         => $width,
-                    'fixed'         => true,
-                    'sortable'      => false,
-                    'resizable'     => false,
-                    'formatter'     => new Expr($this->getActionFunctioName()),
-                    'search'        => false,
-                    'classes'       => 'action-column',
-                    'viewable'      => false,
-                    'formatoptions' => array(
-                        'keys'           => false,
-                        'editbutton'     => $options['nav_grid']['edit'],
-                        'editformbutton' => $this->grid->getAllowEditForm(),
-                        'delbutton'      => $options['nav_grid']['del'],
-                        'delOptions'     => array(
-                            'afterSubmit' => new Expr("function(response, postdata) {
+        $this->grid->addColumn(
+            'Actions',
+            array(
+                 'name'          => 'myac',
+                 'width'         => $width,
+                 'fixed'         => true,
+                 'sortable'      => false,
+                 'resizable'     => false,
+                 'formatter'     => $numCustom ? new Expr($this->getActionFunctioName()) : 'actions',
+                 'search'        => false,
+                 'classes'       => 'action-column',
+                 'viewable'      => false,
+                 'formatoptions' => array(
+                     'keys'           => false,
+                     'editbutton'     => $options['nav_grid']['edit'],
+                     'editformbutton' => $this->grid->getAllowEditForm(),
+                     'delbutton'      => $options['nav_grid']['del'],
+                     'delOptions'     => array(
+                         'afterSubmit' => new Expr("function(response, postdata) {
                                                     var json = eval('(' + response.responseText + ')');
                                                     return [json.success, json.message];
                                                }                                              ")
-                        ),
-                        'editOptions'    => $options['edit_parameters'],
-                        'onError'        => new Expr("function(rowid,response) {
+                     ),
+                     'editOptions'    => $options['edit_parameters'],
+                     'onError'        => new Expr("function(rowid,response) {
                                                                     var json = eval('(' + response.responseText + ')');
                                                                    alert('Error saving row: ' + json.message);
                                                                    jQuery('#" . $this->grid->getGridId() . "').restoreAfterError = false;
                                                                          return true;
                                                                    }
                                                                    ")
-                    )));
-        }
+                 ))
+        );
+    }
 
 
-        public function getActionFunctioName()
-        {
-            return $this->grid->getId() . '_actions';
-        }
+    public function getActionFunctioName()
+    {
+        return $this->grid->getId() . '_actions';
+    }
 
 
-        protected function getCustomButtons($rowId)
-        {
+    protected function getCustomButtons($rowId)
+    {
 
-        }
+    }
 
-        /**
-         * Prepare formatter and attach standard buttons for every row, as well as custom buttons, if needed
-         * Code partially taken from jquery.jqGrid.src.js and must be updated if switching to next jqGrid verison
-         *
-         * @return string
-         */
-        public function renderActionsFormatter()
-        {
-            $btns    = $this->grid->getRowActionButtons() ? : new \stdClass();
-            $btns    = Encoder::encode($btns);
-            $str     = '';
-            $fncName = $this->grid->getId() . '_actions';
+    /**
+     * Prepare formatter and attach standard buttons for every row, as well as custom buttons, if needed
+     * Code partially taken from jquery.jqGrid.src.js and must be updated if switching to next jqGrid verison
+     *
+     * @return string
+     */
+    public function renderActionsFormatter()
+    {
+        $btns    = $this->grid->getRowActionButtons() ? : new \stdClass();
+        $btns    = Encoder::encode($btns);
+        $str     = '';
+        $fncName = $this->grid->getId() . '_actions';
 
-            $formatterCode = <<<ACTION
+        $formatterCode
+            = <<<ACTION
 
                 function {$this->getActionFunctioName()}(cellval,opts, rwd) {
                     var rowid = opts.rowId ;
@@ -170,73 +174,76 @@
                  }
 ACTION;
 
-            return $formatterCode;
-        }
+        return $formatterCode;
+    }
 
-        /**
-         * Prepare javscript code to show custom row button
-         *
-         * @param string $id custom button id
-         *
-         * @return string
-         */
-        public function getCustomButtonsShow($id = '')
-        {
-            $customButtonsShow = "";
-            $rowActionButtons  = $this->grid->getRowActionButtons();
-            foreach ($rowActionButtons as $button) {
-                if (!$id) {
-                    $customButtonsShow .= "
+    /**
+     * Prepare javscript code to show custom row button
+     *
+     * @param string $id custom button id
+     *
+     * @return string
+     */
+    public function getCustomButtonsShow($id = '')
+    {
+        $customButtonsShow = "";
+        $rowActionButtons  = $this->grid->getRowActionButtons();
+        foreach ($rowActionButtons as $button) {
+            if (!$id) {
+                $customButtonsShow
+                    .= "
                     id = (typeof elem == 'undefined') ? rowid : elem;
                     jQuery('tr#' + id + ' div." . $button['class'] . "').show();
                     ";
-                } else {
-                    $customButtonsShow .= "
+            } else {
+                $customButtonsShow .= "
                     jQuery('tr#$id div." . $button['class'] . "').show();
                     ";
-                }
             }
-
-            return $customButtonsShow;
         }
 
-        /**
-         * Prepare javscript code to hide custom row button
-         *
-         * @param string $id custom button id
-         *
-         * @return string
-         */
-        public function getCustomButtonsHide($id = '')
-        {
-            $customButtonsHide = "";
-            $rowActionButtons  = $this->grid->getRowActionButtons();
-            foreach ($rowActionButtons as $button) {
-                if (!$id) {
-                    $customButtonsHide .= "
+        return $customButtonsShow;
+    }
+
+    /**
+     * Prepare javscript code to hide custom row button
+     *
+     * @param string $id custom button id
+     *
+     * @return string
+     */
+    public function getCustomButtonsHide($id = '')
+    {
+        $customButtonsHide = "";
+        $rowActionButtons  = $this->grid->getRowActionButtons();
+        foreach ($rowActionButtons as $button) {
+            if (!$id) {
+                $customButtonsHide
+                    .= "
                     id = (typeof elem == 'undefined') ? rowid : elem;
                     jQuery('tr#' + id + ' div." . $button['class'] . "').hide();
                     ";
-                } else {
-                    $customButtonsHide .= "
+            } else {
+                $customButtonsHide .= "
                     jQuery('tr#$id div." . $button['class'] . "').hide();
                     ";
-                }
             }
-
-            return $customButtonsHide;
         }
 
-        /**
-         * Prepare javscript code for afterInsertRow jqGrid event (show/hide buttons)
-         *
-         * @param string $id custom button id
-         *
-         * @return void
-         */
-        public function prepareAfterInsertRow()
-        {
-            $this->grid->setAfterInsertRow(new Expr("
+        return $customButtonsHide;
+    }
+
+    /**
+     * Prepare javscript code for afterInsertRow jqGrid event (show/hide buttons)
+     *
+     * @param string $id custom button id
+     *
+     * @return void
+     */
+    public function prepareAfterInsertRow()
+    {
+        $this->grid->setAfterInsertRow(
+            new Expr("
             function(rowid,rowdata,rowelem) { 
                 if (rowid == 'new_row') {
                     jQuery('tr#new_row div.ui-inline-edit, tr#new_row div.ui-inline-del').hide();
@@ -244,24 +251,25 @@ ACTION;
                     " . $this->getCustomButtonsHide('new_row') . "
                 }    
         }
-        "));
+        ")
+        );
 
-            return $this;
-        }
+        return $this;
+    }
 
-        /**
-         * Prepare javscript code for afterSaveRow jqGrid event (show/hide row buttons and bind needed events to them)
-         *
-         * @param string $id custom button id
-         *
-         * @return void
-         */
-        public function prepareAfterSaveRow()
-        {
-            // process successfull row adding and editing
-            if ($actionColumn = $this->grid->getColumn('myac')) {
-                $actionColumn->mergeFormatOptions(
-                    array('afterSave' => new Expr("function(rowid, response) {
+    /**
+     * Prepare javscript code for afterSaveRow jqGrid event (show/hide row buttons and bind needed events to them)
+     *
+     * @param string $id custom button id
+     *
+     * @return void
+     */
+    public function prepareAfterSaveRow()
+    {
+        // process successfull row adding and editing
+        if ($actionColumn = $this->grid->getColumn('myac')) {
+            $actionColumn->mergeFormatOptions(
+                array('afterSave' => new Expr("function(rowid, response) {
                     var json = eval('(' + response.responseText + ')');
                     if (json.success && json.id != 'new_row' && rowid == 'new_row') {
                         //change id for saved row
@@ -291,65 +299,68 @@ ACTION;
                     }        
                     return false;
                     }   
-                ")));
-            }
-
-            return $this;
+                "))
+            );
         }
 
-        /**
-         * Prepare javscript code for onEditRow jqGrid event (setup DatePicker and hide row buttons)
-         *
-         * @return void
-         */
-        public function prepareOnEditRow()
-        {
-            if ($actionColumn = $this->grid->getColumn('myac')) {
-                if ($datePicker = $this->grid->getDatePicker()) {
-                    $datePickerFunctionName = $datePicker->getFunctionName();
-                    // this function will work only onEdit, but not on add row
-                    $actionColumn->mergeFormatOptions(
-                        array('onEdit' => new Expr("function (elem){ " . $datePickerFunctionName . "(elem); " .
-                            $this->getCustomButtonsHide() . " }  ")));
-                }
-            }
+        return $this;
+    }
 
-            return $this;
-        }
-
-        /**
-         * Prepare javscript code for afterRestoreRow jqGrid event (show row buttons, and enable add row button)
-         *
-         * @return void
-         */
-        public function prepareAfterRestoreRow()
-        {
-            // enable "add row" button
-            if ($actionColumn = $this->grid->getColumn('myac')) {
+    /**
+     * Prepare javscript code for onEditRow jqGrid event (setup DatePicker and hide row buttons)
+     *
+     * @return void
+     */
+    public function prepareOnEditRow()
+    {
+        if ($actionColumn = $this->grid->getColumn('myac')) {
+            if ($datePicker = $this->grid->getDatePicker()) {
+                $datePickerFunctionName = $datePicker->getFunctionName();
+                // this function will work only onEdit, but not on add row
                 $actionColumn->mergeFormatOptions(
-                    array('afterRestore' => new Expr("function(rowid,response) {
+                    array('onEdit' => new Expr("function (elem){ " . $datePickerFunctionName . "(elem); " .
+                        $this->getCustomButtonsHide() . " }  "))
+                );
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prepare javscript code for afterRestoreRow jqGrid event (show row buttons, and enable add row button)
+     *
+     * @return void
+     */
+    public function prepareAfterRestoreRow()
+    {
+        // enable "add row" button
+        if ($actionColumn = $this->grid->getColumn('myac')) {
+            $actionColumn->mergeFormatOptions(
+                array('afterRestore' => new Expr("function(rowid,response) {
             jQuery('#" . $this->grid->getId() . "_iladd').removeClass('ui-state-disabled');
             " . $this->getCustomButtonsShow() . "    
         } 
-        ")));
-            }
-
-            return $this;
+        "))
+            );
         }
 
-        /**
-         * Prepare javscript code for save columns size data in cookies
-         *
-         * @return Expr
-         */
-        public function prepareSetColumnSizeCookie()
-        {
-            return new Expr("
+        return $this;
+    }
+
+    /**
+     * Prepare javscript code for save columns size data in cookies
+     *
+     * @return Expr
+     */
+    public function prepareSetColumnSizeCookie()
+    {
+        return new Expr("
           function(newwidth, index) {
                 var colModel = $('#" . $this->grid->getId() . "').jqGrid('getGridParam','colModel');
                 var columnName = colModel[index].name;
                 var columnSizesCookieName = '" . BaseGrid::COOKIE_COLUMNS_SIZES_PREFIX .
-                $this->grid->getId() . "';
+            $this->grid->getId() . "';
                 columnSizesCookieName = columnSizesCookieName.toLowerCase().replace(/\//g,'_');
                 var currentValues = jQuery.cookie(columnSizesCookieName);
                 var found = false;
@@ -377,16 +388,16 @@ ACTION;
           }
             ");
 
-        }
+    }
 
-        /**
-         * Prepare javscript code for save information about columns sorting in cookies
-         *
-         * @return Expr
-         */
-        public function prepareSetSortingCookie()
-        {
-            return new Expr("
+    /**
+     * Prepare javscript code for save information about columns sorting in cookies
+     *
+     * @return Expr
+     */
+    public function prepareSetSortingCookie()
+    {
+        return new Expr("
           function(index,iCol,sortorder) {
                 var sortingCookieName = '" . BaseGrid::COOKIE_SORTING_PREFIX . $this->grid->getId() . "';
                 sortingCookieName = sortingCookieName.toLowerCase().replace(/\//g,'_');
@@ -395,16 +406,16 @@ ACTION;
           }
             ");
 
-        }
+    }
 
-        /**
-         * Prepare javscript code for save pagination settings in cookies
-         *
-         * @return Expr
-         */
-        public function prepareSetPagingCookie()
-        {
-            return new Expr("
+    /**
+     * Prepare javscript code for save pagination settings in cookies
+     *
+     * @return Expr
+     */
+    public function prepareSetPagingCookie()
+    {
+        return new Expr("
           function(pgButton) {
                 var pagingCookieName = '" . BaseGrid::COOKIE_PAGING_PREFIX . $this->grid->getId() . "';
                 pagingCookieName = pagingCookieName.toLowerCase().replace(/\//g,'_');
@@ -413,16 +424,16 @@ ACTION;
           }
             ");
 
-        }
+    }
 
-        /**
-         * Prepare javscript code for save information about columns ordering in cookies
-         *
-         * @return Expr
-         */
-        public function prepareSetColumnsOrderingCookie()
-        {
-            return new Expr("
+    /**
+     * Prepare javscript code for save information about columns ordering in cookies
+     *
+     * @return Expr
+     */
+    public function prepareSetColumnsOrderingCookie()
+    {
+        return new Expr("
          jQuery('body').delegate('#gbox_' + '" . $this->grid->getId() . "', 'sortstop', 
             function(event, ui) {
                 var orderingCookieName = '" . BaseGrid::COOKIE_COLUMNS_ORDERING_PREFIX . $this->grid->getId() . "';
@@ -438,53 +449,55 @@ ACTION;
             });
             ");
 
-        }
+    }
 
-        /**
-         * Prepare javscript code for detail grid loading
-         *
-         * @param string $detailGridId    id of details grid
-         * @param string $detailFieldName name of field (in detail grid) to connect master and detail grids
-         * @param string $captionPrefix   prefix of caption for detail grid
-         *
-         * @return string
-         */
-        public function prepareDetailCode($detailGridId = '', $detailFieldName = '', $captionPrefix = '')
-        {
-            $retv = '';
-            if ($detailGridId && $detailFieldName) {
-                $retv = new Expr("
+    /**
+     * Prepare javscript code for detail grid loading
+     *
+     * @param string $detailGridId    id of details grid
+     * @param string $detailFieldName name of field (in detail grid) to connect master and detail grids
+     * @param string $captionPrefix   prefix of caption for detail grid
+     *
+     * @return string
+     */
+    public function prepareDetailCode($detailGridId = '', $detailFieldName = '', $captionPrefix = '')
+    {
+        $retv = '';
+        if ($detailGridId && $detailFieldName) {
+            $retv = new Expr("
                             function(ids) { 
                                 url = jQuery('#" . $detailGridId . "').jqGrid('getGridParam','url');
                                 if (ids == null) { 
                                     ids=0; 
                                     if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) { 
-                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
+                                        jQuery('#" . $detailGridId
+                . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                         jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids).trigger('reloadGrid');
                                     } 
                                 } 
                                 else 
                                 { 
-                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
+                                    jQuery('#" . $detailGridId
+                . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                     jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids);
                                     setTimeout(\"jQuery('#" . $detailGridId . "').trigger('reloadGrid')\", 100);
                                 } 
                             }                     
              ");
 
-            }
-
-            return $retv;
         }
 
-        /**
-         * Prepare javscript code for details grid for gridComplete event (select first row to load corresponding details)
-         *
-         * @return Expr
-         */
-        public function prepareDetailCodeGridComplete()
-        {
-            return new Expr("
+        return $retv;
+    }
+
+    /**
+     * Prepare javscript code for details grid for gridComplete event (select first row to load corresponding details)
+     *
+     * @return Expr
+     */
+    public function prepareDetailCodeGridComplete()
+    {
+        return new Expr("
                     function() { 
                         gridIds = jQuery('#" . $this->grid->getId() . "').jqGrid('getDataIDs');
                         if (gridIds.length > 0) {
@@ -492,64 +505,64 @@ ACTION;
                         }    
                     }
                 ");
-        }
-
-        /**
-         * @param array $customScripts
-         */
-        public function setCustomScripts(array $customScripts)
-        {
-            $this->_customScripts = $customScripts;
-
-            return $this;
-        }
-
-        /**
-         * @param string $customScripts
-         */
-        public function addCustomScript($customScripts)
-        {
-            $this->_customScripts[] = $customScripts;
-
-            return $this;
-        }
-
-        /**
-         * @return array
-         */
-        public function getCustomScripts()
-        {
-            return $this->_customScripts;
-        }
-
-        /**
-         * @param string $containerClass
-         */
-        public function setContainerClass($containerClass)
-        {
-            $this->_containerClass = $containerClass;
-
-            return $this;
-        }
-
-        /**
-         * @return string
-         */
-        public function getContainerClass()
-        {
-            return $this->_containerClass;
-        }
-
-        public function setPadding($padding)
-        {
-            $this->_padding = $padding;
-
-            return $this;
-        }
-
-        public function getPadding()
-        {
-            return $this->_padding;
-        }
-
     }
+
+    /**
+     * @param array $customScripts
+     */
+    public function setCustomScripts(array $customScripts)
+    {
+        $this->_customScripts = $customScripts;
+
+        return $this;
+    }
+
+    /**
+     * @param string $customScripts
+     */
+    public function addCustomScript($customScripts)
+    {
+        $this->_customScripts[] = $customScripts;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomScripts()
+    {
+        return $this->_customScripts;
+    }
+
+    /**
+     * @param string $containerClass
+     */
+    public function setContainerClass($containerClass)
+    {
+        $this->_containerClass = $containerClass;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContainerClass()
+    {
+        return $this->_containerClass;
+    }
+
+    public function setPadding($padding)
+    {
+        $this->_padding = $padding;
+
+        return $this;
+    }
+
+    public function getPadding()
+    {
+        return $this->_padding;
+    }
+
+}
