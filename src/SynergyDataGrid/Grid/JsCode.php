@@ -147,14 +147,6 @@
             $str     = '';
             $fncName = $this->grid->getId() . '_actions';
 
-            foreach ($btns as $btn) {
-                $ocl = sprintf("id='jEditButton_%s' onclick=%s; onmouseover=jQuery(this).addClass('ui-state-hover');
-                onmouseout=jQuery(this).removeClass('ui-state-hover'); ", $rowId, $btn['action']);
-
-                $str .= sprintf("<div title='%s' style='float:left;cursor:pointer;' class='%s' %s>
-                <span class='%s'></span></div>", $btn['name'], $btn['class'], $ocl, $btn['icon']);
-            }
-
             $formatterCode = <<<ACTION
 
                 function {$this->getActionFunctioName()}(cellval,opts, rwd) {
@@ -467,13 +459,13 @@ ACTION;
                                 if (ids == null) { 
                                     ids=0; 
                                     if (jQuery('#" . $detailGridId . "').jqGrid('getGridParam','records') > 0 ) { 
-                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
+                                        jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                         jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids).trigger('reloadGrid');
                                     } 
                                 } 
                                 else 
                                 { 
-                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1}); 
+                                    jQuery('#" . $detailGridId . "').jqGrid('setGridParam',{url: url + '?_search=true&page=1&searchField=" . $detailFieldName . "&searchOper=eq&searchString='+ids,page:1});
                                     jQuery('#" . $detailGridId . "').jqGrid('setCaption','" . $captionPrefix . ": '+ids);
                                     setTimeout(\"jQuery('#" . $detailGridId . "').trigger('reloadGrid')\", 100);
                                 } 
