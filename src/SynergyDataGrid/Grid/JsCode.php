@@ -102,6 +102,10 @@ class JsCode extends Base
                  'search'        => false,
                  'classes'       => 'action-column',
                  'viewable'      => false,
+                 'editable'      => false,
+                 'editrules'     => array(
+                     'edithidden' => false
+                 ),
                  'formatoptions' => array(
                      'keys'           => false,
                      'editbutton'     => $options['nav_grid']['edit'],
