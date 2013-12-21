@@ -378,7 +378,7 @@ return array(
                     'route'       => '/synergydatagrid/crud/:entity',
                     'defaults'    => array(
                         '__NAMESPACE__' => 'SynergyDataGrid\Controller',
-                        'controller'    => 'grid',
+                        'controller'    => 'SynergyDataGrid\Controller\Grid',
                         'action'        => 'crud'
                     ),
                     'constraints' => array(
