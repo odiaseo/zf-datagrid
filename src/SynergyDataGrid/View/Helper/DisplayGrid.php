@@ -101,11 +101,11 @@ class DisplayGrid extends AbstractHelper
 
         $onLoad[] = 'var ' . $grid->getLastSelectVariable() . '; ';
         $onLoad[] = sprintf(
-            'var %s = jQuery("#%s").addClass("synergy-grid").data("padding", %d);',
+            'var obj_%s = jQuery("#%s").addClass("synergy-grid").data("padding", %d);',
             $gridId, $gridId, $grid->getJsCode()->getPadding()
         );
-        $onLoad[] = sprintf('%s.parent().addClass("%s");', $gridId, $grid->getJsCode()->getContainerClass());
-        $onLoad[] = sprintf('%s.data("lastsel", 0);', $gridId);
+        $onLoad[] = sprintf('obj_%s.parent().addClass("%s");', $gridId, $grid->getJsCode()->getContainerClass());
+        $onLoad[] = sprintf('obj_%s.data("lastsel", 0);', $gridId);
 
         if (!$grid->getEditurl()) {
             $grid->setEditurl($grid->getUrl());
@@ -149,15 +149,14 @@ class DisplayGrid extends AbstractHelper
             $request    = new Request();
             $parameters = new Parameters($params);
             $request->setPost($parameters);
-            $request->setUri($grid->getUrl());
 
             $initialData = $grid->getFirstDataAsLocal($request, true);
 
             $postCommand[] = sprintf(
-                '%s.jqGrid("setGridParam", {datatype:"json", treedatatype : "json"});',
+                'obj_%s.jqGrid("setGridParam", {datatype:"json", treedatatype : "json"});',
                 $gridId, $grid->getEditurl()
             );
-            $postCommand[] = sprintf('%s[0].addJSONData(%s) ;', $gridId, Json::encode($initialData));
+            $postCommand[] = sprintf('obj_%s[0].addJSONData(%s) ;', $gridId, Json::encode($initialData));
 
         }
 
@@ -198,7 +197,7 @@ class DisplayGrid extends AbstractHelper
         $grid->reorderColumns();
 
         $onLoad[] = sprintf(
-            '%s.jqGrid(%s);', $gridId,
+            'obj_%s.jqGrid(%s);', $gridId,
             Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true))
         );
 
@@ -219,7 +218,7 @@ class DisplayGrid extends AbstractHelper
             $prmView   = $grid->getNavGrid()->getViewParameters() ? : new \stdClass();
 
             $jsPager = sprintf(
-                '%s.jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s);',
+                'obj_%s.jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s);',
                 $gridId,
                 $grid->getPager(),
                 Json::encode($options, false, array('enableJsonExprFinder' => true)),
@@ -234,13 +233,13 @@ class DisplayGrid extends AbstractHelper
             //display filter toolbar
             if ($config['filter_toolbar']['enabled']) {
                 $onLoad[] = sprintf(
-                    '%s.jqGrid("filterToolbar",%s);',
+                    'obj_%s.jqGrid("filterToolbar",%s);',
                     $gridId,
                     Json::encode($config['filter_toolbar']['options'], false, array('enableJsonExprFinder' => true))
                 );
 
                 if (!$config['filter_toolbar']['showOnLoad']) {
-                    $onLoad[] = sprintf('%s[0].toggleToolbar();', $gridId);
+                    $onLoad[] = sprintf('obj_%s[0].toggleToolbar();', $gridId);
                 }
             }
 
@@ -249,7 +248,7 @@ class DisplayGrid extends AbstractHelper
             if (is_array($navButtons)) {
                 foreach ($navButtons as $title => $button) {
                     $jsPager .= sprintf(
-                        '%s.navButtonAdd("#%s",{
+                        'obj_%s.navButtonAdd("#%s",{
                                                     caption: "%s",
                                                     title: "%s",
                                                     buttonicon: "%s",
@@ -280,7 +279,7 @@ class DisplayGrid extends AbstractHelper
         //setup inline navigation
         if ($grid->getInlineNavEnabled() and $grid->getInlineNav()) {
             $jsInline = sprintf(
-                '%s.jqGrid("inlineNav", "#%s",%s)',
+                'obj_%s.jqGrid("inlineNav", "#%s",%s)',
                 $gridId,
                 $grid->getPager(),
                 Json::encode($grid->getInlineNav()->getOptions(), false, array('enableJsonExprFinder' => true))
@@ -307,14 +306,16 @@ class DisplayGrid extends AbstractHelper
                 $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP, $toolbarPosition);
             }
 
+            $onLoad[] = sprintf("; synergyDataGrid['%s'] = obj_%s;", $gridId, $gridId);
+
             /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
             foreach ($toolbars as $toolbar) {
                 $toolbarId       = $toolbar->getId();
                 $toolbarPosition = $toolbar->getPosition();
                 $onLoad[]        = sprintf("var %s = jQuery('#%s');", $toolbarId, $toolbarId);
                 $onLoad[]        = sprintf(
-                    ";%s.data('grid', %s).addClass('grid-toolbar btn-group grid-toolbar-%s');",
-                    $toolbarId, $gridId, $toolbarPosition
+                    "; %s.addClass('grid-toolbar btn-group grid-toolbar-%s');",
+                    $toolbarId, $toolbarPosition
                 );
 
                 foreach ($toolbar->getItems() as $toolbarButton) {
@@ -323,9 +324,10 @@ class DisplayGrid extends AbstractHelper
                         or $buttonPosition == $toolbarPosition
                     ) {
                         $onLoad[] = sprintf(
-                            "%s.append(\"<button data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
+                            "%s.append(\"<button data-grid-id='%s' data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
                                                                     jQuery('#%s', '#%s').bind('click', %s);",
                             $toolbarId,
+                            $gridId,
                             $toolbarId,
                             $toolbarButton->getId(),
                             $toolbarButton->getTitle(),
