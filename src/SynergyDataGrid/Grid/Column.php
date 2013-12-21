@@ -302,7 +302,7 @@
         private function _fetchDbColumnType()
         {
             if ($this->getSelectable()) {
-                $metadata     = $this->getGrid()->getService()->getClassMetadata();
+                $metadata     = $this->getGrid()->getModel()->getClassMetadata();
                 $name         = $this->getName();
                 $dbColumnType = null;
                 if (isset($metadata->fieldMappings[$name])) {

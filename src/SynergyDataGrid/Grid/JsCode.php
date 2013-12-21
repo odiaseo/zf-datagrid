@@ -157,7 +157,7 @@ class JsCode extends Base
         $formatterCode
             = <<<ACTION
 
-                function {$this->getActionFunctioName()}(cellval,opts, rwd) {
+               ;function {$this->getActionFunctioName()}(cellval,opts, rwd) {
                     var rowid = opts.rowId ;
                     if(rowid === undefined || $.fmatter.isEmpty(rowid)) {
                         return "";
