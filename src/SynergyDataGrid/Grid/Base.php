@@ -133,10 +133,11 @@
         /**
          * Magic method to work with all object options without necessity to create tons of methods. Provide overloading features.
          *
-         * @param string $name      name of called method
-         * @param array  $arguments array of method arguments
+         * @param $name
+         * @param $arguments
          *
-         * @return mixed
+         * @return bool|mixed|Base
+         * @throws \Exception
          */
         public function __call($name, $arguments)
         {

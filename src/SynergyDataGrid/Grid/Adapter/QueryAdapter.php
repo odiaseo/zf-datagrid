@@ -25,7 +25,7 @@ use SynergyDataGrid\Model\BaseModel;
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
  * @package mvcgrid
  */
-abstract class QueryAdapter implements GridAdapterInterface
+abstract class QueryAdapter
 {
     /**
      * Doctrine Service Model

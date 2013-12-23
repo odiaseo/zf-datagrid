@@ -9,62 +9,74 @@
 
 namespace SynergyDataGrid\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Zend\Http\Response;
 
-class GridController extends AbstractActionController
+class GridController extends BaseGridController
 {
-    /**
-     * CRUD operations for Grid Models
-     *
-     * @return JsonModel
-     */
-    public function crudAction()
+    public function getList()
     {
-        $response       = '';
-        $options        = array();
-        $serviceManager = $this->getServiceLocator();
+        /** @var $service \SynergyDataGrid\Service\GridService */
+        $service = $this->getServiceLocator()->get('grid_service');
+        $params  = array_merge(
+            $this->params()->fromQuery(),
+            $this->params()->fromRoute()
+        );
 
-        /** @var $grid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
-        $grid = $serviceManager->get('jqgrid');
+        $payLoad = $service->getGridList($params);
 
-        $entityKey            = $this->params()->fromRoute('entity', null);
-        $className            = $grid->getClassnameFromEntityKey($entityKey);
-        $options['fieldName'] = $this->params()->fromRoute('fieldName', $this->params()->fromQuery('fieldName', null));
+        return $this->_sendPayload($payLoad);
 
-        if ($className) {
-            $request = $this->getRequest();
-            $grid->setGridIdentity(
-                $className,
-                $entityKey,
-                $this->params()->fromPost('__root__', null),
-                $this->params()->fromPost('displayTree', false)
-            );
+    }
 
-            if ($grid->getIsTreeGrid()) {
+    /**
+     * Create a new row
+     *
+     * @param mixed $data
+     *
+     * @return \Zend\View\Model\ModelInterface
+     */
+    public function create($data)
+    {
+        /** @var $service \SynergyDataGrid\Service\GridService */
+        $service = $this->getServiceLocator()->get('grid_service');
+        $params  = array_merge(
+            $data,
+            $this->params()->fromQuery(),
+            $this->params()->fromRoute()
+        );
 
-                $rootId = $this->params()->fromPost('__root__', null);
-                $nodeId = $this->params()->fromPost('nodeid', null);
-
-                if ($rootId and !$nodeId) {
-                    /** @var $baseModel \SynergyDataGrid\Model\BaseModel */
-                    $baseModel = $serviceManager->get('synergydatagrid\model');
-                    if ($item = $baseModel->getRepository($className)->find($rootId)) {
-                        $post            = $request->getPost();
-                        $post['nodeid']  = $item->getId();
-                        $post["n_left"]  = $item->getLft();
-                        $post["n_right"] = $item->getRgt();
-                        $post["n_level"] = $item->getLevel();
-
-                        $request->setPost($post);
-                    }
-                }
-            }
-
-            $response = $grid->prepareGridData($request, $options);
+        if ($this->params()->fromPost('oper') == 'del') {
+            $payLoad = $service->deleteRecord($params);
+        } else {
+            $payLoad = $service->createRecord($params);
         }
 
-        return new JsonModel($response);
+
+
+        return $this->_sendPayload($payLoad);
+
+    }
+
+    /**
+     * Update grid record
+     *
+     * @param mixed $data
+     *
+     * @return mixed|\Zend\View\Model\ModelInterface
+     */
+    public function replaceList($data)
+    {
+        /** @var $service \SynergyDataGrid\Service\GridService */
+        $service = $this->getServiceLocator()->get('grid_service');
+        $params  = array_merge(
+            $data,
+            $this->params()->fromQuery(),
+            $this->params()->fromRoute()
+        );
+
+        $payLoad = $service->updateRecord($params);
+
+        return $this->_sendPayload($payLoad);
+
     }
 }

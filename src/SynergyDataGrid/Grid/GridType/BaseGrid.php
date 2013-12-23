@@ -279,7 +279,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * NavGrid instance
      *
-     * @var \SynergyDataGrid\Grid\NavGrid
+     * @var \SynergyDataGrid\Grid\Navigation\NavGrid
      */
     protected $_navGrid;
     /**
@@ -291,7 +291,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * InlineNav instance
      *
-     * @var \SynergyDataGrid\Grid\InlineNav
+     * @var \SynergyDataGrid\Grid\Navigation\InlineNav
      */
     protected $_inlineNav;
     /**
@@ -412,8 +412,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
 
 
     /**
-     * @param $config
-     * @param $serviceLocator
+     * @param array                   $config
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param                         $manager
      */
     public function __construct(array $config, ServiceLocatorInterface $serviceLocator, $manager)
     {
@@ -443,9 +444,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set up default options before applying user defined options
      *
-     * @param string $id id of grid
-     *
-     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
+     * @return $this
      */
     public function setGridDisplayOptions()
     {
@@ -619,7 +618,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     }
 
 
-    protected function _formatGridData($rows, $columns)
+    public function formatGridData($rows, $columns)
     {
         $records     = array();
         $columnNames = array_keys($columns);
@@ -827,9 +826,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Attach current detail grid to given master grid
      *
-     * @param string $id id of master grid
+     * @param string $masterId
      *
-     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
+     * @return $this
      */
     public function attachToMaster($masterId = '')
     {
@@ -1233,9 +1232,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set javascript code for processAfterSubmit jqGrid event
      *
-     * @param \Zend_Json_Expr $processAfterSubmit javascript code for an event
+     * @param string $processAfterSubmit
      *
-     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
+     * @return $this
      */
     public function setProcessAfterSubmit($processAfterSubmit = '')
     {
@@ -1522,9 +1521,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set all custom navigator buttons
      *
-     * @param array $options array of options for all custom navigator buttons
+     * @param array $navButtons
      *
-     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
+     * @return $this
      */
     public function setNavButtons($navButtons = array())
     {
@@ -1757,9 +1756,10 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         return $this->_config;
     }
 
-
     /**
-     * @param \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
+     * @param $serviceLocator
+     *
+     * @return $this
      */
     public function setServiceLocator($serviceLocator)
     {
@@ -1787,9 +1787,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Delete record based on passed id and return result
      *
-     * @param \Zend\Http\Request $request
+     * @param Request $request
      *
-     * @return string
+     * @return mixed
      */
     abstract public function delete(Request $request);
 
@@ -1804,9 +1804,12 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
 
     /**
      * Function to replace the deprecated render function
-     *Completely render current grid object or just send AJAX response
+     * Completely render current grid object or just send AJAX response
      *
-     * @return string
+     * @param RequestInterface $request
+     * @param array            $options
+     *
+     * @return mixed
      */
     abstract public function prepareGridData(RequestInterface $request = null, $options = array());
 
@@ -1830,9 +1833,10 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Create grid data based on request and using pagination
      *
-     * @param \Zend\Http\Request $request
+     * @param Request $request
+     * @param bool    $dataOnly
      *
-     * @return \stdClass
+     * @return mixed
      */
     abstract protected function _createGridData(Request $request, $dataOnly = false);
 
@@ -1844,8 +1848,11 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Binds the grid to the database entity and assigns an ID to the grid
      *
-     * @param      $entityClassName
-     * @param null $gridId
+     * @param        $entityClassName
+     * @param string $gridId
+     * @param bool   $displayTree
+     *
+     * @return mixed
      */
     abstract public function setGridIdentity($entityClassName, $gridId = '', $displayTree = true);
 
@@ -1861,13 +1868,11 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     abstract public function setObjectManager($serviceManager);
 
     /**
-     * @param $filer
-     * @param $sort
-     * @param $treeFiler
+     * @param $request
+     * @param $service
      *
-     * @return \Zend\Paginator\Paginator
+     * @return mixed
      */
-
     abstract protected function getPaginator($request, $service);
 
     /**
@@ -1939,7 +1944,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     }
 
     /**
-     * @param  $entityKey
+     * @param $entityKey
+     *
+     * @return $this
      */
     public function setEntityKey($entityKey)
     {

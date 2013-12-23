@@ -23,11 +23,16 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
 use SynergyDataGrid\Util\ArrayUtils;
 use Zend\Http\PhpEnvironment\Request;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\RequestInterface;
 
 final class DoctrineORMGrid extends BaseGrid
 {
+    /**
+     * Response
+     *
+     * @var null
+     */
+    public $return = null;
     /**
      * Entity class name
      *
@@ -97,7 +102,9 @@ final class DoctrineORMGrid extends BaseGrid
     /**
      * Add subGrid configuration to the grid
      *
-     * @param $model
+     * @param $subGridMap
+     *
+     * @return SubGrid
      */
     public function getSubGridModel($subGridMap)
     {
@@ -136,8 +143,17 @@ final class DoctrineORMGrid extends BaseGrid
         return $subGrid;
     }
 
+    /**
+     * Set grid columns by mapping entity attributes to grid columns
+     *
+     * @param bool $dataOnly
+     *
+     * @return $this|mixed
+     */
     public function setGridColumns($dataOnly = false)
     {
+        $adjustment = 0;
+
         if (!$this->_columnsSet) {
             $target = '';
 
@@ -394,12 +410,20 @@ final class DoctrineORMGrid extends BaseGrid
 
     /**
      * Function to replace the deprecated render function
-     *Completely render current grid object or just send AJAX response
+     * Completely render current grid object or just send AJAX response
      *
-     * @return string
+     * @param RequestInterface $request
+     * @param array            $options
+     *
+     * @return array|\stdClass|string
      */
     public function prepareGridData(RequestInterface $request = null, $options = array())
     {
+        $data = array(
+            'error'   => false,
+            'message' => ''
+        );
+
         try {
             if (!$request) {
                 $serviceManager = $this->getModel()->getServiceManager();
@@ -408,7 +432,7 @@ final class DoctrineORMGrid extends BaseGrid
             if (!$this->getUrl()) {
                 $this->setUrl($request->getRequestUri());
             }
-            $data = null;
+
 
             $str = parse_url($request->getRequestUri(), PHP_URL_QUERY);
             parse_str($str, $queryParams);
@@ -424,7 +448,7 @@ final class DoctrineORMGrid extends BaseGrid
 
             if ($subGridid) {
                 if ($operation == 'del') {
-                    $data = $this->deleteSubgridRow($request, $subGridid, $options['fieldName']);
+                    $data = $this->deleteSubgridRow($request, $options['fieldName']);
                 } elseif ($operation == 'edit' || $operation == 'add') {
                     $data = $this->editSubGrid($request, $subGridid, $options['fieldName']);
                 } else {
@@ -439,11 +463,13 @@ final class DoctrineORMGrid extends BaseGrid
                     $data = $this->_createGridData($request);
                 }
             }
-
+            ;
 
         } catch (\Exception $e) {
-            header('HTTP/1.1 400 Error Saving Data');
-            $data = array('error' => $e->getMessage());
+            $data = array(
+                'error'   => true,
+                'message' => $e->getMessage()
+            );
         }
 
         return $data;
@@ -510,7 +536,7 @@ final class DoctrineORMGrid extends BaseGrid
             'page'    => $request->getPost('page', 1),
             'total'   => ceil($total / $rowNum),
             'records' => $total,
-            'rows'    => $this->_formatGridData($childRows, $columns)
+            'rows'    => $this->formatGridData($childRows, $columns)
         );
 
         return $grid;
@@ -519,14 +545,17 @@ final class DoctrineORMGrid extends BaseGrid
     /**
      * Create grid data based on request and using pagination
      *
-     * @param \Zend\Http\Request $request
+     * @param Request $request
+     * @param bool    $dataOnly
      *
-     * @return \stdClass
+     * @return array|\stdClass
+     *
      */
     protected function _createGridData(Request $request, $dataOnly = true)
     {
         $page      = $request->getPost('page', 1);
         $paginator = $this->getPaginator($request);
+
         $rows      = $paginator->getIterator();
 
         $this->reorderColumns();
@@ -539,7 +568,7 @@ final class DoctrineORMGrid extends BaseGrid
             'page'    => $page,
             'total'   => ceil($total / $rowNum),
             'records' => $total,
-            'rows'    => $this->_formatGridData($rows, $columns)
+            'rows'    => $this->formatGridData($rows, $columns)
         );
 
         return $grid;
@@ -548,9 +577,10 @@ final class DoctrineORMGrid extends BaseGrid
     /**
      * Delete record based on passed id and return result
      *
-     * @param \Zend\Http\Request $request
+     * @param Request $request
      *
-     * @return string
+     * @return array|string
+     *
      */
     public function delete(Request $request)
     {
@@ -570,15 +600,14 @@ final class DoctrineORMGrid extends BaseGrid
     /**
      * Delete record based on passed id and return result
      *
-     * @param \Zend\Http\Request $request
+     * @param Request $request
+     * @param         $fieldName
      *
-     * @return string
+     * @return array
      */
-    public function deleteSubgridRow(Request $request, $parentRowId, $fieldName)
+    public function deleteSubgridRow(Request $request, $fieldName)
     {
-        $id      = $request->getPost('id');
-        $pass    = true;
-        $message = '';
+        $id = $request->getPost('id');
 
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
         $target  = $mapping->associationMappings[$fieldName]['targetEntity'];
@@ -590,15 +619,16 @@ final class DoctrineORMGrid extends BaseGrid
             $message = sprintf('Row #%d successfully deleted', $id);
         } catch (\Exception $e) {
             $message = 'Unable to delete record. ' . $e->getMessage();
-            $pass    = false;
+            $retv    = false;
         }
 
-        return array('success' => $retv, 'message' => $message);
+        return array('error' => $retv ? false : true, 'message' => $message);
     }
 
     /**
      * @param      $request
      * @param null $entity
+     * @param null $model
      *
      * @return \Doctrine\ORM\Mapping\Entity|null
      */
@@ -606,7 +636,6 @@ final class DoctrineORMGrid extends BaseGrid
     {
         $params      = $request->getPost();
         $pass        = true;
-        $id          = 0;
         $message     = '';
         $model       = $model ? : $this->getModel();
         $entityClass = $model->getEntityClass();
@@ -690,22 +719,24 @@ final class DoctrineORMGrid extends BaseGrid
             }
         }
 
-        return $pass ? $entity : null;
+        $this->return = array(
+            'error'   => !$pass,
+            'message' => $message
+        );
+
+        return $entity;
     }
 
     /**
      * @param $request
-     * @param $gridId
-     * @param $fieldName
+     * @param $id
+     * @param $field
      *
      * @return array
      */
     public function editSubGrid($request, $id, $field)
     {
         $pass    = true;
-        $message = '';
-        $columns = array();
-
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
         $target  = $mapping->associationMappings[$field]['targetEntity'];
 
@@ -734,12 +765,12 @@ final class DoctrineORMGrid extends BaseGrid
                 $message = $e->getMessage();
                 $pass    = false;
             }
+
+            return array('error' => !$pass, 'message' => $message, 'id' => $id);
         } else {
-            header('HTTP/1.1 400 Error Saving Data');
+            return $this->return;
         }
 
-
-        return array('success' => $pass, 'message' => $message, 'id' => $id);
     }
 
     /**
@@ -764,12 +795,9 @@ final class DoctrineORMGrid extends BaseGrid
                 $message = $e->getMessage();
                 $pass    = false;
             }
-        } else {
-            header('HTTP/1.1 400 Error Saving Data');
         }
 
-
-        return array('success' => $pass, 'message' => $message, 'id' => $id);
+        return array('error' => !$pass, 'message' => $message, 'id' => $id);
     }
 
 
@@ -911,7 +939,9 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param int $entityId
+     * @param $entityId
+     *
+     * @return $this
      */
     public function setEntityId($entityId)
     {
@@ -929,7 +959,9 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param string $entity
+     * @param $entity
+     *
+     * @return $this
      */
     public function setEntity($entity)
     {
@@ -986,7 +1018,9 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param boolean $columnsSet
+     * @param $columnsSet
+     *
+     * @return $this
      */
     public function setColumnsSet($columnsSet)
     {
@@ -1023,7 +1057,9 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $customQueryBuilder
+     * @param QueryBuilder $customQueryBuilder
+     *
+     * @return $this
      */
     public function setCustomQueryBuilder(QueryBuilder $customQueryBuilder)
     {
@@ -1041,7 +1077,7 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param       $request
+     * @param       $request \Zend\Http\PhpEnvironment\Request
      * @param null  $model
      * @param array $subGridFilter
      *

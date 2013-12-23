@@ -12,6 +12,38 @@
  *
  */
 return array(
+
+    'router'       => array(
+        'routes' => array(
+            'synergydatagrid'         => array(
+                'type'    => 'Segment',
+                'options' => array(
+                    'route'       => '/synergydatagrid/crud/:entity[/:id]',
+                    'defaults'    => array(
+                        '__NAMESPACE__' => 'SynergyDataGrid\Controller',
+                        'controller'    => 'SynergyDataGrid\Controller\Grid',
+                    ),
+                    'constraints' => array(
+                        'entity' => '[a-zA-Z\-]+'
+                    ),
+                ),
+            ),
+            'synergydatagrid\subgrid' => array(
+                'type'    => 'Segment',
+                'options' => array(
+                    'route'       => '/synergydatagrid/crud/:entity/subgrid/:fieldName[/:id]',
+                    'defaults'    => array(
+                        '__NAMESPACE__' => 'SynergyDataGrid\Controller',
+                        'controller'    => 'SynergyDataGrid\Controller\SubGrid',
+                    ),
+                    'constraints' => array(
+                        'entity'    => '[a-zA-Z\-]+',
+                        'fieldName' => '[a-zA-Z\-]+',
+                    ),
+                ),
+            ),
+        ),
+    ),
     'jqgrid'       => array(
         /**
          * Location where entity classname to entity key mappings are stored
@@ -366,38 +398,9 @@ return array(
     ),
     'controllers'  => array(
         'invokables' => array(
-            'SynergyDataGrid\Controller\Grid' => 'SynergyDataGrid\Controller\GridController',
+            'SynergyDataGrid\Controller\Grid'    => 'SynergyDataGrid\Controller\GridController',
+            'SynergyDataGrid\Controller\SubGrid' => 'SynergyDataGrid\Controller\SubGridController',
         ),
     ),
 
-    'router'       => array(
-        'routes' => array(
-            'synergydatagrid' => array(
-                'type'          => 'Segment',
-                'options'       => array(
-                    'route'       => '/synergydatagrid/crud/:entity',
-                    'defaults'    => array(
-                        '__NAMESPACE__' => 'SynergyDataGrid\Controller',
-                        'controller'    => 'SynergyDataGrid\Controller\Grid',
-                        'action'        => 'crud'
-                    ),
-                    'constraints' => array(
-                        'entity' => '[a-zA-Z\-]+'
-                    ),
-                ),
-                'may_terminate' => true,
-                'child_routes'  => array(
-                    'subgrid' => array(
-                        'type'    => 'Segment',
-                        'options' => array(
-                            'route'       => '/subgrid/:fieldName',
-                            'constraints' => array(
-                                'fieldName' => '[a-zA-Z\-]+',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    ),
 );

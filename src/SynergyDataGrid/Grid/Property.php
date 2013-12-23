@@ -38,10 +38,8 @@
         /**
          * Set up base Property options
          *
-         * @param mixed $owner   object owner of property
-         * @param array $options array of property options
-         *
-         * @return void
+         * @param       $owner
+         * @param array $options
          */
         public function __construct($owner, $options = array())
         {
@@ -85,7 +83,7 @@
          *
          * @param mixed $owner owner to set
          *
-         * @return \SynergyDataGrid\Property
+         * @return \SynergyDataGrid\Grid\Property
          */
         public function setOwner($owner)
         {
@@ -107,9 +105,9 @@
         /**
          * Set Property name
          *
-         * @param string $proeprty Property name
+         * @param $property
          *
-         * @return \SynergyDataGrid\Property
+         * @return $this
          */
         public function setProperty($property)
         {

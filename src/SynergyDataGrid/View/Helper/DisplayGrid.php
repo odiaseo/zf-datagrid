@@ -51,7 +51,10 @@ class DisplayGrid extends AbstractHelper
                                 var gw = par.innerWidth() - padding;
                                 g.jqGrid("setGridWidth",gw);
                             }
-                            var synergyDataGrid = synergyDataGrid || {};
+                            if(typeof synergyDataGrid == "undefined"){
+                                synergyDataGrid = {};
+                            }
+
                             synergyDataGrid["' . DatePicker::DATE_PICKER_FUNCTION . '"] = []; ' . $js;
 
         if ($appendScript) {
@@ -213,7 +216,7 @@ class DisplayGrid extends AbstractHelper
             $options   = $grid->getNavGrid()->getOptions() ? : new \stdClass();
             $prmEdit   = $grid->getNavGrid()->getEditParameters() ? : new \stdClass();
             $prmAdd    = $grid->getNavGrid()->getAddParameters() ? : new \stdClass();
-            $prmDel    = $grid->getNavGrid()->getDelParameters() ? : new \stdClass();
+            $prmDel    = $grid->getNavGrid()->getDeleteParameters() ? : new \stdClass();
             $prmSearch = $grid->getNavGrid()->getSearchParameters() ? : new \stdClass();
             $prmView   = $grid->getNavGrid()->getViewParameters() ? : new \stdClass();
 
