@@ -56,9 +56,12 @@ class Module
                  *
                  */
                 'association_mapping_callback' => array(
+
                     '__default__' => function ($serviceManager, $entity, $mappedBy = null) {
+                        /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
                         $values = array(':Select');
-                        $em     = $serviceManager->get('doctrine.entitymanager.orm_default');
+                        /** @var $em \Doctrine\Orm\EntityManager */
+                        $em = $serviceManager->get('doctrine.entitymanager.orm_default');
                         try {
                             if ($mappedBy) {
                                 $qb    = $em->createQueryBuilder();
@@ -96,7 +99,7 @@ class Module
                         'column-chooser' => array(
                             'id'       => 'column_chooser',
                             'icon'     => 'ui-icon-folder-open',
-                            'action'   => new \Zend\Json\Expr(
+                            'action'   => new Expr(
                                 "function (){ jQuery('#" . $gridId . "').jqGrid('columnChooser');  }"),
                             'title'    => "Reorder Columns",
                             'caption'  => "",
@@ -107,7 +110,7 @@ class Module
                             'caption' => "",
                             'title'   => "Toggle Search Toolbar",
                             'icon'    => 'ui-icon-pin-s',
-                            'action'  => new \Zend\Json\Expr("jQuery('#" . $gridId . "')[0].toggleToolbar(); ")
+                            'action'  => new Expr("jQuery('#" . $gridId . "')[0].toggleToolbar(); ")
                         ),
 
                     );
@@ -151,6 +154,7 @@ class Module
                  *
                  */
                 'grid_url_generator'           => function ($sm, $entity, $fieldName, $targetEntity, $urlType) {
+                    /** @var $sm\Zend\ServiceManager\ServiceManager */
                     /** @var $helper \Zend\View\Helper\Url */
                     $helper = $sm->get('viewhelpermanager')->get('url');
 
@@ -162,7 +166,7 @@ class Module
                         case BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
                         case BaseGrid::DYNAMIC_URL_TYPE_SUBGRID :
                             $url    = $helper(
-                                'synergydatagrid/subgrid',
+                                'synergydatagrid\subgrid',
                                 array(
                                      'entity'    => $entityKey,
                                      'fieldName' => $fieldName
@@ -185,9 +189,17 @@ class Module
         return $merged;
     }
 
-    public function getServiceConfig($e = null)
+    public function getServiceConfig()
     {
         return array(
+            'aliases'            => array(
+                'synergy\service\grid'    => 'SynergyDataGrid\Service\GridService',
+                'synergy\service\subgrid' => 'SynergyDataGrid\Service\SubGridService',
+            ),
+            'invokables'         => array(
+                'SynergyDataGrid\Service\GridService'    => 'SynergyDataGrid\Service\GridService',
+                'SynergyDataGrid\Service\SubGridService' => 'SynergyDataGrid\Service\SubGridService',
+            ),
             'shared'             => array(
                 'jqgrid'                => false,
                 'synergydatagrid\model' => false,

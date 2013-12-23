@@ -16,7 +16,7 @@ class GridController extends BaseGridController
     public function getList()
     {
         /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\grid');
         $params  = array_merge(
             $this->params()->fromQuery(),
             $this->params()->fromRoute()
@@ -38,7 +38,7 @@ class GridController extends BaseGridController
     public function create($data)
     {
         /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\grid');
         $params  = array_merge(
             $data,
             $this->params()->fromQuery(),
@@ -67,7 +67,7 @@ class GridController extends BaseGridController
     public function replaceList($data)
     {
         /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\grid');
         $params  = array_merge(
             $data,
             $this->params()->fromQuery(),

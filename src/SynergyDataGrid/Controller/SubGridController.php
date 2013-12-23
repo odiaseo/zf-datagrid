@@ -22,7 +22,7 @@ class SubGridController extends BaseGridController
     {
 
         /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('sub_grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
         $params  = array_merge(
             $this->params()->fromQuery(),
             $this->params()->fromRoute()
@@ -44,7 +44,7 @@ class SubGridController extends BaseGridController
     public function replaceList($data)
     {
         /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('sub_grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
         $params  = array_merge(
             $data,
             $this->params()->fromQuery(),
@@ -60,7 +60,7 @@ class SubGridController extends BaseGridController
     public function create($data)
     {
         /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('sub_grid_service');
+        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
 
         $params = array_merge(
             $data,
