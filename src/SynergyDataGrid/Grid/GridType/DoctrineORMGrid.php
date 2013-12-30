@@ -46,13 +46,6 @@ final class DoctrineORMGrid extends BaseGrid
      */
     private $_entityId;
     /**
-     * Grid id
-     *
-     * @var string
-     */
-    private $_id;
-
-    /**
      * Flag to indicate if columns have been set to prevent id being done twice
      *
      * @var bool
@@ -1191,12 +1184,5 @@ final class DoctrineORMGrid extends BaseGrid
         return $filename;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->_id;
-    }
 
 }
