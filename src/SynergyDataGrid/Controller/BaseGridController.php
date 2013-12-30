@@ -9,28 +9,13 @@
 
 namespace SynergyDataGrid\Controller;
 
+use SynergyCommon\Controller\BaseRestfulController;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
 
-class BaseGridController extends AbstractRestfulController
+class BaseGridController
+    extends BaseRestfulController
 {
-    /**
-     * Accept header criteria
-     *
-     * @var array
-     */
-    protected $_acceptCriteria
-        = array(
-            'Zend\View\Model\JsonModel' => array(
-                'application/json',
-                'application/jsonp',
-                'application/javascript'
-            ),
-            'Zend\View\Model\ViewModel' => array(
-                '*/*'
-            ),
-        );
 
     public function _processRequest()
     {
@@ -67,42 +52,32 @@ class BaseGridController extends AbstractRestfulController
         return $this->_sendPayload($payLoad);
     }
 
+    /**
+     * Set variables required for nestedset models
+     *
+     * @param $className
+     */
     protected function _setTreeGridVariables($className)
     {
         $rootId = $this->params()->fromPost('__root__', null);
         $nodeId = $this->params()->fromPost('nodeid', null);
 
+        /** @var $request \Zend\Http\PhpEnvironment\Request */
+        $request = $this->getRequest();
+
         if ($rootId and !$nodeId) {
             /** @var $baseModel \SynergyDataGrid\Model\BaseModel */
             $baseModel = $this->getServiceLocator()->get('synergydatagrid\model');
             if ($item = $baseModel->getRepository($className)->find($rootId)) {
-                $post            = $this->getRequest()->getPost();
+                $post            = $request->getPost();
                 $post['nodeid']  = $item->getId();
                 $post["n_left"]  = $item->getLft();
                 $post["n_right"] = $item->getRgt();
                 $post["n_level"] = $item->getLevel();
 
-                $this->getRequest()->setPost($post);
+                $request->setPost($post);
             }
         }
     }
 
-    /**
-     * Render output
-     *
-     * @param $payload
-     *
-     * @return \Zend\View\Model\ModelInterface
-     */
-    protected function _sendPayload($payload)
-    {
-        $viewModel = $this->acceptableViewModelSelector($this->_acceptCriteria);
-        $viewModel->setVariables($payload);
-
-        if (isset($payload['error']) and $payload['error'] == true) {
-            $this->getResponse()->setStatusCode(Response::STATUS_CODE_400);
-        }
-
-        return $viewModel;
-    }
 }

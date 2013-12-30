@@ -22,6 +22,8 @@ use Zend\Filter\HtmlEntities;
 /**
  * Column class for single grid column implementation
  *
+ * @method mergeFormatoptions()
+ *
  * @author  Pele Odiase
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options
  * @package mvcgrid

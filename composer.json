@@ -30,10 +30,12 @@
     },
     "autoload": {
         "psr-0": {
-            "SynergyDataGrid": "src/"
+            "SynergyDataGrid": "src/",
+            "SynergyDataGridTest": "tests/module"
         },
         "classmap": [
-            "./Module.php"
+            "./Module.php",
+            "./tests/module/Module.php"
         ]
     }
 }

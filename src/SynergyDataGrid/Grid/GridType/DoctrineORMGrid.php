@@ -67,12 +67,6 @@ final class DoctrineORMGrid extends BaseGrid
      * @var array
      */
     private $_subGrid = array();
-
-    /**
-     * @var \Zend\Paginator\Paginator
-     */
-    private $_paginator = null;
-
     /**
      * @var \Doctrine\ORM\QueryBuilder
      */
@@ -108,6 +102,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function getSubGridModel($subGridMap)
     {
+        $names = $width = array();
         /** @var $model \SynergyDataGrid\Model\BaseModel */
         $model = $this->getModel($subGridMap['targetEntity']);
 
@@ -155,7 +150,6 @@ final class DoctrineORMGrid extends BaseGrid
         $adjustment = 0;
 
         if (!$this->_columnsSet) {
-            $target = '';
 
             $utils = new ArrayUtils();
 
@@ -293,8 +287,10 @@ final class DoctrineORMGrid extends BaseGrid
                     continue;
                 } else {
                     if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
-                        $this->_subGrid = $this->getSubGridModel($map);
-                        $target         = $fieldName;
+                        $index = count($this->_subGrid);
+                        /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
+                        $subGrid = $this->getSubGridModel($map);
+                        $target  = $fieldName;
 
                         if (is_callable($this->_config['grid_url_generator'])) {
                             $subGridUrl = $this->_config['grid_url_generator'](
@@ -313,8 +309,8 @@ final class DoctrineORMGrid extends BaseGrid
                                 self::DYNAMIC_URL_TYPE_GRID
                             );
 
-                            $this->_subGrid->setUrl($subGridUrl);
-                            $this->_subGrid->setEditurl($editUrl);
+                            $subGrid->setUrl($subGridUrl);
+                            $subGrid->setEditurl($editUrl);
                         } else {
                             $subGridUrl = $this->getSubGridUrl();
                         }
@@ -324,11 +320,13 @@ final class DoctrineORMGrid extends BaseGrid
                             $subGridUrl .= '&fieldName=' . $target;
                         }
 
-                        $this->setSubGridModel(array($this->_subGrid));
+
+                        $this->setSubGridModel(array($subGrid));
                         $this->setSubGridUrl($subGridUrl);
 
                         $this->_hasSubGrid = true;
                         $this->setSubGrid(true);
+                        $this->_subGrid[$index] = $subGrid;
                     }
                 }
 
@@ -419,6 +417,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function prepareGridData(RequestInterface $request = null, $options = array())
     {
+        /** @var $request \Zend\Http\PhpEnvironment\Request */
         $data = array(
             'error'   => false,
             'message' => ''
@@ -486,7 +485,6 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function createSubGridData(Request $request, $id, $field)
     {
-        $columns = array();
         /** @var $model \SynergyDataGrid\Model\BaseModel */
         $model = $this->getModel($this->_entity);
 
@@ -523,6 +521,7 @@ final class DoctrineORMGrid extends BaseGrid
             $childRows = new ArrayCollection();
         }
 
+        /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
         $subGrid = $this->getServiceLocator()->get('jqgrid');
         $subGrid->setGridIdentity(
             $targetEntity,
@@ -556,7 +555,7 @@ final class DoctrineORMGrid extends BaseGrid
         $page      = $request->getPost('page', 1);
         $paginator = $this->getPaginator($request);
 
-        $rows      = $paginator->getIterator();
+        $rows = $paginator->getIterator();
 
         $this->reorderColumns();
         $columns = $this->setGridColumns($dataOnly)->getColumns();
@@ -634,6 +633,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     protected function createEntity($request, $entity = null, $model = null)
     {
+        /** @var $request \Zend\Http\PhpEnvironment\Request */
         $params      = $request->getPost();
         $pass        = true;
         $message     = '';
@@ -672,22 +672,26 @@ final class DoctrineORMGrid extends BaseGrid
                         if ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::ONE_TO_MANY) {
                             $message = "OneToMany updates not supported: '{$param}' was not updated";
                         } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_MANY) {
-                            if ($entity->$param) {
-                                $entity->$param->clear();
+
+                            /** @var $entityParam \Doctrine\Common\Collections\ARrayCollection */
+                            $entityParam = $entity->$param;
+                            if ($entityParam) {
+                                $entityParam->clear();
                             } else {
-                                $entity->$param = new ArrayCollection();
+                                $entityParam = new ArrayCollection();
                             }
                             $value = explode(',', $value);
                             $value = array_unique(array_filter($value));
 
                             foreach ($value as $v) {
                                 if ($foreignEntity = $this->getEntityManager()->find($target, $v)) {
-                                    $entity->$param->add($foreignEntity);
+                                    $entityParam->add($foreignEntity);
                                 } else {
                                     $pass    = false;
                                     $message = "Unable to update join table: {$target} " . $param . '"';
                                 }
                             }
+                            $this->$param = $entityParam;
                         } elseif ($value) {
                             if ($foreignEntity = $this->getEntityManager()->find($target, $value)) {
                                 $entity->$method($foreignEntity);
@@ -736,7 +740,9 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function editSubGrid($request, $id, $field)
     {
+        /** @var $request \Zend\Http\PhpEnvironment\Request */
         $pass    = true;
+        $row     = null;
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
         $target  = $mapping->associationMappings[$field]['targetEntity'];
 
@@ -745,11 +751,13 @@ final class DoctrineORMGrid extends BaseGrid
         if (is_numeric($subGridId)) {
             $entity = $this->getEntityManager()->getRepository($target)->find($subGridId);
         } else {
+            /** @var $row \SynergyCommon\Entity\AbstractEntity */
             $row    = $this->getEntityManager()->getRepository($this->_entity)->find($id);
             $entity = new $target;
         }
 
         $model = $this->getModel($target);
+        /** @var $entity  \SynergyCommon\Entity\AbstractEntity */
         if ($entity = $this->createEntity($request, $entity, $model)) {
             try {
                 if (is_numeric($subGridId)) {
@@ -1182,4 +1190,13 @@ final class DoctrineORMGrid extends BaseGrid
 
         return $filename;
     }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
 }

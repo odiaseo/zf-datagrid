@@ -52,6 +52,11 @@ class AbstractModelFactory
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         $model = new BaseModel();
+        /** @var $logger \SynergyCommon\Util\ErrorHandler */
+        $logger = $serviceLocator->get('logger');
+
+        $model->getLogger($logger);
+
         return $model;
 
     }

@@ -52,6 +52,13 @@ class BaseModel
             'CONTAIN'               => 'LIKE ?',
             'NOT_CONTAIN'           => 'NOT LIKE ?'
         );
+    /**
+     * Error handler
+     *
+     * @var \SynergyCommon\Util\ErrorHandler
+     */
+    protected $_logger;
+
     protected $_orm_key = 'doctrine.entitymanager.orm_default';
     /**
      * @var \SynergyDataGrid\Model\Config\ModelOptions
@@ -102,7 +109,7 @@ class BaseModel
      */
     protected $_classMetadata;
     /**
-     * @var \\Zend\ServiceManager\ServiceManager
+     * @var \Zend\ServiceManager\ServiceManager
      */
     protected $_sm;
 
@@ -597,7 +604,7 @@ class BaseModel
      */
     public function populateEntity($entity, $params)
     {
-
+        $message = null;
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntityClass());
 
         foreach ($params as $param => $value) {
@@ -607,7 +614,7 @@ class BaseModel
             ) {
 
                 $method = 'set' . ucfirst($param);
-                $value = ($value == 'null' or (empty($value) and !is_numeric($value))) ? null : $value;
+                $value  = ($value == 'null' or (empty($value) and !is_numeric($value))) ? null : $value;
 
                 if (isset($mapping->associationMappings[$param])) {
                     $target = $mapping->associationMappings[$param]['targetEntity'];
@@ -615,7 +622,7 @@ class BaseModel
                     if ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::ONE_TO_MANY) {
                         $message = "OneToMany updates not supported: '{$param}' was not updated";
                     } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_MANY) {
-                        /** @var \Doctrine\Common\Collection\ArrayCollection $param */
+                        /** @var \Doctrine\Common\Collections\ArrayCollection $param */
                         if ($entity->$param) {
                             $entity->$param->clear();
                         } else {
@@ -628,7 +635,6 @@ class BaseModel
                             if ($foreignEntity = $this->getEntityManager()->find($target, $v)) {
                                 $entity->$param->add($foreignEntity);
                             } else {
-                                $pass    = false;
                                 $message = "Unable to update join table: {$target} " . $param . '"';
                             }
                         }
@@ -636,7 +642,6 @@ class BaseModel
                         if ($foreignEntity = $this->getEntityManager()->find($target, $value)) {
                             $entity->$method($foreignEntity);
                         } else {
-                            $pass    = false;
                             $message = "Unable to update join table: {$target} field" . $param . '"';
                         }
                     }
@@ -651,7 +656,6 @@ class BaseModel
                             $value = $ds ? new \DateTime($ds) : null;
                             $entity->$method($value);
                         } catch (\Exception $e) {
-                            $pass    = false;
                             $message = 'Wrong date format for column "' . $param . '"';
                             break;
                         }
@@ -662,6 +666,9 @@ class BaseModel
             }
         }
 
+        if ($message) {
+            $this->getLogger()->notice($message);
+        }
 
         return $entity;
     }
@@ -677,5 +684,30 @@ class BaseModel
 
         return false;
 
+    }
+
+    /**
+     * @param \SynergyCommon\Util\ErrorHandler $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->_logger = $logger;
+    }
+
+    /**
+     * @return \SynergyCommon\Util\ErrorHandler
+     */
+    public function getLogger()
+    {
+        return $this->_logger;
+    }
+
+
+    /**
+     * @return \Zend\ServiceManager\ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->_sm;
     }
 }

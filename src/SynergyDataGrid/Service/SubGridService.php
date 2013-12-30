@@ -73,11 +73,14 @@ class SubGridService
             return $record;
 
         } catch (\Exception $exception) {
-            return array(
+            $this->getLogger()->logException($exception);
+            $record = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $record;
     }
 
     public function updateSubGridRecord($data)
@@ -100,17 +103,19 @@ class SubGridService
             $entity = $model->save($entity);
             $id     = $entity->getId();
 
-            return array(
+            $record = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully updated', $id)
             );
         } catch (\Exception $exception) {
-
-            return array(
+            $this->getLogger()->logException($exception);
+            $record = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $record;
     }
 
     public function createSubGridRecord($data)
@@ -134,18 +139,21 @@ class SubGridService
             $model->save($row);
             $id = $row->getId();
 
-            return array(
+            $record = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully updated', $id)
             );
         } catch (\Exception $exception) {
-
-            return array(
+            $this->getLogger()->logException($exception);
+            $record = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $record;
     }
+
     /**
      * @param $data
      *
@@ -165,15 +173,18 @@ class SubGridService
             $subGridModel = $this->_getModel($target, $data);
             $subGridModel->remove($data['id']);
 
-            return array(
+            $record = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully deleted', $data['id'])
             );
         } catch (\Exception $exception) {
-            return array(
+            $this->getLogger()->logException($exception);
+            $record = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $record;
     }
 }

@@ -1,7 +1,8 @@
 <?php
 namespace SynergyDataGrid;
 
-use SynergyDataGrid\Grid\Adapter\QueryAdapter;
+use Monolog\Handler\RotatingFileHandler;
+use SynergyCommon\Util\ErrorHandler;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use Zend\Json\Expr;
 use Zend\ServiceManager\ServiceManager;
@@ -204,7 +205,16 @@ class Module
             'abstract_factories' => array(
                 'SynergyDataGrid\Model\AbstractModelFactory',
                 'SynergyDataGrid\Grid\AbstractGridFactory'
-            )
+            ),
+            'factories'          => array(
+                'logger' => function () {
+                    $filename = 'data/logs/' . __NAMESPACE__ . '-app.log';
+                    $stream   = new RotatingFileHandler($filename, 5);
+                    $logger   = new ErrorHandler(__NAMESPACE__, array($stream));
+
+                    return $logger;
+                },
+            ),
         );
     }
 

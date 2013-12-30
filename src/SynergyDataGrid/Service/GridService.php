@@ -12,7 +12,7 @@ class GridService
      *
      * @param $data
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return array
      */
     public function getGridList($data)
     {
@@ -41,13 +41,18 @@ class GridService
                 'rows'    => $grid->formatGridData($rows, $columns)
             );
 
-            return $return;
+
         } catch (\Exception $exception) {
-            return array(
+
+            $this->getLogger()->logException($exception);
+
+            $return = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $return;
     }
 
     /**
@@ -65,16 +70,22 @@ class GridService
             $model     = $this->_getModel($className, $data);
             $model->updateEntity($id, $data);
 
-            return array(
+            $return = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully updated', $id)
             );
         } catch (\Exception $exception) {
-            return array(
+
+            $this->getLogger()->logException($exception);
+
+            $return = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $return;
+
     }
 
     /**
@@ -94,16 +105,19 @@ class GridService
             $entity = $model->populateEntity($entity, $data);
             $entity = $model->save($entity);
 
-            return array(
+            $return = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully created', $entity->getId())
             );
         } catch (\Exception $exception) {
-            return array(
+            $this->getLogger()->logException($exception);
+            $return = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $return;
     }
 
     /**
@@ -118,16 +132,21 @@ class GridService
             $model     = $this->_getModel($className);
             $model->remove($data['id']);
 
-            return array(
+            $return = array(
                 'error'   => false,
                 'message' => sprintf('Record #%d successfully deleted', $data['id'])
             );
         } catch (\Exception $exception) {
-            return array(
+
+            $this->getLogger()->logException($exception);
+
+            $return = array(
                 'error'   => true,
                 'message' => $exception->getMessage()
             );
         }
+
+        return $return;
     }
 
 }

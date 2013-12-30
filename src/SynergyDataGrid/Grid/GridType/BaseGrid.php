@@ -35,6 +35,26 @@ use Zend\Stdlib\RequestInterface;
 /**
  * JqGrid class for implement base jqGrid plugin functionality
  *
+ * @method setDatatype($value)
+ * @method setEditurl($value)
+ * @method setSubGrid($value)
+ * @method setSubGridModel($value)
+ * @method setSubGridUrl($value)
+ * @method setTreeGrid($value)
+ * @method setCaption($value)
+ * @method setHidegrid($value)
+ * @method setService($value)
+ *
+ * @method getCaption()
+ * @method getSubGridUrl()
+ * @method getDatatype()
+ * @method getEditurl()
+ * @method getSubGrid()
+ * @method getRowNum()
+ * @method getSortorder()
+ * @method getSortname()
+ * @method getSubGridModel($subGridMap)
+ *
  * @author  Pele Odiase
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:jqgriddocs
  * @package mvcgrid
@@ -1769,7 +1789,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     }
 
     /**
-     * @return \Zend\ServiceManager\ServiceLocatorInterface
+     * @return \Zend\ServiceManager\ServiceManager
      */
     public function getServiceLocator()
     {

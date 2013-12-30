@@ -193,4 +193,12 @@ class BaseService
 
         return $model;
     }
+
+    /**
+     * @return \SynergyCommon\Util\ErrorHandler
+     */
+    public function getLogger()
+    {
+        return $this->_serviceManager->get('logger');
+    }
 }

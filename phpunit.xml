@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false">
+<phpunit bootstrap="tests/Bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false">
 
     <testsuites>
         <testsuite name="Synergy Data Grid Test Suite">
-            <directory suffix="Test.php">../Tests</directory>
+            <directory suffix="Test.php">tests/module/SynergyDataGridTest/Test</directory>
         </testsuite>
     </testsuites>
     <php>
-        <includePath>../src</includePath>
-        <includePath>../vendor</includePath>
+        <includePath>src</includePath>
+        <includePath>vendor</includePath>
     </php>
     <filter>
         <whitelist>

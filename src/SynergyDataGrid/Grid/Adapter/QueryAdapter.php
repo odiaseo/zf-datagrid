@@ -83,10 +83,10 @@ abstract class QueryAdapter
      * @param BaseGrid  $grid
      * @param BaseModel $service
      * @param bool      $filter array of filter options
-     * @param bool      $sort   array of sort options
+     * @param array      $sort   array of sort options
      * @param null      $treeData
      */
-    public function __construct(BaseGrid $grid, BaseModel $service, $filter = false, $sort = false, $treeData = null)
+    public function __construct(BaseGrid $grid, BaseModel $service, $filter = false, $sort = array(), $treeData = null)
     {
         $this->setService($service);
         $this->setFilter($filter);
@@ -98,7 +98,7 @@ abstract class QueryAdapter
     /**
      * Get service model instance
      *
-     * @return \SynergyDataGrid\Model\BaseModel
+     * @return BaseModel
      */
     public function getService()
     {
@@ -184,7 +184,9 @@ abstract class QueryAdapter
     }
 
     /**
-     * @param array $treeFilter
+     * @param $treeData
+     *
+     * @return $this
      */
     public function setTreeFilter($treeData)
     {
