@@ -607,7 +607,7 @@ class BaseModel
             ) {
 
                 $method = 'set' . ucfirst($param);
-                $value  = ($value == 'null' or empty($value)) ? null : $value;
+                $value = ($value == 'null' or (empty($value) and !is_numeric($value))) ? null : $value;
 
                 if (isset($mapping->associationMappings[$param])) {
                     $target = $mapping->associationMappings[$param]['targetEntity'];
@@ -615,7 +615,7 @@ class BaseModel
                     if ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::ONE_TO_MANY) {
                         $message = "OneToMany updates not supported: '{$param}' was not updated";
                     } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_MANY) {
-                        /** @var \Doctrine\Common\Collections\ArrayCollection $param */
+                        /** @var \Doctrine\Common\Collection\ArrayCollection $param */
                         if ($entity->$param) {
                             $entity->$param->clear();
                         } else {
