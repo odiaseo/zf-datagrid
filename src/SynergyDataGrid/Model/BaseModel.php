@@ -625,7 +625,7 @@ class BaseModel
                     } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_MANY) {
                         /** @var \Doctrine\Common\Collections\ArrayCollection $param */
                         if ($entity->$getter() and $entity->$getter()->count()) {
-                            $entity->$param->clear();
+                            $entity->$getter()->clear();
                         } else {
                             $entity->$method(new ArrayCollection());
                         }

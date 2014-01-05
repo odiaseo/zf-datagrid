@@ -44,7 +44,7 @@ class DisplayGrid extends AbstractHelper
 
         $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
         $js
-                      = 'function synergyResizeGrid(grid, parentSelector){
+            = 'function synergyResizeGrid(grid, parentSelector){
                                 var g = jQuery(grid);
                                 var par = g.closest(parentSelector);
                                 var padding = g.data("padding");
@@ -55,7 +55,10 @@ class DisplayGrid extends AbstractHelper
                                 synergyDataGrid = {};
                             }
 
-                            synergyDataGrid["' . DatePicker::DATE_PICKER_FUNCTION . '"] = []; ' . $js;
+                           if(typeof synergyDataGrid["' . DatePicker::DATE_PICKER_FUNCTION . '"] == "undefined"){
+                                synergyDataGrid["' . DatePicker::DATE_PICKER_FUNCTION . '"] = [];
+                           }
+                           ' . $js;
 
         if ($appendScript) {
             if ($config['render_script_as_template']) {
