@@ -22,6 +22,7 @@ use SynergyDataGrid\Grid\Navigation\InlineNav;
 use SynergyDataGrid\Grid\Navigation\NavGrid;
 use SynergyDataGrid\Grid\Plugin\DatePicker;
 use SynergyDataGrid\Grid\SubGridAwareInterface;
+use SynergyDataGrid\Model\BaseModel as BaseModel;
 use SynergyDataGrid\Util\ArrayUtils;
 use Zend\Filter\Word\CamelCaseToDash;
 use Zend\Filter\Word\CamelCaseToSeparator;
@@ -44,7 +45,27 @@ use Zend\Stdlib\RequestInterface;
  * @method setCaption($value)
  * @method setHidegrid($value)
  * @method setService($value)
+ * @method setSortorder()
+ * @method setSortname()
+ * @method setOnSortCol()
+ * @method setOnPaging()
+ * @method setAutowidth()
+ * @method setShrinkToFit()
+ * @method setPager()
+ * @method setPrmNames()
+ * @method setRowNum()
+ * @method setSortable()
+ * @method setOnSelectRow()
+ * @method setGridComplete()
+ * @method setResizeStop()
+ * @method setAfterInsertRow()
+ * @method setSubGridRowExpanded()
+ * @method setToolbar()
  *
+ * @method getEntityId()
+ * @method getEntity()
+ * @method getName()
+ * @method getSortable()
  * @method getCaption()
  * @method getSubGridUrl()
  * @method getDatatype()
@@ -54,6 +75,14 @@ use Zend\Stdlib\RequestInterface;
  * @method getSortorder()
  * @method getSortname()
  * @method getSubGridModel($subGridMap)
+ * @method getPager()
+ * @method getPrmNames()
+ * @method getGridId()
+ * @method getToolbar()
+ *
+ * @method BaseModel getModel()
+ *
+ * @method mergePostdata()
  *
  * @author  Pele Odiase
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:jqgriddocs
@@ -123,6 +152,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     const COOKIE_PAGING_PREFIX = 'jqgrid_paging_';
 
+    protected $_id;
     /**
      * Entity key used in crud URL
      *
@@ -470,7 +500,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     {
         $this->setPager($this->getId() . '_pager');
         if (!isset($this->_config['grid_options']['rowList'])) {
-            $this->setRowList(
+            $this->setPager(
                 range(
                     $this->_defaultItemCountPerPage, $this->_defaultItemCountPerPage * 5,
                     $this->_defaultItemCountPerPage
@@ -501,12 +531,11 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         $this->mergePostData(
             array(
                  self::GRID_IDENTIFIER  => $this->getId(),
-                 self::ENTITY_IDENTFIER => $this->_entity
+                 self::ENTITY_IDENTFIER => $this->getEntity()
             )
         );
 
         $this->setDatePicker(new DatePicker($this, $this->_config['plugins']['date_picker']));
-        $datePickerFunctionName = $this->getDatePicker()->getFunctionName();
 
         //Set navigation options
         $navGrid = isset($this->_config['nav_grid']) ? $this->_config['nav_grid'] : array();
@@ -553,7 +582,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         $inlineNavOptions = isset($this->_config['inline_nav']) ? $this->_config['inline_nav'] : array();
 
         $funcName                                       = $this->getDatePicker()->getFunctionName();
-        $inlineNavOptions['addRowParams']['oneditfunc'] = new \Zend\Json\Expr(" function() { {$funcName}(new_row);  }");
+        $inlineNavOptions['addRowParams']['oneditfunc'] = new Expr(" function() { {$funcName}(new_row);  }");
 
         if ($inlineNavOptions) {
             $this->setInlineNav($inlineNavOptions);
@@ -643,6 +672,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         $records     = array();
         $columnNames = array_keys($columns);
 
+        /** @var $row \SynergyCommon\Entity\BaseEntity */
         foreach ($rows as $k => $row) {
 
             if ($rowId = $row->getId()) {
@@ -753,7 +783,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function prepareSorting()
     {
         $id            = $this->getId();
-        $url           = $this->getUrl();
         $sortingCookie = str_replace('/', '_', strtolower(self::COOKIE_SORTING_PREFIX . $id));
         if (isset($_COOKIE[$sortingCookie])) {
             list($name, $order) = explode(':', $_COOKIE[$sortingCookie]);
@@ -774,7 +803,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function preparePaging()
     {
         $id           = $this->getId();
-        $url          = $this->getUrl();
         $pagingCookie = str_replace('/', '_', strtolower(self::COOKIE_PAGING_PREFIX . $id));
         if (isset($_COOKIE[$pagingCookie])) {
             $rowNum = $_COOKIE[$pagingCookie];
@@ -795,13 +823,13 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     {
         if ($this->getSortable()) {
             $id             = $this->getId();
-            $url            = $this->getUrl();
             $orderingCookie = str_replace('/', '_', strtolower(self::COOKIE_COLUMNS_ORDERING_PREFIX . $id));
             if (isset($_COOKIE[$orderingCookie])) {
                 $ordering = explode(':', $_COOKIE[$orderingCookie]);
                 if (count($ordering) == count($this->_columns)) {
                     $newColumns = array();
                     foreach ($ordering as $col) {
+                        /** @var $oldCol \SynergyDataGrid\Grid\Column */
                         foreach ($this->_columns as $oldCol) {
                             if ($oldCol->getName() == $col) {
                                 $newColumns[] = $oldCol;
@@ -885,9 +913,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set JsCode object
      *
-     * @param \SynergyDataGrid\Grid\JsCode $jsCode JsCode object instance
+     * @param $jsCode
      *
-     * @return JsGrid
+     * @return $this
      */
     public function setJsCode($jsCode)
     {
@@ -1146,6 +1174,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function setColModel($columns)
     {
         $colModel = array();
+        /** @var $column \SynergyDataGrid\Grid\Column */
         foreach ($columns as $column) {
             $colModel[] = $column->getOptions();
             //datepicker doesn't work with edittype=date
@@ -1172,6 +1201,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function setColNames($columns)
     {
         $colNames = array();
+        /** @var $column \SynergyDataGrid\Grid\Column */
         foreach ($columns as $column) {
             $colNames[] = $column->getTitle();
         }
@@ -1193,9 +1223,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set last select javascript variable name
      *
-     * @param string $lastSelectVariable last selected row javascript variable name
+     * @param $lastSelectVariable
      *
-     * @return EntityGrid
+     * @return $this
      */
     public function setLastSelectVariable($lastSelectVariable)
     {
@@ -1242,7 +1272,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Get javascript code for processAfterSubmit jqGrid event
      *
-     * @return \Zend_Json_Expr
+     * @return string
      */
     public function getProcessAfterSubmit()
     {
@@ -1290,7 +1320,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Get InineNav object instance for current grid
      *
-     * @return \SynergyDataGrid\InlineNav
+     * @return \SynergyDataGrid\Grid\Navigation\InlineNav
      */
     public function getInlineNav()
     {
@@ -1342,7 +1372,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Get NavGrid object instance for current grid
      *
-     * @return \SynergyDataGrid\Grid\NavGrid
+     * @return \SynergyDataGrid\Grid\Navigation\NavGrid
      */
     public function getNavGrid()
     {
@@ -1380,7 +1410,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set DatePicker instance for current grid
      *
-     * @param \SynergyDataGrid\DatePicker $datePicker $datePicker object instance for current grid
+     * @param \SynergyDataGrid\GRid\Plugin\DatePicker $datePicker $datePicker object instance for current grid
      *
      * @return \SynergyDataGrid\Grid\GridType\BaseGrid
      */
@@ -1590,7 +1620,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
             $this->setResizeStop(null);
             $this->setAutowidth(true);
             // no columns allowed to be resized
-
+            /** @var $column \SynergyDataGrid\Grid\Column */
             foreach ($this->_columns as $column) {
                 $column->setResizable(false);
             }
@@ -1639,9 +1669,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set reloadAfterChangeColumnOrdering flag
      *
-     * @param bool $reloadAfterChangeColumnOrdering reload after change column ordering flag
+     * @param $reloadAfterChangeColumnsOrdering
      *
-     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
+     * @return $this
      */
     public function setReloadAfterChangeColumnsOrdering($reloadAfterChangeColumnsOrdering)
     {
@@ -1709,7 +1739,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function getUrl()
     {
         if (!$this->_url) {
-            $request = $this->getService()->getServiceManager()->get('request');
+            /** @var $model BaseModel */
+            $model   = $this->getModel();
+            $request = $model->getServiceManager()->get('request');
             if ($request instanceof Request) {
                 $this->_url = $request->getRequestUri();
             }
@@ -1764,7 +1796,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     }
 
     /**
-     * @return Toolbar
+     * @return \SynergyDataGrid\Grid\Toolbar
      */
     public function getToolbarConfig()
     {
@@ -1836,7 +1868,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     /**
      * Set column model for grid
      *
-     * @return mixed
+     * @return $this
      */
     abstract public function setGridColumns();
 
@@ -1911,7 +1943,8 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     public function getEntityKeyFromClassname($className)
     {
-        $cache = include $this->getEntityCacheFile();
+        $filename = $this->getEntityCacheFile();
+        $cache    = include  "$filename";
 
         return array_search($className, $cache);
     }
@@ -1925,7 +1958,8 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     public function getClassnameFromEntityKey($entityKey)
     {
-        $cache = include $this->getEntityCacheFile();
+        $filename = $this->getEntityCacheFile();
+        $cache    = include "$filename";
 
         return isset($cache[$entityKey]) ? $cache[$entityKey] : null;
     }
@@ -1941,13 +1975,14 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     protected function _createEntityCache($filename)
     {
-        $output  = array();
+        $output = array();
+        /** @var $cmf \Doctrine\ORM\Mapping\ClassMetadataFactory */
         $cmf     = $this->getObjectManager()->getMetadataFactory();
         $classes = $cmf->getAllMetadata();
 
         $filter = new CamelCaseToDash();
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata @class */
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata $class */
         foreach ($classes as $class) {
             $name         = str_replace($class->namespace . '\\', '', $class->getName());
             $key          = strtolower($filter->filter($name));
@@ -1982,4 +2017,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     {
         return $this->_entityKey;
     }
+
+    /**
+     * @return mixed
+     */
+    abstract public function getObjectManager();
 }

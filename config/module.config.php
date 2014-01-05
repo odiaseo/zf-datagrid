@@ -46,6 +46,12 @@ return array(
     ),
     'jqgrid'       => array(
         /**
+         * Allow retrieval of data from a different domain
+         * All CRUD request would be prefixed with the api_domain value
+         * e.g. http://www.example.com
+         */
+        'api_domain'                        => '',
+        /**
          * Location where entity classname to entity key mappings are stored
          */
         'entity_cache'                      => array(

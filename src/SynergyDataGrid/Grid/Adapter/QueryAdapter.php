@@ -83,7 +83,7 @@ abstract class QueryAdapter
      * @param BaseGrid  $grid
      * @param BaseModel $service
      * @param bool      $filter array of filter options
-     * @param array      $sort   array of sort options
+     * @param array     $sort   array of sort options
      * @param null      $treeData
      */
     public function __construct(BaseGrid $grid, BaseModel $service, $filter = false, $sort = array(), $treeData = null)

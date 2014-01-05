@@ -1,7 +1,7 @@
 <?php
 namespace SynergyDataGrid\View\Helper;
 
-/**
+/*
  * This file is part of the Synergy package.
  *
  * (c) Pele Odiase <info@rhemastudio.com>
@@ -9,7 +9,7 @@ namespace SynergyDataGrid\View\Helper;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @author  Pele Odiase
+ * @author Pele Odiase
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
@@ -19,9 +19,9 @@ use SynergyDataGrid\Grid\SubGridAwareInterface;
 use SynergyDataGrid\Grid\Toolbar;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Json\Expr;
+use Zend\Json\Json;
 use Zend\Stdlib\Parameters;
 use Zend\View\Helper\AbstractHelper;
-use Zend\Json\Json;
 
 /**
  * View Helper to render jqGrid control
@@ -44,7 +44,7 @@ class DisplayGrid extends AbstractHelper
 
         $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
         $js
-            = 'function synergyResizeGrid(grid, parentSelector){
+                      = 'function synergyResizeGrid(grid, parentSelector){
                                 var g = jQuery(grid);
                                 var par = g.closest(parentSelector);
                                 var padding = g.data("padding");
@@ -61,8 +61,13 @@ class DisplayGrid extends AbstractHelper
                            ' . $js;
 
         if ($appendScript) {
+            /**
+             * @var $headScript \Zend\View\Helper\HeadScript
+             */
+            $headScript = $this->getView()->headScript();
+
             if ($config['render_script_as_template']) {
-                $this->getView()->headScript()
+                $headScript
                     ->setAllowArbitraryAttributes(true)
                     ->appendScript($js)
                     ->appendScript(
@@ -73,8 +78,7 @@ class DisplayGrid extends AbstractHelper
                         )
                     );
             } else {
-                $this->getView()->headScript()
-                    ->appendScript($js)
+                $headScript->appendScript($js)
                     ->appendScript($onLoadScript);
             }
 
@@ -95,6 +99,10 @@ class DisplayGrid extends AbstractHelper
         $js          = array();
         $onLoad      = array();
         $postCommand = array();
+        $showToolbar = false;
+
+        $jsPager   = '';
+        $htmlPager = '';
 
         $config = $grid->getConfig();
         $gridId = $grid->getId();
@@ -118,7 +126,7 @@ class DisplayGrid extends AbstractHelper
         }
 
         //add custom toolbar buttons
-        list($toolbarEnabled, $toolbarPosition) = $grid->getToolbar();
+        list(, $toolbarPosition) = $grid->getToolbar();
 
         if (!$showToolbar = ($config['toolbar_buttons']['global']
             or isset($config['toolbar_buttons']['specific'][$grid->getEntityId()]))
@@ -178,6 +186,7 @@ class DisplayGrid extends AbstractHelper
         //Add subgrid as grid data. This will override any subgrid
         if ($grid instanceof SubGridAwareInterface and  $subGrids = $grid->getSubGridsAsGrid()) {
 
+            $l = $s = $h = array();
             foreach ($subGrids as $subGrid) {
                 list($l[], $s[], $h[]) = $this->initGrid($subGrid);
             }
@@ -195,7 +204,7 @@ class DisplayGrid extends AbstractHelper
                     implode("\n", $s)
                 )
             );
-
+            /** @var $grid \SynergyDataGrid\Grid\GridType\BaseGrid */
             $grid->setSubGridRowExpanded($expandFunction);
         }
 
@@ -314,7 +323,7 @@ class DisplayGrid extends AbstractHelper
 
             $onLoad[] = sprintf("; synergyDataGrid['%s'] = obj_%s;", $gridId, $gridId);
 
-            /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
+            /** @var $toolbar \SynergyDataGrid\Grid\Toolbar */
             foreach ($toolbars as $toolbar) {
                 $toolbarId       = $toolbar->getId();
                 $toolbarPosition = $toolbar->getPosition();
@@ -323,7 +332,7 @@ class DisplayGrid extends AbstractHelper
                     "; %s.addClass('grid-toolbar btn-group grid-toolbar-%s');",
                     $toolbarId, $toolbarPosition
                 );
-
+                /** @var $toolbarButton \SynergyDataGrid\Grid\Toolbar\Item */
                 foreach ($toolbar->getItems() as $toolbarButton) {
                     $buttonPosition = $toolbarButton->getPosition();
                     if ($buttonPosition == Toolbar::POSITION_BOTH

@@ -1,10 +1,15 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
+/*
+ * This file is part of the Synergy package.
  *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * (c) Pele Odiase <info@rhemastudio.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author Pele Odiase
+ * @license http://opensource.org/licenses/BSD-3-Clause
+ *
  */
 
 namespace SynergyDataGrid\Controller;
@@ -50,7 +55,6 @@ class GridController extends BaseGridController
         } else {
             $payLoad = $service->createRecord($params);
         }
-
 
 
         return $this->_sendPayload($payLoad);

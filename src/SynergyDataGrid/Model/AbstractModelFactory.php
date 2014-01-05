@@ -1,6 +1,9 @@
 <?php
 namespace SynergyDataGrid\Model;
 
+use Zend\ServiceManager\AbstractFactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
 /**
  * This file is part of the Synergy package.
  *
@@ -13,10 +16,6 @@ namespace SynergyDataGrid\Model;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-
 class AbstractModelFactory
     implements AbstractFactoryInterface
 {

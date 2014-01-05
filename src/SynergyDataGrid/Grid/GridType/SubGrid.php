@@ -14,6 +14,7 @@ namespace SynergyDataGrid\Grid\GridType;
  *
  */
 
+
 use SynergyDataGrid\Grid\Base;
 
 class SubGrid extends Base
@@ -26,6 +27,10 @@ class SubGrid extends Base
     public $align = array();
     public $params = array();
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $_entityManager;
     protected $_entity;
     protected $_service;
 
@@ -41,6 +46,11 @@ class SubGrid extends Base
         return $this->_service;
     }
 
+    /**
+     * @param $entityManager
+     *
+     * @return $this
+     */
     public function setEntityManager($entityManager)
     {
         $this->_entityManager = $entityManager;
@@ -48,6 +58,9 @@ class SubGrid extends Base
         return $this;
     }
 
+    /**
+     * @return \Doctrine\ORM\EntityManager
+     */
     public function getEntityManager()
     {
         return $this->_entityManager;

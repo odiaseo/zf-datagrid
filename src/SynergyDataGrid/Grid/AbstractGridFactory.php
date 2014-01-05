@@ -1,10 +1,21 @@
 <?php
 namespace SynergyDataGrid\Grid;
 
-use SynergyDataGrid\Grid\GridType\DoctrineODMGrid;
+/*
+ * This file is part of the Synergy package.
+ *
+ * (c) Pele Odiase <info@rhemastudio.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author Pele Odiase
+ * @license http://opensource.org/licenses/BSD-3-Clause
+ *
+ */
+
 use SynergyDataGrid\Grid\GridType\DoctrineORMGrid;
 use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class AbstractGridFactory
@@ -54,7 +65,7 @@ class AbstractGridFactory
                 $manager = $serviceLocator->get('doctrine.entitymanager.orm_default');
                 $class   = 'SynergyDataGrid\Grid\GridType\DoctrineORMGrid';
         }
- 
+
         $grid = new $class($config['jqgrid'], $serviceLocator, $manager);
 
         return $grid;

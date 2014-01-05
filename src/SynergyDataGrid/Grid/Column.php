@@ -22,8 +22,27 @@ use Zend\Filter\HtmlEntities;
 /**
  * Column class for single grid column implementation
  *
- * @method mergeFormatoptions()
  *
+ * @method setEditable()
+ * @method setOnSelectRow()
+ * @method getFormatter()
+ * @method setSorttype()
+ * @method getIndex()
+ * @method setIndex()
+ * @method setResizable()
+ *
+ * @method getName()
+ * @method getEdittype()
+ * @method getOptions()
+ *
+ * @method mergeFormatoptions()
+ * @method setDelbutton()
+ * @method setEditbutton()
+ * @method setWidth()
+ * @method setEdittypeIfNotSet()
+ * @method setFormatterIfNotSet()
+ * @method setSizeIfNotSet()
+ * @method setMaxlengthIfNotSet()
  * @author  Pele Odiase
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options
  * @package mvcgrid
@@ -39,7 +58,7 @@ class Column extends Base
     /**
      * Parent jqGrid object
      *
-     * @var \SynergyDataGrid\Grid\JqGridFactory
+     * @var \SynergyDataGrid\Grid\GridType\BaseGrid
      */
     protected $_grid;
     /**
@@ -143,19 +162,17 @@ class Column extends Base
     const DEFAULT_DATETIME_NEWFORMAT = 'F d, Y H:i:s';
 
     /**
-     * Set up base options
+     *  Set up base options
      *
-     * @param array                               $options array of options
-     * @param \SynergyDataGrid\Grid\JqGridFactory $grid    instanse of JqGrid object
-     *
-     * @return void
+     * @param array $options
+     * @param       $grid
      */
     public function __construct($options = array(), $grid)
     {
-        $this->setGrid($grid)
-            ->_setDefaultOptions()
-            ->setOptions($options)
-            ->_setDependantOptions($options);
+        $this->setGrid($grid);
+        $this->_setDefaultOptions();
+        $this->setOptions($options);
+        $this->_setDependantOptions($options);
     }
 
     /**
@@ -232,7 +249,7 @@ class Column extends Base
     /**
      * Get cell value for current column for specified row
      *
-     * @param array $row array with grid row
+     * @param $row
      *
      * @return string
      */
@@ -251,6 +268,7 @@ class Column extends Base
             //do nothing
         } elseif ($cellValue instanceof PersistentCollection) {
             $idList = array();
+            /** @var $item \SynergyCommon\Entity\BaseEntity */
             foreach ($cellValue as $item) {
                 $idList[] = $item->getId();
             }
@@ -311,7 +329,9 @@ class Column extends Base
     private function _fetchDbColumnType()
     {
         if ($this->getSelectable()) {
-            $metadata     = $this->getGrid()->getModel()->getClassMetadata();
+            /** @var $model \SynergyDataGrid\Model\BaseModel */
+            $model        = $this->getGrid()->getModel();
+            $metadata     = $model->getClassMetadata();
             $name         = $this->getName();
             $dbColumnType = null;
             if (isset($metadata->fieldMappings[$name])) {
@@ -466,7 +486,7 @@ class Column extends Base
     /**
      * Set EditOptions object for current column
      *
-     * @param \SynergyDataGrid\Grid\Column\EditOptions $editOptions EditOptions object for current column
+     * @param $editOptions EditOptions object for current column
      *
      * @return \SynergyDataGrid\Grid\Column
      */
@@ -492,7 +512,7 @@ class Column extends Base
     /**
      * Set FormatOptions object for current column
      *
-     * @param \SynergyDataGrid\Grid\Column\FormatOptions $formatOptions FormatOptions object for current column
+     * @param $formatOptions FormatOptions object for current column
      *
      * @return \SynergyDataGrid\Grid\Column
      */
@@ -519,9 +539,9 @@ class Column extends Base
     /**
      * Set EditRules object for current column
      *
-     * @param \SynergyDataGrid\Grid\Column\EditRules $formatOption EditRules object for current column
+     * @param $editRules
      *
-     * @return \SynergyDataGrid\Grid\Column
+     * @return $this
      */
     public function setEditrules($editRules)
     {
@@ -535,7 +555,7 @@ class Column extends Base
     /**
      * Get Grid instance for current column
      *
-     * @return \SynergyDataGrid\Grid\Column\EditRules
+     * @return \SynergyDataGrid\Grid\GridType\BaseGrid
      */
     public function getGrid()
     {
@@ -545,11 +565,11 @@ class Column extends Base
     /**
      * Set JqGrid instance for current column
      *
-     * @param \SynergyDataGrid\Grid\JqGridFactory $grid JqGrid instance for current column
+     * @param \SynergyDataGrid\Grid\GridType\BaseGrid $grid
      *
-     * @return \SynergyDataGrid\Grid\Column
+     * @return $this
      */
-    public function setGrid($grid = '')
+    public function setGrid($grid = null)
     {
         $this->_grid = $grid;
 
@@ -569,11 +589,11 @@ class Column extends Base
     /**
      * Set Selectable property for current column
      *
-     * @param bool $selectable selectable property for current column
+     * @param bool $selectable
      *
-     * @return \SynergyDataGrid\Grid\Column
+     * @return $this
      */
-    public function setSelectable($selectable = '')
+    public function setSelectable($selectable = false)
     {
         $this->_selectable = $selectable;
 
@@ -588,5 +608,4 @@ class Column extends Base
 
         return $this->_htmlFilter;
     }
-
 }

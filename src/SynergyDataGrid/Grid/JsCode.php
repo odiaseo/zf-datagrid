@@ -30,7 +30,7 @@ class JsCode extends Base
     /**
      * JqGrid instance
      *
-     * @var string
+     * @var \SynergyDataGrid\Grid\GridType\BaseGrid
      */
     private $grid;
     /** user defined scripts
@@ -48,12 +48,11 @@ class JsCode extends Base
 
     protected $_padding;
 
-    /**
-     * Set up base JsCode options
-     *
-     * @param EntityGrid $grid
-     */
 
+    /**
+     * @param BaseGrid $grid
+     * @param int      $padding
+     */
     public function __construct(BaseGrid $grid = null, $padding = 0)
     {
         $this->grid     = $grid;
@@ -149,10 +148,8 @@ class JsCode extends Base
      */
     public function renderActionsFormatter()
     {
-        $btns    = $this->grid->getRowActionButtons() ? : new \stdClass();
-        $btns    = Encoder::encode($btns);
-        $str     = '';
-        $fncName = $this->grid->getId() . '_actions';
+        $btns = $this->grid->getRowActionButtons() ? : new \stdClass();
+        $btns = Encoder::encode($btns);
 
         $formatterCode
             = <<<ACTION
@@ -240,9 +237,7 @@ ACTION;
     /**
      * Prepare javscript code for afterInsertRow jqGrid event (show/hide buttons)
      *
-     * @param string $id custom button id
-     *
-     * @return void
+     * @return $this
      */
     public function prepareAfterInsertRow()
     {
@@ -262,11 +257,9 @@ ACTION;
     }
 
     /**
-     * Prepare javscript code for afterSaveRow jqGrid event (show/hide row buttons and bind needed events to them)
+     *  Prepare javscript code for afterSaveRow jqGrid event (show/hide row buttons and bind needed events to them)
      *
-     * @param string $id custom button id
-     *
-     * @return void
+     * @return $this
      */
     public function prepareAfterSaveRow()
     {
@@ -313,7 +306,7 @@ ACTION;
     /**
      * Prepare javscript code for onEditRow jqGrid event (setup DatePicker and hide row buttons)
      *
-     * @return void
+     * @return $this
      */
     public function prepareOnEditRow()
     {
@@ -334,7 +327,7 @@ ACTION;
     /**
      * Prepare javscript code for afterRestoreRow jqGrid event (show row buttons, and enable add row button)
      *
-     * @return void
+     * @return $this
      */
     public function prepareAfterRestoreRow()
     {
@@ -513,6 +506,8 @@ ACTION;
 
     /**
      * @param array $customScripts
+     *
+     * @return $this
      */
     public function setCustomScripts(array $customScripts)
     {
@@ -522,7 +517,9 @@ ACTION;
     }
 
     /**
-     * @param string $customScripts
+     * @param $customScripts
+     *
+     * @return $this
      */
     public function addCustomScript($customScripts)
     {
@@ -540,7 +537,9 @@ ACTION;
     }
 
     /**
-     * @param string $containerClass
+     * @param $containerClass
+     *
+     * @return $this
      */
     public function setContainerClass($containerClass)
     {

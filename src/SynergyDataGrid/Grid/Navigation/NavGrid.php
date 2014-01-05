@@ -18,6 +18,14 @@ use SynergyDataGrid\Grid\Property;
 /**
  * NavGrid class for work with Navigation Control in JqGrid
  *
+ * @method mergeAddParameters()
+ * @method mergeEditParameters()
+ * @method mergeSearchParameters()
+ * @method mergeDeleteParameters()
+ * @method mergeViewParameters()
+ *
+ * @method setSearch()
+ *
  * @author  Pele Odiase
  * @see     http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
  * @package mvcgrid

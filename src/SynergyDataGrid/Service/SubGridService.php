@@ -1,6 +1,17 @@
 <?php
 namespace SynergyDataGrid\Service;
-
+/*
+ * This file is part of the Synergy package.
+ *
+ * (c) Pele Odiase <info@rhemastudio.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author Pele Odiase
+ * @license http://opensource.org/licenses/BSD-3-Clause
+ *
+ */
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 
@@ -129,6 +140,7 @@ class SubGridService
             $mapping = $model->getEntityManager()->getClassMetadata($className);
             $target  = $mapping->associationMappings[$field]['targetEntity'];
 
+            /** @var $row \SynergyCommon\Entity\BaseEntity */
             $row    = $model->findObject($data['subgridid']);
             $entity = new $target;
 
