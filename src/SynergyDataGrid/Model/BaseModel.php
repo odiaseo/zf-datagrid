@@ -1,6 +1,15 @@
 <?php
 namespace SynergyDataGrid\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use SynergyDataGrid\Model\Config\ModelOptions;
+
 /**
  * This file is part of the Synergy package.
  *
@@ -13,15 +22,6 @@ namespace SynergyDataGrid\Model;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use SynergyDataGrid\Model\Config\ModelOptions;
-
 /**
  * Class to handle base functionality to work with Doctrine Models
  *
@@ -614,6 +614,7 @@ class BaseModel
             ) {
 
                 $method = 'set' . ucfirst($param);
+                $getter = 'get' . ucfirst($param);
                 $value  = ($value == 'null' or (empty($value) and !is_numeric($value))) ? null : $value;
 
                 if (isset($mapping->associationMappings[$param])) {
@@ -623,17 +624,17 @@ class BaseModel
                         $message = "OneToMany updates not supported: '{$param}' was not updated";
                     } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_MANY) {
                         /** @var \Doctrine\Common\Collections\ArrayCollection $param */
-                        if ($entity->$param) {
+                        if ($entity->$getter() and $entity->$getter()->count()) {
                             $entity->$param->clear();
                         } else {
-                            $entity->$param = new ArrayCollection();
+                            $entity->$method(new ArrayCollection());
                         }
                         $value = explode(',', $value);
                         $value = array_unique(array_filter($value));
 
                         foreach ($value as $v) {
                             if ($foreignEntity = $this->getEntityManager()->find($target, $v)) {
-                                $entity->$param->add($foreignEntity);
+                                $entity->$getter()->add($foreignEntity);
                             } else {
                                 $message = "Unable to update join table: {$target} " . $param . '"';
                             }
