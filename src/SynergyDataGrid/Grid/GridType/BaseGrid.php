@@ -1739,12 +1739,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     public function getUrl()
     {
         if (!$this->_url) {
-            /** @var $model BaseModel */
-            $model   = $this->getModel();
-            $request = $model->getServiceManager()->get('request');
-            if ($request instanceof Request) {
-                $this->_url = $request->getRequestUri();
-            }
+            $this->_url = $this->getCrudUrl($this->getEntityKey());
         }
 
         return $this->_url;
@@ -2022,4 +2017,13 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      * @return mixed
      */
     abstract public function getObjectManager();
+
+    /**
+     * Get the CRUD url for edit
+     *
+     * @param $entityKey
+     *
+     * @return mixed
+     */
+    abstract public function getCrudUrl($entityKey);
 }

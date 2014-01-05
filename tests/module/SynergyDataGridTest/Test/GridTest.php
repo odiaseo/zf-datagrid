@@ -123,7 +123,11 @@ class GridTest
         $viewHelper = $this->_serviceManager->get('viewhelpermanager')->get('displayGrid');
 
         $viewHelper->setView(new PhpRenderer());
+        $data = $viewHelper($this->_grid, false);
 
+        $this->assertArrayHasKey('html', $data);
+        $this->assertArrayHasKey('js', $data);
+        $this->assertArrayHasKey('onLoad', $data);
     }
 
 }

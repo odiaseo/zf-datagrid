@@ -30,13 +30,14 @@ return array(
 
     ),
     'jqgrid'   => array(
+        'first_data_as_local' => false,
         'compress_script' > true,
-        'grid_model'      => array(
+        'grid_model'          => array(
             'testBrands' => array(
                 'isSubGridAsGrid' => true
             )
         ),
-        'toolbar_buttons' => array(
+        'toolbar_buttons'     => array(
             'global' => array(
                 'help' => array(
                     'title'      => 'Help',

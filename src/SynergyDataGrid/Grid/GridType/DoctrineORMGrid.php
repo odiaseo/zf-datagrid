@@ -878,8 +878,9 @@ final class DoctrineORMGrid extends BaseGrid
         /**
          * Set default crud route
          */
+        $apiDomain = rtrim($config ['api_domain'], '/') . '/';
         $entityKey = $this->getEntityKeyFromClassname($entityClassName);
-        $crudUrl   = $this->getCrudUrl($entityKey);
+        $crudUrl   = $apiDomain . ltrim($this->getCrudUrl($entityKey), '/');
         $this->setUrl($crudUrl);
         $this->setSubGridUrl($crudUrl);
 
