@@ -215,7 +215,7 @@ class BaseModel
      */
     public function getRepository()
     {
-        return $this->_repository;
+        return $this->getEntityManager()->getRepository($this->getEntityClass());
     }
 
     /**

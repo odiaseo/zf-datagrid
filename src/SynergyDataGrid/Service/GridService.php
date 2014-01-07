@@ -1,5 +1,6 @@
 <?php
 namespace SynergyDataGrid\Service;
+
 /*
  * This file is part of the Synergy package.
  *
@@ -12,6 +13,7 @@ namespace SynergyDataGrid\Service;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
+
 use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManager;
 
@@ -109,11 +111,37 @@ class GridService
     public function createRecord($data)
     {
         try {
+            unset($data['id']);
             $className = $this->getClassnameFromEntityKey($data['entity']);
             $model     = $this->_getModel($className, $data);
-            $entity    = new $className();
 
-            $entity = $model->populateEntity($entity, $data);
+            /** @var $entity \SynergyCommon\Entity\BaseEntity */
+            $entity  = new $className();
+            $mapping = $model->getEntityManager()->getClassMetadata($className);
+
+            if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName
+            ) {
+                $entity->setTitle($data['title']);
+                /** @var $repo \Gedmo\Tree\Entity\Repository\NestedTreeRepository */
+                $repo = $model->getRepository();
+                if (isset($data['parent']) and $parent = $model->findObject($data['parent'])) {
+                    $repo->persistAsFirstChildOf($entity, $parent);
+                } else {
+                    $repo->persistAsLastChild($entity);
+                }
+
+                $model->getEntityManager()->flush();
+                $model->getEntityManager()->clear();
+
+                $entity = $model->findObject($entity->getId());
+                $entity = $model->populateEntity($entity, $data);
+                if (method_exists($entity, 'setCreatedAt')) {
+                    $entity->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+                }
+            } else {
+                $entity = $model->populateEntity($entity, $data);
+            }
+
             $entity = $model->save($entity);
 
             $return = array(
