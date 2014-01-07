@@ -24,7 +24,6 @@ use SynergyDataGrid\Grid\Plugin\DatePicker;
 use SynergyDataGrid\Grid\SubGridAwareInterface;
 use SynergyDataGrid\Model\BaseModel as BaseModel;
 use SynergyDataGrid\Util\ArrayUtils;
-use Zend\Filter\Word\CamelCaseToDash;
 use Zend\Filter\Word\CamelCaseToSeparator;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Json\Expr;
@@ -1930,70 +1929,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     abstract public function getCustomQueryBuilder();
 
     /**
-     * Get key from class name map
-     *
-     * @param $className
-     *
-     * @return mixed
-     */
-    public function getEntityKeyFromClassname($className)
-    {
-        $filename = $this->getEntityCacheFile();
-        $cache    = include  "$filename";
-
-        return array_search($className, $cache);
-    }
-
-    /**
-     * Get classname from key map
-     *
-     * @param $entityKey
-     *
-     * @return null
-     */
-    public function getClassnameFromEntityKey($entityKey)
-    {
-        $filename = $this->getEntityCacheFile();
-        $cache    = include "$filename";
-
-        return isset($cache[$entityKey]) ? $cache[$entityKey] : null;
-    }
-
-    abstract public function getEntityCacheFile();
-
-    /**
-     * Create cache file if it does not exist
-     *
-     * @param $filename
-     *
-     * @return bool|int
-     */
-    protected function _createEntityCache($filename)
-    {
-        $output = array();
-        /** @var $cmf \Doctrine\ORM\Mapping\ClassMetadataFactory */
-        $cmf     = $this->getObjectManager()->getMetadataFactory();
-        $classes = $cmf->getAllMetadata();
-
-        $filter = new CamelCaseToDash();
-
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata $class */
-        foreach ($classes as $class) {
-            $name         = str_replace($class->namespace . '\\', '', $class->getName());
-            $key          = strtolower($filter->filter($name));
-            $output[$key] = $class->getName();
-        }
-
-        $data = '<?php return ' . var_export($output, true) . ';';
-
-        if (!is_dir(dirname($filename))) {
-            @mkdir(dirname($filename), 0755, true);
-        }
-
-        return file_put_contents($filename, $data);
-    }
-
-    /**
      * @param $entityKey
      *
      * @return $this
@@ -2020,10 +1955,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
 
     /**
      * Get the CRUD url for edit
-     *
-     * @param $entityKey
-     *
-     * @return mixed
      */
     abstract public function getCrudUrl($entityKey);
 }

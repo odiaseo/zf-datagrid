@@ -879,7 +879,9 @@ final class DoctrineORMGrid extends BaseGrid
          * Set default crud route
          */
         $apiDomain = rtrim($config ['api_domain'], '/') . '/';
-        $entityKey = $this->getEntityKeyFromClassname($entityClassName);
+        /** @var $service \SynergyDataGrid\Service\GridService' */
+        $service   = $this->getServiceLocator()->get('synergy\service\grid');
+        $entityKey = $service->getEntityKeyFromClassname($entityClassName);
         $crudUrl   = $apiDomain . ltrim($this->getCrudUrl($entityKey), '/');
         $this->setUrl($crudUrl);
         $this->setSubGridUrl($crudUrl);

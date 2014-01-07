@@ -1,12 +1,13 @@
 <?php
 namespace SynergyDataGrid;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Monolog\Handler\RotatingFileHandler;
 use SynergyCommon\Util\ErrorHandler;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
+use SynergyDataGrid\Service\GridService;
 use Zend\Json\Expr;
 use Zend\ServiceManager\ServiceManager;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 
 /**
  * Module
@@ -156,9 +157,11 @@ class Module
                     /** @var $helper \Zend\View\Helper\Url */
                     $helper = $sm->get('viewhelpermanager')->get('url');
 
-                    /** @var $grid \SynergyDataGrid\Grid\GridType\BaseGrid */
-                    $grid      = $sm->get('jqgrid');
-                    $entityKey = $grid->getEntityKeyFromClassname($entity);
+
+                    /** @var $service \SynergyDataGrid\Service\GridService' */
+                    $service = $sm->get('synergy\service\grid');
+
+                    $entityKey = $service->getEntityKeyFromClassname($entity);
 
                     switch ($urlType) {
                         case BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:

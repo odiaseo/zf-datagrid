@@ -23,7 +23,9 @@
         "doctrine/doctrine-module": ">=0.7",
         "monolog/monolog": "dev-master",
         "ewgo/solarium-module": "dev-master",
-        "synergy/common": "dev-master"
+        "zf-commons/zfc-user-doctrine-orm": "dev-master",
+        "synergy/common": "dev-master",
+        "bjyoungblood/bjy-authorize": "dev-master"
     },
     "suggest": {
         "gedmo/doctrine-extensions": ">=v2.2.0"

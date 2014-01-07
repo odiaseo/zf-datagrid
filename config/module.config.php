@@ -52,14 +52,6 @@ return array(
          */
         'api_domain'                        => '',
         /**
-         * Location where entity classname to entity key mappings are stored
-         */
-        'entity_cache'                      => array(
-            'orm' => 'data/SynergyDataGrid/cache/orm_entity_classmap.php',
-            'odm' => 'data/SynergyDataGrid/cache/odm_entity_classmap.php',
-        ),
-
-        /**
          * settings for customising plugins e.g. jquery datepicker
          */
         'plugins'                           => array(
@@ -410,4 +402,13 @@ return array(
         ),
     ),
 
+    'synergy'      => array(
+        /**
+         * Location where entity classname to entity key mappings are stored
+         */
+        'entity_cache' => array(
+            'orm' => 'data/SynergyDataGrid/cache/orm_entity_classmap.php',
+            'odm' => 'data/SynergyDataGrid/cache/odm_entity_classmap.php',
+        ),
+    )
 );

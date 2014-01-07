@@ -29,8 +29,11 @@ class BaseGridController
         /** @var $grid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
         $grid = $serviceManager->get('jqgrid');
 
+        /** @var $service \SynergyDataGrid\Service\GridService' */
+        $service = $serviceManager->get('synergy\service\grid');
+
         $entityKey            = $this->params()->fromRoute('entity', null);
-        $className            = $grid->getClassnameFromEntityKey($entityKey);
+        $className            = $service->getClassnameFromEntityKey($entityKey);
         $options['fieldName'] = $this->params()->fromRoute('fieldName', $this->params()->fromQuery('fieldName', null));
 
         if ($className) {

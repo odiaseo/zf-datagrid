@@ -16,7 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 
 class SubGridService
-    extends BaseService
+    extends BaseGridService
 {
 
     /**
@@ -30,7 +30,7 @@ class SubGridService
     {
         try {
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
             $field     = $data['fieldName'];
 
             $row       = $model->getEntityManager()->getRepository($className)->find($data['subgridid']);
@@ -44,7 +44,7 @@ class SubGridService
                 $targetEntity = get_class($refObject);
             }
 
-            $subGridModel = $this->_getModel($targetEntity, $data);
+            $subGridModel = $this->getModel($targetEntity, $data);
             $parentMeta   = $model->getEntityManager()->getClassMetadata($className);
 
 
@@ -99,7 +99,7 @@ class SubGridService
         try {
 
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
             $field     = $data['fieldName'];
 
             $mapping = $model->getEntityManager()->getClassMetadata($className);
@@ -108,7 +108,7 @@ class SubGridService
 
             $entity = $model->getEntityManager()->getRepository($target)->find($rowId);
 
-            $subGridModel = $this->_getModel($target, $data);
+            $subGridModel = $this->getModel($target, $data);
             $entity       = $subGridModel->populateEntity($entity, $data);
 
             $entity = $model->save($entity);
@@ -134,8 +134,9 @@ class SubGridService
         try {
 
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
             $field     = $data['fieldName'];
+            $getter = 'get' . ucfirst($field);
 
             $mapping = $model->getEntityManager()->getClassMetadata($className);
             $target  = $mapping->associationMappings[$field]['targetEntity'];
@@ -144,10 +145,10 @@ class SubGridService
             $row    = $model->findObject($data['subgridid']);
             $entity = new $target;
 
-            $subGridModel = $this->_getModel($target, $data);
+            $subGridModel = $this->getModel($target, $data);
             $entity       = $subGridModel->populateEntity($entity, $data);
 
-            $row->$field->add($entity);
+            $row->$getter()->add($entity);
             $model->save($row);
             $id = $row->getId();
 
@@ -176,13 +177,13 @@ class SubGridService
         try {
 
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
             $field     = $data['fieldName'];
 
             $mapping = $model->getEntityManager()->getClassMetadata($className);
             $target  = $mapping->associationMappings[$field]['targetEntity'];
 
-            $subGridModel = $this->_getModel($target, $data);
+            $subGridModel = $this->getModel($target, $data);
             $subGridModel->remove($data['id']);
 
             $record = array(

@@ -18,7 +18,7 @@ use Zend\Json\Json;
 use Zend\ServiceManager\ServiceManager;
 
 class GridService
-    extends BaseService
+    extends BaseGridService
 {
     /**
      * Get paginated list
@@ -36,7 +36,7 @@ class GridService
             $grid = $this->_serviceManager->get('jqgrid');
             $grid->setGridIdentity($className, $data['entity']);
 
-            $model = $this->_getModel($className, $data, $grid->getConfig());
+            $model = $this->getModel($className, $data, $grid->getConfig());
 
             $paginator = $model->getPaginator();
             $rows      = $paginator->getIterator();
@@ -80,7 +80,7 @@ class GridService
         try {
             $id        = $data['id'];
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
             $model->updateEntity($id, $data);
 
             $return = array(
@@ -113,7 +113,7 @@ class GridService
         try {
             unset($data['id']);
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className, $data);
+            $model     = $this->getModel($className, $data);
 
             /** @var $entity \SynergyCommon\Entity\BaseEntity */
             $entity  = new $className();
@@ -170,7 +170,7 @@ class GridService
     {
         try {
             $className = $this->getClassnameFromEntityKey($data['entity']);
-            $model     = $this->_getModel($className);
+            $model     = $this->getModel($className);
             $model->remove($data['id']);
 
             $return = array(
@@ -188,6 +188,14 @@ class GridService
         }
 
         return $return;
+    }
+
+    public function getEntityManager()
+    {
+        /** @var $grid \SynergyDataGrid\Grid\GridType\BaseGrid */
+        $grid = $this->_serviceManager->get('jqgrid');
+
+        return $grid->getObjectManager();
     }
 
 }
