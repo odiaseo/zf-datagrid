@@ -121,7 +121,9 @@ class GridService
 
             if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName
             ) {
-                $entity->setTitle($data['title']);
+                if (isset($data['title'])) {
+                    $entity->setTitle($data['title']);
+                }
                 /** @var $repo \Gedmo\Tree\Entity\Repository\NestedTreeRepository */
                 $repo = $model->getRepository();
                 if (isset($data['parent']) and $parent = $model->findObject($data['parent'])) {
