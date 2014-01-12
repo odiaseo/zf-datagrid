@@ -873,16 +873,20 @@ final class DoctrineORMGrid extends BaseGrid
             $config ['grid_options'] = $utils->arrayMergeRecursiveCustom($config ['grid_options'], $config [$gridId]);
         }
 
-        $this->setConfig($config);
-
         /**
          * Set default crud route
          */
-        $apiDomain = rtrim($config ['api_domain'], '/') . '/';
         /** @var $service \SynergyDataGrid\Service\GridService' */
         $service   = $this->getServiceLocator()->get('synergy\service\grid');
         $entityKey = $service->getEntityKeyFromClassname($entityClassName);
-        $crudUrl   = $apiDomain . ltrim($this->getCrudUrl($entityKey), '/');
+        $crudUrl   = $this->getCrudUrl($entityKey);
+
+        if (!empty($config['api_domain'])) {
+            $crudUrl .= rtrim($config['api_domain'], '/') . '/' . ltrim($crudUrl, '/');
+            //disable local data
+            $config ['first_data_as_local'] = false;
+        }
+
         $this->setUrl($crudUrl);
         $this->setSubGridUrl($crudUrl);
 
@@ -892,6 +896,8 @@ final class DoctrineORMGrid extends BaseGrid
         if (!$caption = $this->getCaption()) {
             $this->setCaption(ucwords(str_replace('-', ' ', $entityKey)));
         }
+
+        $this->setConfig($config);
 
         return $this;
     }
