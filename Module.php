@@ -157,6 +157,15 @@ class Module
                     /** @var $helper \Zend\View\Helper\Url */
                     $helper = $sm->get('viewhelpermanager')->get('url');
 
+                    //handle api_domain  urls
+                    $config = $sm->get('config');
+                    if (!empty($config['jqgrid']['api_domain'])) {
+                        $prefix = rtrim($config['jqgrid']['api_domain'], '/');
+                        $concat = '&';
+                    } else {
+                        $prefix = '';
+                        $concat = '?';
+                    }
 
                     /** @var $service \SynergyDataGrid\Service\GridService' */
                     $service = $sm->get('synergy\service\grid');
@@ -166,18 +175,19 @@ class Module
                     switch ($urlType) {
                         case BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
                         case BaseGrid::DYNAMIC_URL_TYPE_SUBGRID :
-                            $url    = $helper(
+                            $url = $helper(
                                 'synergydatagrid\subgrid',
                                 array(
                                      'entity'    => $entityKey,
                                      'fieldName' => $fieldName
                                 )
                             );
-                            $return = new Expr("'$url?subgridid='+row_id");
+
+                            $return = new Expr("'{$prefix}$url{$concat}subgridid='+row_id");
                             break;
 
                         default:
-                            $return = $helper('synergydatagrid', array('entity' => $entityKey));
+                            $return = $prefix . $helper('synergydatagrid', array('entity' => $entityKey));
                     }
 
                     return $return;
