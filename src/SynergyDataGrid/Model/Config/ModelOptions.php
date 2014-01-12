@@ -45,8 +45,6 @@ class ModelOptions
 
     protected $_subGridFilter;
 
-    protected $sort;
-
     public function setCustomQueryBuilder($customQueryBuilder)
     {
         $this->_customQueryBuilder = $customQueryBuilder;
@@ -176,16 +174,4 @@ class ModelOptions
     {
         return $this->sord;
     }
-
-    public function setSort($sort)
-    {
-        $this->sort = $sort;
-    }
-
-    public function getSort()
-    {
-        return $this->sort;
-    }
-
-
 }

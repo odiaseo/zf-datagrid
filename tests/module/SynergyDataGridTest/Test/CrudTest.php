@@ -15,7 +15,11 @@ class CrudTest
         /** @var $service \SynergyDataGrid\Service\GridService */
         $service = $this->_serviceManager->get('synergy\service\grid');
         $params  = array(
-            'entity' => 'test-tree'
+            'entity' => 'test-tree',
+            'page'   => 1,
+            'rows'   => 25,
+            'sord'   => 'asc',
+            'sidx'   => 'title',
         );
 
         $payLoad = $service->getGridList($params);

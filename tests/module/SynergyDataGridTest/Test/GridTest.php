@@ -108,6 +108,8 @@ class GridTest
         $params = array(
             'page'                     => 1,
             'rows'                     => 25,
+            'sord'                     => 'asc',
+            'sidx'                     => 'id',
             BaseGrid::GRID_IDENTIFIER  => $this->_grid->getId(),
             BaseGrid::ENTITY_IDENTFIER => $this->_grid->getEntity()
         );

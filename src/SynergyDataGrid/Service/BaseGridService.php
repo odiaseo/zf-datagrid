@@ -88,8 +88,9 @@ class BaseGridService
      */
     public function getModel($className, $data = array(), $gridOptions = array())
     {
+        $sort = array();
         if (isset($data['sidx'])) {
-            $sort = array(
+            $sort[] = array(
                 'sidx' => $data['sidx'],
                 'sord' => isset($data['sord']) ? $data['sord'] : 'asc'
             );
@@ -105,7 +106,8 @@ class BaseGridService
             'page'       => isset($data['page']) ? $data['page'] : null,
             'rows'       => isset($data['rows']) ? $data['rows'] : null,
             'sord'       => isset($data['sord']) ? $data['sord'] : null,
-            'sort'       => $sort
+            'sidx'       => isset($data['sidx']) ? $data['sidx'] : null,
+            'sortOrder'  => $sort
         );
 
         /** @var $model \SynergyDataGrid\Model\BaseModel */
