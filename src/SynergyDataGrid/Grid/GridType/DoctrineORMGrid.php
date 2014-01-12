@@ -882,7 +882,7 @@ final class DoctrineORMGrid extends BaseGrid
         $crudUrl   = $this->getCrudUrl($entityKey);
 
         if (!empty($config['api_domain'])) {
-            $crudUrl .= rtrim($config['api_domain'], '/') . '/' . ltrim($crudUrl, '/');
+            $crudUrl = rtrim($config['api_domain'], '/') . '/' . ltrim($crudUrl, '/');
             //disable local data
             $config ['first_data_as_local'] = false;
         }
