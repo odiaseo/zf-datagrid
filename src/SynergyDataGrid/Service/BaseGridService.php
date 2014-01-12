@@ -89,7 +89,7 @@ class BaseGridService
     public function getModel($className, $data = array(), $gridOptions = array())
     {
         $sort = array();
-        if (isset($data['sidx'])) {
+        if (!empty($data['sidx'])) {
             $sort[] = array(
                 'sidx' => $data['sidx'],
                 'sord' => isset($data['sord']) ? $data['sord'] : 'asc'

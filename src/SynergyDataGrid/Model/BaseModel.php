@@ -385,7 +385,7 @@ class BaseModel
         if (is_array($sort)) {
             $c = 0;
             foreach ($sort as $s) {
-                if (isset($s['sidx'])) {
+                if (!empty($s['sidx'])) {
                     $field     = $s['sidx'];
                     $direction = isset($s['sord']) ? $s['sord'] : 'asc';
                     if ($c) {
