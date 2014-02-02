@@ -3,8 +3,8 @@
 use Zend\Mvc\Application;
 use Zend\ServiceManager\ServiceManager;
 
-
 error_reporting(E_ALL | E_STRICT);
+date_default_timezone_set('UTC');
 
 chdir(dirname(__DIR__));
 $basePath = realpath('./') . '/';
