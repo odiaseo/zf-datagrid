@@ -54,7 +54,7 @@ class AbstractModelFactory
         /** @var $logger \SynergyCommon\Util\ErrorHandler */
         $logger = $serviceLocator->get('logger');
 
-        $model->getLogger($logger);
+        $model->setLogger($logger);
 
         return $model;
 
