@@ -192,6 +192,8 @@ final class DoctrineORMGrid extends BaseGrid
                             $data['editoptions']['size']      = $map['length'];
                             break;
                         }
+                        $data['searchoptions']['sopt'] = $this->getSearchOptions('cn');
+                        break;
                 }
 
 
@@ -200,6 +202,7 @@ final class DoctrineORMGrid extends BaseGrid
                     $data['key']                   = true;
                     $data['formoptions']['rowpos'] = 1;
                     $data['formoptions']['colpos'] = 1;
+                    $data['searchoptions']['sopt'] = $this->getSearchOptions('bw');
                     $adjustment                    = 10;
 
                     if ($this->isTreeGrid) {
@@ -246,8 +249,9 @@ final class DoctrineORMGrid extends BaseGrid
                     );
                 }
 
-                if (!isset($data['searchoptions']['sopt'])) {
-                    $data['searchoptions']['sopt'] = array_keys($this->_expression);
+                if (empty($data['searchoptions']['sopt'])) {
+                    $data['searchoptions']['sopt'] = $this->getSearchOptions();
+                    ;
                 }
 
                 if ($this->isRequired($map, $data, $fieldName, $default)) {
@@ -1193,5 +1197,26 @@ final class DoctrineORMGrid extends BaseGrid
         return $filename;
     }
 
+    /**
+     * Get search options and ensure the default is the first item
+     *
+     * @param string $default
+     *
+     * @return array
+     */
+    public function getSearchOptions($default = 'eq')
+    {
+        $default = strtolower($default);
+        $options = $this->_expression;
+        if (array_key_exists($default, $options)) {
+            unset($options[$default]);
+            $values = array_keys($options);
+            array_unshift($values, $default);
+        } else {
+            $values = array_keys($this->_expression);
+        }
+
+        return $values;
+    }
 
 }
