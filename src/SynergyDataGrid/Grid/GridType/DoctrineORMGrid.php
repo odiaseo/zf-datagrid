@@ -251,7 +251,6 @@ final class DoctrineORMGrid extends BaseGrid
 
                 if (empty($data['searchoptions']['sopt'])) {
                     $data['searchoptions']['sopt'] = $this->getSearchOptions();
-                    ;
                 }
 
                 if ($this->isRequired($map, $data, $fieldName, $default)) {

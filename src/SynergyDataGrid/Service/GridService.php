@@ -118,8 +118,10 @@ class GridService
             /** @var $entity \SynergyCommon\Entity\BaseEntity */
             $entity  = new $className();
             $mapping = $model->getEntityManager()->getClassMetadata($className);
+            $reflection = new \ReflectionClass($mapping->customRepositoryClassName);
 
             if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName
+                || $reflection->isSubClassOf('Gedmo\Tree\Entity\Repository\NestedTreeRepository')
             ) {
                 if (isset($data['title'])) {
                     $entity->setTitle($data['title']);
