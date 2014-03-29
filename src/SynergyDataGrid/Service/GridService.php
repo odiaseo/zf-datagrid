@@ -119,12 +119,14 @@ class GridService
             $entity  = new $className();
             $mapping = $model->getEntityManager()->getClassMetadata($className);
 
-            if ($mapping->customRepositoryClassName) {
+            if (!empty($mapping->customRepositoryClassName)) {
                 $reflection = new \ReflectionClass($mapping->customRepositoryClassName);
+            } else {
+                $reflection = null;
             }
 
             if ('Gedmo\Tree\Entity\Repository\NestedTreeRepository' == $mapping->customRepositoryClassName
-                || $reflection->isSubClassOf('Gedmo\Tree\Entity\Repository\NestedTreeRepository')
+                || ($reflection && $reflection->isSubClassOf('Gedmo\Tree\Entity\Repository\NestedTreeRepository'))
             ) {
                 if (isset($data['title'])) {
                     $entity->setTitle($data['title']);
