@@ -49,7 +49,7 @@ class GridService
 
             $return = array(
                 'page'    => $model->getOptions()->getPage() ? : 1,
-                'total'   => ceil($total / $rowNum),
+                'total'   => $rowNum ? ceil($total / $rowNum) : 1,
                 'records' => $total,
                 'rows'    => $grid->formatGridData($rows, $columns)
             );

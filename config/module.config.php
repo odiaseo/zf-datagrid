@@ -24,7 +24,7 @@ return array(
                         'controller'    => 'SynergyDataGrid\Controller\Grid',
                     ),
                     'constraints' => array(
-                        'entity' => '[a-zA-Z\-]+'
+                        'entity' => '[a-zA-Z\-0-9]+'
                     ),
                 ),
             ),
@@ -37,7 +37,7 @@ return array(
                         'controller'    => 'SynergyDataGrid\Controller\SubGrid',
                     ),
                     'constraints' => array(
-                        'entity'    => '[a-zA-Z\-]+',
+                        'entity'    => '[a-zA-Z\-0-9]+',
                         'fieldName' => '[a-zA-Z\-]+',
                     ),
                 ),
