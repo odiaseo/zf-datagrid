@@ -683,7 +683,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
              * @var $column \SynergyDataGrid\Grid\Column
              */
             foreach ($columns as $name => $column) {
-
+                if($name == 'myac') continue;
                 $index = array_search($name, $columnNames);
                 if ($index !== false) {
                     $records[$k]['cell'][$index] = $column->cellValue($row);
