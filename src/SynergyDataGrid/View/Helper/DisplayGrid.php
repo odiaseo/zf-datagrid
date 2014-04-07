@@ -93,7 +93,7 @@ class DisplayGrid extends AbstractHelper
             }
         } catch (\Exception $exception) {
             /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
-            $serviceManager = $this->getView()->getgetHelperPluginManager()->getServiceLocator();
+            $serviceManager = $this->getView()->getHelperPluginManager()->getServiceLocator();
 
             if ($serviceManager->has('logger')) {
                 /** @var $logger \SynergyCommon\Util\ErrorHandler */
