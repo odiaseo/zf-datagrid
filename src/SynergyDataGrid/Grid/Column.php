@@ -279,7 +279,7 @@ class Column extends Base
                 $cellValue = '';
             }
 
-        } elseif (is_object($cellValue)) {
+        } elseif (is_object($cellValue) and method_exists($cellValue, 'getId')) {
             $cellValue = $cellValue->getId();
         }
 
