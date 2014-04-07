@@ -13,6 +13,7 @@ namespace SynergyDataGrid\View\Helper;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
+use SynergyCommon\Util\ErrorHandler;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Grid\Plugin\DatePicker;
 use SynergyDataGrid\Grid\SubGridAwareInterface;
@@ -39,12 +40,13 @@ class DisplayGrid extends AbstractHelper
      */
     public function __invoke(BaseGrid $grid, $appendScript = true)
     {
-        list($onLoad, $js, $html) = $this->initGrid($grid);
-        $config = $grid->getConfig();
+        try {
+            list($onLoad, $js, $html) = $this->initGrid($grid);
+            $config = $grid->getConfig();
 
-        $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
-        $js
-                      = 'function synergyResizeGrid(grid, parentSelector){
+            $onLoadScript = ';jQuery(function(){' . $onLoad . '});';
+            $js
+                          = 'function synergyResizeGrid(grid, parentSelector){
                                 var g = jQuery(grid);
                                 var par = g.closest(parentSelector);
                                 var padding = g.data("padding");
@@ -60,37 +62,57 @@ class DisplayGrid extends AbstractHelper
                            }
                            ' . $js;
 
-        if ($appendScript) {
-            /**
-             * @var $headScript \Zend\View\Helper\HeadScript
-             */
-            $headScript = $this->getView()->headScript();
+            if ($appendScript) {
+                /**
+                 * @var $headScript \Zend\View\Helper\HeadScript
+                 */
+                $headScript = $this->getView()->headScript();
 
-            if ($config['render_script_as_template']) {
-                $headScript
-                    ->setAllowArbitraryAttributes(true)
-                    ->appendScript($js)
-                    ->appendScript(
-                        $onLoadScript, 'text/x-jquery-tmpl',
-                        array("id"       => $grid->getId() . '_script',
-                              "class"    => 'grid-script',
-                              'noescape' => true
-                        )
-                    );
+                if ($config['render_script_as_template']) {
+                    $headScript
+                        ->setAllowArbitraryAttributes(true)
+                        ->appendScript($js)
+                        ->appendScript(
+                            $onLoadScript, 'text/x-jquery-tmpl',
+                            array("id"       => $grid->getId() . '_script',
+                                  "class"    => 'grid-script',
+                                  'noescape' => true
+                            )
+                        );
+                } else {
+                    $headScript->appendScript($js)->appendScript($onLoadScript);
+                }
+
+                return $html;
             } else {
-                $headScript->appendScript($js)
-                    ->appendScript($onLoadScript);
+                return array(
+                    'html'   => $html,
+                    'js'     => $js,
+                    'onLoad' => $onLoad
+                );
+            }
+        } catch (\Exception $exception) {
+            /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
+            $serviceManager = $this->getView()->getgetHelperPluginManager()->getServiceLocator();
+
+            if ($serviceManager->has('logger')) {
+                /** @var $logger \SynergyCommon\Util\ErrorHandler */
+                $logger = $serviceManager->get('logger');
+                if ($logger instanceof ErrorHandler) {
+                    $logger->logException($exception);
+                } else {
+                    /** @var $logger \Zend\Log\Logger */
+                    $logger->err($exception->getMessage());
+                }
             }
 
-            return $html;
-        } else {
             return array(
-                'html'   => $html,
-                'js'     => $js,
-                'onLoad' => $onLoad
+                'html'   => '',
+                'js'     => '',
+                'onLoad' => '',
+                'error'  => $exception->getMessage()
             );
         }
-
     }
 
     public function initGrid(BaseGrid $grid)
