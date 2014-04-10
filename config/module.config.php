@@ -407,8 +407,8 @@ return array(
          * Location where entity classname to entity key mappings are stored
          */
         'entity_cache' => array(
-            'orm' => 'data/SynergyDataGrid/cache/orm_entity_classmap.php',
-            'odm' => 'data/SynergyDataGrid/cache/odm_entity_classmap.php',
+            'orm' => 'data/cache/SynergyDataGrid/orm_entity_classmap.php',
+            'odm' => 'data/cache/SynergyDataGrid/odm_entity_classmap.php',
         ),
     )
 );
