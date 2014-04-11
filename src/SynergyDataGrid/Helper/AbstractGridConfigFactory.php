@@ -25,7 +25,7 @@ class AbstractGridConfigFactory
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);
 
         if (substr($requestedName, 0, strlen($this->_configPrefix)) == $this->_configPrefix
-            && isset($config['synergy']['config_helper'][$configHelper])
+            && isset($config['synergy']['config_helpers'][$configHelper])
         ) {
             return true;
         }
@@ -48,9 +48,9 @@ class AbstractGridConfigFactory
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);
         $config       = $serviceLocator->get('config');
 
-        $helperClass = $config['synergy']['config_helper'][$configHelper];
+        $helperClass = $config['synergy']['config_helpers'][$configHelper];
 
-        /** @var $class \SynergyDataGrid\Config\BaseConfig */
+        /** @var $class \SynergyDataGrid\Helper\BaseConfigHelper */
         $service = new $helperClass;
         if ($service instanceof BaseConfigHelper) {
             $service->setServiceManager($serviceLocator);

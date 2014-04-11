@@ -389,12 +389,19 @@ return array(
          * This is the default label/title field when displaying join table records in selects
          */
         'default_association_mapping_label' => 'title',
+        'association_mapping_callback'      => array(
+            '__default__' => 'synergy\helper\defaultAssociationCallback',
+        ),
+        'custom_nav_buttons'                => 'synergy\helper\customNavigation',
+        'grid_url_generator'                => 'synergy\helper\urlGenerator',
     ),
+
     'view_manager' => array(
         'strategies' => array(
             'ViewJsonStrategy',
         ),
     ),
+
     'controllers'  => array(
         'invokables' => array(
             'SynergyDataGrid\Controller\Grid'    => 'SynergyDataGrid\Controller\GridController',
@@ -413,7 +420,10 @@ return array(
         'entity_cache_lifetime' => 24 * 60 * 60,
 
         'config_helpers'        => array(
-            'urlGenerator' => 'SynergyDataGrid\UrlGenerator'
+            'urlGenerator'               => 'SynergyDataGrid\Helper\UrlGeneratorHelper',
+            'defaultAssociationCallback' => 'SynergyDataGrid\Helper\DefaultAssociationCallbackHelper',
+            'customNavigation'           => 'SynergyDataGrid\Helper\CustomNavigationHelper',
         )
-    )
+    ),
+
 );

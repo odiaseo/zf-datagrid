@@ -11,5 +11,4 @@ data/logs
 composer.lock
 composer.phar
 autoload
-application.config.php
 local.php

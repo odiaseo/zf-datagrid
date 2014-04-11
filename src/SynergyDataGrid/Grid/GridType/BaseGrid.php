@@ -590,7 +590,10 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         //add user defined navigation buttons
         if (isset($this->_config['custom_nav_buttons'])) {
             $customNavOptions = $this->_config['custom_nav_buttons'];
-            if (is_callable($customNavOptions)) {
+            if (is_string($customNavOptions)) {
+                $helper      = $this->_serviceLocator->get($this->_config['custom_nav_buttons']);
+                $optionArray = $helper->execute(array($this->getId()));
+            } elseif (is_callable($customNavOptions)) {
                 $optionArray = $customNavOptions($this->getId());
             } else {
                 $optionArray = $customNavOptions;
@@ -683,7 +686,9 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
              * @var $column \SynergyDataGrid\Grid\Column
              */
             foreach ($columns as $name => $column) {
-                if($name == 'myac') continue;
+                if ($name == 'myac') {
+                    continue;
+                }
                 $index = array_search($name, $columnNames);
                 if ($index !== false) {
                     $records[$k]['cell'][$index] = $column->cellValue($row);
