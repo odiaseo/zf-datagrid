@@ -21,11 +21,13 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
+use SynergyDataGrid\Helper\BaseConfigHelper;
 use SynergyDataGrid\Util\ArrayUtils;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Stdlib\RequestInterface;
 
-final class DoctrineORMGrid extends BaseGrid
+final class DoctrineORMGrid
+    extends BaseGrid
 {
     /**
      * Response
@@ -285,11 +287,41 @@ final class DoctrineORMGrid extends BaseGrid
                     if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
                         $index = count($this->_subGrid);
                         /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
-                        $subGrid = $this->getSubGridModel($map);
-                        $target  = $fieldName;
+                        $subGrid   = $this->getSubGridModel($map);
+                        $target    = $fieldName;
+                        $generator = null;
 
-                        if (is_callable($this->_config['grid_url_generator'])) {
-                            $subGridUrl = $this->_config['grid_url_generator'](
+
+                        if (is_string($this->_config['grid_url_generator'])) {
+                            $generator  = $this->_serviceLocator->get($this->_config['grid_url_generator']);
+                            $subGridUrl = $this->getSubGridUrl();
+
+                            if ($generator instanceof BaseConfigHelper) {
+                                $subGridUrl = $generator->execute(
+                                    array(
+                                         $this->getEntity(),
+                                         $fieldName,
+                                         $map['targetEntity'],
+                                         self::DYNAMIC_URL_TYPE_SUBGRID
+                                    )
+                                );
+
+                                $editUrl = $generator->execute(
+                                    array(
+                                         $map['targetEntity'],
+                                         $fieldName,
+                                         null,
+                                         self::DYNAMIC_URL_TYPE_GRID
+                                    )
+                                );
+
+                                $subGrid->setUrl($subGridUrl);
+                                $subGrid->setEditurl($editUrl);
+                            }
+                        } elseif (is_callable($this->_config['grid_url_generator'])) {
+                            $generator = $this->_config['grid_url_generator'];
+
+                            $subGridUrl = $generator(
                                 $this->getServiceLocator(),
                                 $this->getEntity(),
                                 $fieldName,
@@ -297,7 +329,7 @@ final class DoctrineORMGrid extends BaseGrid
                                 self::DYNAMIC_URL_TYPE_SUBGRID
                             );
 
-                            $editUrl = $this->_config['grid_url_generator'](
+                            $editUrl = $generator(
                                 $this->getServiceLocator(),
                                 $map['targetEntity'],
                                 $fieldName,
@@ -305,11 +337,14 @@ final class DoctrineORMGrid extends BaseGrid
                                 self::DYNAMIC_URL_TYPE_GRID
                             );
 
+
                             $subGrid->setUrl($subGridUrl);
                             $subGrid->setEditurl($editUrl);
                         } else {
                             $subGridUrl = $this->getSubGridUrl();
                         }
+
+
                         if (strpos($subGridUrl, '?') === false) {
                             $subGridUrl .= '?fieldName=' . $target;
                         } else {
@@ -804,18 +839,35 @@ final class DoctrineORMGrid extends BaseGrid
         return array('error' => !$pass, 'message' => $message, 'id' => $id);
     }
 
+    /**
+     * @param $map
+     * @param $fieldName
+     *        if (is_string($this->_config['grid_url_generator'])) {
+    $generator = $this->_serviceLocator->get($this->_config['grid_url_generator']);
+     *
+     * @return array|mixed
+     */
 
     protected function _getRelatedList($map, $fieldName)
     {
-
-        if (isset($this->_config['association_mapping_callback'][$fieldName])
-            and  is_callable($this->_config['association_mapping_callback'][$fieldName])
-        ) {
+        $function = null;
+        if (isset($this->_config['association_mapping_callback'][$fieldName])) {
             $function = $this->_config['association_mapping_callback'][$fieldName];
-            $values   = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy']);
-        } elseif (is_callable($this->_config['association_mapping_callback']['__default__'])) {
+        } elseif (isset($this->_config['association_mapping_callback']['__default__'])) {
             $function = $this->_config['association_mapping_callback']['__default__'];
-            $values   = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy']);
+        }
+
+        if (is_string($function)) {
+            /** @var $helper \SynergyDataGrid\Helper\BaseConfigHelper */
+            $helper = $this->_serviceLocator->get($function);
+            $values = $helper->execute(
+                array(
+                     $map['targetEntity'],
+                     $map['mappedBy']
+                )
+            );
+        } elseif (is_callable($function)) {
+            $values = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy']);
         } else {
             $idField    = $this->_config['default_association_mapping_id'];
             $labelField = $this->_config['default_association_mapping_label'];
@@ -931,8 +983,32 @@ final class DoctrineORMGrid extends BaseGrid
             $subGridMap['targetEntity'],
             $subGridMap['fieldName']
         );
+        if (is_string($this->_config['grid_url_generator'])) {
+            $generator = $this->_serviceLocator->get($this->_config['grid_url_generator']);
 
-        if (is_callable($this->_config['grid_url_generator'])) {
+            if ($generator instanceof BaseConfigHelper) {
+                $url = $generator->execute(
+                    array(
+                         $this->getEntity(),
+                         $subGridMap['fieldName'],
+                         $subGridMap['targetEntity'],
+                         self::DYNAMIC_URL_TYPE_ROW_EXPAND
+                    )
+                );
+
+                $editUrl = $generator->execute(
+                    array(
+                         $this->getEntity(),
+                         $subGridMap['fieldName'],
+                         $subGridMap['targetEntity'],
+                         self::DYNAMIC_URL_TYPE_SUBGRID
+                    )
+                );
+
+                $subGrid->setUrl($url);
+                $subGrid->setEditurl($editUrl);
+            }
+        } elseif (is_callable($this->_config['grid_url_generator'])) {
             $url = $this->_config['grid_url_generator'](
                 $subGrid->getServiceLocator(), $this->getEntity(),
                 $subGridMap['fieldName'], $subGridMap['targetEntity'], self::DYNAMIC_URL_TYPE_ROW_EXPAND
@@ -1182,18 +1258,6 @@ final class DoctrineORMGrid extends BaseGrid
     public function getCustomAdapter()
     {
         return $this->_customAdapter;
-    }
-
-    public function getEntityCacheFile()
-    {
-        $config   = $this->_serviceLocator->get('config');
-        $filename = $config['jqgrid']['entity_cache']['orm'];
-
-        if (!file_exists($filename)) {
-            $this->_createEntityCache($filename);
-        }
-
-        return $filename;
     }
 
     /**

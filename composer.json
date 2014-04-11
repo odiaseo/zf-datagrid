@@ -16,6 +16,12 @@
             "email": "peleodiase@yahoo.co.uk"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:odiaseo/synergy-common.git"
+        }
+    ],
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.0",

@@ -35,6 +35,9 @@ return array(
         'grid_model'          => array(
             'testBrands' => array(
                 'isSubGridAsGrid' => true
+            ),
+            'testTree'   => array(
+                'isSubGrid' => true
             )
         ),
         'toolbar_buttons'     => array(
