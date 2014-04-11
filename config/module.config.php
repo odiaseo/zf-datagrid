@@ -410,6 +410,10 @@ return array(
             'orm' => 'data/cache/SynergyDataGrid/orm_entity_classmap.php',
             'odm' => 'data/cache/SynergyDataGrid/odm_entity_classmap.php',
         ),
-        'entity_cache_lifetime' => 24 * 60 * 60
+        'entity_cache_lifetime' => 24 * 60 * 60,
+
+        'config_helpers'        => array(
+            'urlGenerator' => 'SynergyDataGrid\UrlGenerator'
+        )
     )
 );
