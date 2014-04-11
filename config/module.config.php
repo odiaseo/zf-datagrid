@@ -406,9 +406,10 @@ return array(
         /**
          * Location where entity classname to entity key mappings are stored
          */
-        'entity_cache' => array(
+        'entity_cache'          => array(
             'orm' => 'data/cache/SynergyDataGrid/orm_entity_classmap.php',
             'odm' => 'data/cache/SynergyDataGrid/odm_entity_classmap.php',
         ),
+        'entity_cache_lifetime' => 24 * 60 * 60
     )
 );
