@@ -289,7 +289,9 @@ class Column extends Base
             $retv  = is_string($cellValue) ? $this->getHtmlFilter()->filter($cellValue) : $cellValue;
             if ($value and $retv) {
                 if (is_array($value)) {
-                    $retv = isset($value[$retv]) ? $value[$retv] : $retv;
+                    if (!is_array($retv)) {
+                        $retv = isset($value[$retv]) ? $value[$retv] : $retv;
+                    }
                 } else {
                     $allPairs = explode(';', $value);
                     if (is_array($allPairs) && count($allPairs)) {

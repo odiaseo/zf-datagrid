@@ -660,6 +660,9 @@ class BaseModel
                             $message = 'Wrong date format for column "' . $param . '"';
                             break;
                         }
+                    } elseif ($type == 'json_array' && is_string($value)) {
+                        $value = array_filter(explode(',', $value));
+                        $entity->$method($value);
                     } else {
                         $entity->$method($value);
                     }
