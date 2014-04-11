@@ -15,6 +15,7 @@ namespace SynergyDataGrid\Grid\Toolbar;
  */
 
 use SynergyDataGrid\Grid\Property;
+use Zend\Json\Expr;
 
 class Item extends Property
 {
@@ -53,7 +54,7 @@ class Item extends Property
 
     public function setCallback($callback)
     {
-        $this->_callback = $callback;
+        $this->_callback = is_string($callback) ? new Expr($callback) : $callback;
 
         return $this;
     }

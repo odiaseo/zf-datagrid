@@ -24,6 +24,7 @@ use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
 use SynergyDataGrid\Helper\BaseConfigHelper;
 use SynergyDataGrid\Util\ArrayUtils;
 use Zend\Http\PhpEnvironment\Request;
+use Zend\Json\Expr;
 use Zend\Stdlib\RequestInterface;
 
 final class DoctrineORMGrid
@@ -952,6 +953,9 @@ final class DoctrineORMGrid
             $this->setCaption(ucwords(str_replace('-', ' ', $entityKey)));
         }
 
+        if (!empty($config ['grid_options']['onSelectRow']) && is_string($config ['grid_options']['onSelectRow'])) {
+            $config ['grid_options']['onSelectRow'] = new Expr($config ['grid_options']['onSelectRow']);
+        }
         $this->setConfig($config);
 
         return $this;
