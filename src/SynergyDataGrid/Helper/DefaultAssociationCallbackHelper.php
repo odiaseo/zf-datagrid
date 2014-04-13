@@ -19,8 +19,16 @@ use SynergyDataGrid\Grid\GridType\BaseGrid;
 class DefaultAssociationCallbackHelper
     extends BaseConfigHelper
 {
+    protected static $_list = array();
+
     public function execute(array $parameters)
     {
+        $hash = md5(json_encode($parameters));
+
+        if (isset(static::$_list[$hash])) {
+            return static::$_list[$hash];
+        }
+
         list($entity, $mappedBy) = $parameters;
         /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
         $values = array(':Select');
@@ -41,10 +49,12 @@ class DefaultAssociationCallbackHelper
                     ->getQuery()
                     ->execute();
             }
+
             foreach ($list as $item) {
-                $values[]
-                    = $item['id'] . ':' . str_replace(array('&amp;', '&'), ' and ', $item['title']);
+                $values[$item['id']] = str_replace(array('&amp;', '&'), ' and ', $item['title']);
             }
+
+            static::$_list[$hash] = $values;
         } catch (\Exception $e) {
             //@TODO fix this
         }
