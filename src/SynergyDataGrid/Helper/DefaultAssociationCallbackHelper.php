@@ -51,7 +51,7 @@ class DefaultAssociationCallbackHelper
             }
 
             foreach ($list as $item) {
-                $values[$item['id']] = str_replace(array('&amp;', '&'), ' and ', $item['title']);
+                $values[] = $item['id'] . ':' . str_replace(array('&amp;', '&'), ' and ', $item['title']);
             }
 
             static::$_list[$hash] = $values;
