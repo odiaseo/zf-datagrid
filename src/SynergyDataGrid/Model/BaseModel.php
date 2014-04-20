@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use SynergyCommon\Paginator\Adapter\DoctrinePaginator;
 use SynergyDataGrid\Model\Config\ModelOptions;
 
 /**
@@ -336,7 +337,7 @@ class BaseModel
     public function getPaginator()
     {
         $query     = $this->createQuery();
-        $paginator = new Paginator($query);
+        $paginator = new DoctrinePaginator($query);
 
         return $paginator;
     }

@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use SynergyCommon\Paginator\Adapter\DoctrinePaginator;
 use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
 use SynergyDataGrid\Helper\BaseConfigHelper;
 use SynergyDataGrid\Util\ArrayUtils;
@@ -1239,7 +1240,7 @@ final class DoctrineORMGrid
             }
         }
 
-        $paginator = new Paginator($query);
+        $paginator = new DoctrinePaginator($query);
 
         return $paginator;
     }
