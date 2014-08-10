@@ -107,7 +107,8 @@ class BaseGridService
             'rows'       => isset($data['rows']) ? $data['rows'] : null,
             'sord'       => isset($data['sord']) ? $data['sord'] : null,
             'sidx'       => isset($data['sidx']) ? $data['sidx'] : null,
-            'sortOrder'  => $sort
+            'presets'    => isset($data['presets']) ? $data['presets'] : array(),
+            'sortOrder'  => $sort,
         );
 
         /** @var $model \SynergyDataGrid\Model\BaseModel */

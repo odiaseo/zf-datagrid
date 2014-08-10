@@ -342,6 +342,23 @@ class BaseModel
         return $paginator;
     }
 
+    protected function addPresets($data)
+    {
+        $alias = $this->getAlias();
+        if (isset($data['searchField'])) {
+            $value  = $data[$data['searchField']];
+            $clause = sprintf(
+                '%s.%s %s %s', $alias, $data['searchField'], $this->_operator[$data['searchOper']], $value
+            );
+            $this->_qb->andWhere($clause);
+        }
+
+        if (isset($data['sidx'])) {
+            $dir = (strtolower($data['sord']) == 'asc') ? 'ASC' : 'DESC';
+            $this->_qb->addOrderBy($alias . '.' . $data['sidx'], $dir);
+        }
+    }
+
     /**
      * Create query object
      *
@@ -365,6 +382,10 @@ class BaseModel
 
         if ($offset) {
             $this->_qb->setFirstResult($offset);
+        }
+
+        if ($presets = $this->_options->getPresets()) {
+            $this->addPresets($presets);
         }
 
         $filter = $this->_options->getFilters();

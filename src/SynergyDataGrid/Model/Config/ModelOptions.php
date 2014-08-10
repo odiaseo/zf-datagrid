@@ -45,6 +45,18 @@ class ModelOptions
 
     protected $_subGridFilter;
 
+    protected $_presets;
+
+    public function setPresets($presets)
+    {
+        $this->_presets = $presets;
+    }
+
+    public function getPresets()
+    {
+        return $this->_presets;
+    }
+
     public function setCustomQueryBuilder($customQueryBuilder)
     {
         $this->_customQueryBuilder = $customQueryBuilder;
