@@ -178,7 +178,7 @@ final class DoctrineORMGrid
                     'editoptions' => array(
                         'data-field-type' => $map['type'],
                         'defaultValue'    => $default,
-                        'NullIfEmpty'     => $map['nullable']
+                        'NullIfEmpty'     => (isset($map['nullable']) && $map["nullable"])
                     ),
                     'editrules'   => array(
                         'edithidden' => false
