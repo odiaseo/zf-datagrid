@@ -79,6 +79,7 @@ class GridService
     {
         try {
             $id        = $data['id'];
+            unset($data['id']);
             $className = $this->getClassnameFromEntityKey($data['entity']);
             $model     = $this->getModel($className, $data);
             $model->updateEntity($id, $data);

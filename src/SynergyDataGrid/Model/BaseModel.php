@@ -346,11 +346,8 @@ class BaseModel
     {
         $alias = $this->getAlias();
         if (isset($data['searchField'])) {
-            $value  = $data[$data['searchField']];
-            $clause = sprintf(
-                '%s.%s %s %s', $alias, $data['searchField'], $this->_operator[$data['searchOper']], $value
-            );
-            $this->_qb->andWhere($clause);
+            $value = $data[$data['searchField']];
+            $this->filter($data['searchField'], $value, $data['searchOper']);
         }
 
         if (isset($data['sidx'])) {
