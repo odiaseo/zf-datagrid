@@ -150,6 +150,10 @@ final class DoctrineORMGrid
 			$reflectionClass = new \ReflectionClass( $this->getEntity() );
 			$configDefaults  = $this->_config['default_values'];
 
+			if ( is_string( $configDefaults ) ) {
+				$configDefaults = $this->getServiceLocator()->get( $configDefaults );
+			}
+
 			/** @var $service \SynergyDataGrid\Service\GridService' */
 			$service        = $this->getServiceLocator()->get( 'synergy\service\grid' );
 			$entityKey      = $service->getEntityKeyFromClassname( $this->getEntity() );

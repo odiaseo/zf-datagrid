@@ -240,6 +240,9 @@ return array(
 		 * For entity specific defaults, use the specifiy
 		 * The array key is the entity field name and the value would be the default value
 		 *
+		 * If a string  values if provided, the service manager would be used to get the values which should return an array
+		 * with the same structure as specified
+		 *
 		 * example
 		 * ========
 		 * 'default_values'                    => array(
