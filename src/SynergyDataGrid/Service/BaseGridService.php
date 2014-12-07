@@ -46,22 +46,11 @@ class BaseGridService
         $filters   = array();
         $operation = isset($data['searchOper']) ? $data['searchOper'] : 'eq';
 
-        if (isset($data['filters'])) {
-            $filter = Json::decode($data['filters'], Json::TYPE_ARRAY);
+        if (isset($data['customFilters'])) {
+            return $this->processSearchFilters($data['customFilters']);
 
-            if (count($filter['rules']) > 0) {
-
-                foreach ($filter['rules'] as $rule) {
-                    $filters['field'][]      = $rule['field'];
-                    $filters['value'][]      = $rule['data'];
-                    $filters['expression'][] = $this->_expression[$rule['op']];
-                }
-
-                $filters['options']['multiple'] = true;
-                $filters['options']['boolean']  = (isset($filter['groupOp'])) ? $filter['groupOp'] : 'AND';
-
-                return $filters;
-            }
+        } elseif (isset($data['filters'])) {
+            return $this->processSearchFilters($data['Filters']);
         } elseif (isset($data['searchField'])) {
 
             // Single field filtering
@@ -74,7 +63,31 @@ class BaseGridService
         }
 
         return $filters;
+    }
 
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
+    private function  processSearchFilters($params)
+    {
+        $filter = Json::decode($params, Json::TYPE_ARRAY);
+
+        if (isset($filter['rules']) and count($filter['rules']) > 0) {
+
+            foreach ($filter['rules'] as $rule) {
+                $filters['field'][]      = $rule['field'];
+                $filters['value'][]      = $rule['data'];
+                $filters['expression'][] = $this->_expression[$rule['op']];
+            }
+
+            $filters['options']['multiple'] = true;
+            $filters['options']['boolean']  = (isset($filter['groupOp'])) ? $filter['groupOp'] : 'AND';
+
+            return $filters;
+        }
+        return array();
     }
 
     /**
@@ -98,11 +111,16 @@ class BaseGridService
             $sort = array();
         }
 
+        if (isset($data['filters'])) {
+            $filters = $this->_processFilter($data);
+        } else {
+            $filters = array();
+        }
         $options = array(
             'gridConfig' => $gridOptions,
+            'filters'    => $filters,
             'grid'       => isset($data['grid']) ? $data['grid'] : null,
             'entity'     => isset($data['entity']) ? $data['entity'] : null,
-            'filters'    => isset($data['filters']) ? $this->_processFilter($data) : null,
             'page'       => isset($data['page']) ? $data['page'] : null,
             'rows'       => isset($data['rows']) ? $data['rows'] : null,
             'sord'       => isset($data['sord']) ? $data['sord'] : null,

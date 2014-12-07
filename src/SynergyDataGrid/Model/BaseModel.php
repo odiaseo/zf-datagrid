@@ -13,16 +13,14 @@ use SynergyDataGrid\Model\Config\ModelOptions;
 
 /**
  * This file is part of the Synergy package.
- *
  * (c) Pele Odiase <info@rhemastudio.com>
- *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @author  Pele Odiase
  * @license http://opensource.org/licenses/BSD-3-Clause
- *
  */
+
 /**
  * Class to handle base functionality to work with Doctrine Models
  *
@@ -114,7 +112,6 @@ class BaseModel
      */
     protected $_sm;
 
-
     public function __construct(ModelOptions $options = null)
     {
         $this->_options = $options;
@@ -128,7 +125,6 @@ class BaseModel
 
         $alias = 'e';
         $this->setAlias($alias);
-
 
         return $this;
 
@@ -507,7 +503,7 @@ class BaseModel
         } elseif (is_string($expression) && array_key_exists($expression, $this->_operator)) {
             $this->_qb->andWhere(
                 $this->getAlias() . '.' . $field . ' '
-                    . str_replace('?', ':' . $field, $this->_operator[$expression])
+                . str_replace('?', ':' . $field, $this->_operator[$expression])
             );
             $this->_qb->setParameter($field, $this->_setWildCardInValue($expression, $value));
         }
@@ -526,18 +522,18 @@ class BaseModel
         $boolean = strtoupper($options['boolean']);
 
         foreach ($rules as $rule) {
-            if ($boolean == 'OR') {
-                $this->_qb->orWhere(
-                    $this->getAlias() . '.' . $rule['field']
-                        . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
-                );
+            $aliasField  = $this->getAlias() . '.' . $rule['field'];
+            $placeHolder = ':' . $rule['field'];
+            $method      = strtolower($boolean) . 'Where';
+
+            if ($rule['value'] != 0 && (is_null($rule['value']) or ($rule['value'] == 'null'))) {
+                $clause = $this->_qb->expr()->isNull($aliasField);
             } else {
-                $this->_qb->andWhere(
-                    $this->getAlias() . '.' . $rule['field']
-                        . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
-                );
+                $clause = $aliasField . ' ' . str_replace('?', $placeHolder, $this->_operator[$rule['expression']]);
+                $this->_qb->setParameter($placeHolder, $this->_setWildCardInValue($rule['expression'], $rule['value']));
             }
-            $this->_qb->setParameter($rule['field'], $this->_setWildCardInValue($rule['expression'], $rule['value']));
+
+            $this->_qb->$method($clause);
         }
     }
 
@@ -628,8 +624,8 @@ class BaseModel
 
         foreach ($params as $param => $value) {
             if (array_key_exists($param, $mapping->fieldMappings) or array_key_exists(
-                $param, $mapping->associationMappings
-            )
+                    $param, $mapping->associationMappings
+                )
             ) {
 
                 $method = 'set' . ucfirst($param);
@@ -730,7 +726,6 @@ class BaseModel
     {
         return $this->_logger;
     }
-
 
     /**
      * @return \Zend\ServiceManager\ServiceManager
