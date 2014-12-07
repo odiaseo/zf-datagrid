@@ -50,7 +50,7 @@ class BaseGridService
             return $this->processSearchFilters($data['customFilters']);
 
         } elseif (isset($data['filters'])) {
-            return $this->processSearchFilters($data['Filters']);
+            return $this->processSearchFilters($data['filters']);
         } elseif (isset($data['searchField'])) {
 
             // Single field filtering
@@ -111,7 +111,7 @@ class BaseGridService
             $sort = array();
         }
 
-        if (isset($data['filters'])) {
+        if (isset($data['filters']) || isset($data['customFilters'])) {
             $filters = $this->_processFilter($data);
         } else {
             $filters = array();

@@ -224,7 +224,9 @@ If you want to specify a WHERE clause to be used when populating the grid, you c
 a  custom QueryBuilder builder and setting it on the grid as shown below:
 
 In Your controller:
+
 ```php
+       
            ......
            $grid  = $serviceManager->get('jqgrid');
 
@@ -274,6 +276,8 @@ identity as show below:
         $grid->setGridIdentity($className, $entityKey, null, false, $queryParam);
      
 #Configuration Options
+
+
 ```php
 
         'jqgrid'       => array(
