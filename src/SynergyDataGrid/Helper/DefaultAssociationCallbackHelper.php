@@ -7,13 +7,11 @@ use SynergyDataGrid\Grid\GridType\BaseGrid;
  * Class DefaultAssociationCallbackHelper
  * This is the default association mapping callbach function
  * Returns formatted string for rendering select options
- *
  * You can specify difference callback functions for each mapped field e.d. to specify
  * a callback function for a field myField
  * add the myfield index to the array  myField => youCallbackFunction
  *
- * @See * http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editable
- *
+ * @See     * http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editable
  * @package SynergyDataGrid\Helper
  */
 class DefaultAssociationCallbackHelper
@@ -40,16 +38,17 @@ class DefaultAssociationCallbackHelper
                 $query = $qb->select('m.id, m.title')
                     ->from($entity, 'e')
                     ->innerJoin('e.' . $mappedBy, 'm')
-                    ->addOrder('m.title')
+                    ->orderBy('m.title')
                     ->getQuery();
                 $list  = $query->execute();
             } else {
                 $qb   = $em->createQueryBuilder();
                 $list = $qb->select('e.id, e.title')
                     ->from($entity, 'e')
+                    ->orderBy('e.title')
                     ->getQuery()
-                    ->addOrder('e.title')
                     ->execute();
+
             }
 
             foreach ($list as $item) {
