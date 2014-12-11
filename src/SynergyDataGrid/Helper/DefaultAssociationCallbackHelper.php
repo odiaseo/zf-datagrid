@@ -40,6 +40,7 @@ class DefaultAssociationCallbackHelper
                 $query = $qb->select('m.id, m.title')
                     ->from($entity, 'e')
                     ->innerJoin('e.' . $mappedBy, 'm')
+                    ->addOrder('m.title')
                     ->getQuery();
                 $list  = $query->execute();
             } else {
@@ -47,6 +48,7 @@ class DefaultAssociationCallbackHelper
                 $list = $qb->select('e.id, e.title')
                     ->from($entity, 'e')
                     ->getQuery()
+                    ->addOrder('e.title')
                     ->execute();
             }
 
