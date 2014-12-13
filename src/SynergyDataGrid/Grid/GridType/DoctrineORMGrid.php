@@ -407,6 +407,10 @@ final class DoctrineORMGrid
                     $data
                 );
 
+                if ($type = self::TYPE_SELECT && isset($this->_config['select']['options'])) {
+                    $data = array_merge_recursive($this->_config['select']['options'], $data);
+                }
+
                 if ($map['type'] == ClassMetadataInfo::MANY_TO_MANY
                     or $map['type'] == ClassMetadataInfo::ONE_TO_MANY
                 ) {
