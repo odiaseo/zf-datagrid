@@ -53,12 +53,15 @@ class BaseGridService
 
 		if ( isset( $data['searchField'] ) ) {
 			// Single field filtering
-			$filters = array(
-				'field'      => $data['searchField'],
-				'value'      => trim( $data['searchString'] ),
-				'expression' => $this->_expression[ $operation ],
-				'options'    => array()
+			$rules = array(
+				array(
+					'field'   => $data['searchField'],
+					'data'    => trim( $data['searchString'] ),
+					'op'      => $operation,
+				)
 			);
+
+			$filters = $this->processSearchFilters( array( 'rules' => $rules ), $filters );
 		}
 
 		return $filters;
