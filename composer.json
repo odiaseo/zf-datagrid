@@ -43,5 +43,10 @@
             "./Module.php",
             "tests/module/Module.php"
         ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
