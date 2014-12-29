@@ -46,6 +46,11 @@ return array(
 	),
 	'jqgrid'       => array(
 		/**
+		 * Specify factory class which should return an array config daa. This would be merged with
+		 * the jqgrid config in the order specified
+		 */
+		'factories'                         => array(),
+		/**
 		 * Allow retrieval of data from a different domain
 		 * All CRUD request would be prefixed with the api_domain value
 		 * e.g. http://www.example.com

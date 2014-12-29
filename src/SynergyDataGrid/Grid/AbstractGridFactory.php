@@ -53,7 +53,7 @@ class AbstractGridFactory
 		$config     = $serviceLocator->get( 'Config' );
 		$gridConfig = $config['jqgrid'];
 
-		if ( isset( $gridConfig['factories'] ) ) {
+		if ( array_key_exists( 'factories', $gridConfig ) ) {
 			foreach ( (array) $gridConfig['factories'] as $alias ) {
 				if ( $serviceLocator->has( $alias ) ) {
 					$addConfig  = $serviceLocator->get( $alias );
