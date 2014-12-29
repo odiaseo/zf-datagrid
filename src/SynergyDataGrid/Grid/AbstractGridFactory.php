@@ -14,8 +14,10 @@ namespace SynergyDataGrid\Grid;
  *
  */
 
+use SynergyDataGrid\Util\ArrayUtils;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+
 
 class AbstractGridFactory
 	implements AbstractFactoryInterface {
@@ -54,10 +56,11 @@ class AbstractGridFactory
 		$gridConfig = $config['jqgrid'];
 
 		if ( array_key_exists( 'factories', $gridConfig ) ) {
+			$util = new ArrayUtils();
 			foreach ( (array) $gridConfig['factories'] as $alias ) {
 				if ( $serviceLocator->has( $alias ) ) {
 					$addConfig  = $serviceLocator->get( $alias );
-					$gridConfig = array_merge( $gridConfig, $addConfig );
+					$gridConfig = $util->arrayMergeRecursiveCustom( $gridConfig, $addConfig );
 				}
 			}
 		}
