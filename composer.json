@@ -30,6 +30,9 @@
         "doctrine/orm": "2.*",
         "synergy/common": "1.0.x-dev"
     },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
     "suggest": {
         "gedmo/doctrine-extensions": ">=v2.2.0",
         "monolog/monolog": "For enhanced logging features"
