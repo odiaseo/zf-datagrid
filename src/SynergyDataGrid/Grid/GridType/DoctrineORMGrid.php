@@ -879,7 +879,7 @@ final class DoctrineORMGrid
                 )
             );
         } elseif (is_callable($function)) {
-            $values = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy']);
+            $values = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy'], $this);
         } else {
             $idField    = $this->_config['default_association_mapping_id'];
             $labelField = $this->_config['default_association_mapping_label'];
