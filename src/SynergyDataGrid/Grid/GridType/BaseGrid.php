@@ -13,6 +13,7 @@ namespace SynergyDataGrid\Grid\GridType;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use SynergyDataGrid\Grid\Base;
@@ -121,7 +122,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     const TYPE_FILE       = 'file';
     const SUB_GRID_SUFFIX = '_sub_';
 
-
     const DYNAMIC_URL_TYPE_GRID       = 1;
     const DYNAMIC_URL_TYPE_EDIT       = 2;
     const DYNAMIC_URL_TYPE_SUBGRID    = 3;
@@ -183,28 +183,24 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         );
     /**
      * The default value of this property is:
-     * {page:“page”,rows:“rows”, sort:“sidx”, order:“sord”, search:“_search”, nd:“nd”, id:“id”, oper:“oper”, editoper:“edit”, addoper:“add”,
-     * deloper:“del”, subgridid:“id”, npage:null, totalrows:“totalrows”}
-     * This customizes names of the fields sent to the server on a POST request. For example, with this setting, you can change the sort
-     *  order element from sidx to mysort by setting prmNames: {sort: “mysort”}. The string that will be POST-ed to the server will then be
-     * myurl.php?page=1&rows=10&mysort=myindex&sord=asc rather than myurl.php?page=1&rows=10&sidx=myindex&sord=asc
-     * So the value of the column on which to sort upon can be obtained by looking at $POST['mysort'] in PHP. When some parameter is set to * null, it will be
-     * not sent to the server. For example if we set prmNames: {nd:null} the nd parameter will not be sent to the server. For npage * option see the scroll
-     * option.
-     * These options have the following meaning and default values:
-     *  page: the requested page (default value page)
-     * rows: the number of rows requested (default value rows)
-     * sort: the sorting column (default value sidx)
-     * order: the sort order (default value sord)
-     * search: the search indicator (default value _search)
-     * nd: the time passed to the request (for IE browsers not to cache the request) (default value nd)
-     * id: the name of the id when POST-ing data in editing modules (default value id)
-     * oper: the operation parameter (default value oper)
-     * editoper: the name of operation when the data is POST-ed in edit mode (default value edit)
-     * addoper: the name of operation when the data is posted in add mode (default value add)
-     * deloper: the name of operation when the data is posted in delete mode (default value del)
-     * totalrows: the number of the total rows to be obtained from server - see rowTotal (default value totalrows)
-     * subgridid: the name passed when we click to load data in the subgrid (default value id)
+     * {page:“page”,rows:“rows”, sort:“sidx”, order:“sord”, search:“_search”, nd:“nd”, id:“id”, oper:“oper”,
+     * editoper:“edit”, addoper:“add”, deloper:“del”, subgridid:“id”, npage:null, totalrows:“totalrows”} This
+     * customizes names of the fields sent to the server on a POST request. For example, with this setting, you can
+     * change the sort order element from sidx to mysort by setting prmNames: {sort: “mysort”}. The string that will be
+     * POST-ed to the server will then be myurl.php?page=1&rows=10&mysort=myindex&sord=asc rather than
+     * myurl.php?page=1&rows=10&sidx=myindex&sord=asc So the value of the column on which to sort upon can be obtained
+     * by looking at $POST['mysort'] in PHP. When some parameter is set to * null, it will be not sent to the server.
+     * For example if we set prmNames: {nd:null} the nd parameter will not be sent to the server. For npage * option
+     * see the scroll option. These options have the following meaning and default values: page: the requested page
+     * (default value page) rows: the number of rows requested (default value rows) sort: the sorting column (default
+     * value sidx) order: the sort order (default value sord) search: the search indicator (default value _search) nd:
+     * the time passed to the request (for IE browsers not to cache the request) (default value nd) id: the name of the
+     * id when POST-ing data in editing modules (default value id) oper: the operation parameter (default value oper)
+     * editoper: the name of operation when the data is POST-ed in edit mode (default value edit) addoper: the name of
+     * operation when the data is posted in add mode (default value add) deloper: the name of operation when the data
+     * is posted in delete mode (default value del) totalrows: the number of the total rows to be obtained from server
+     * - see rowTotal (default value totalrows) subgridid: the name passed when we click to load data in the subgrid
+     * (default value id)
      *
      * @var array
      */
@@ -459,7 +455,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     protected $_nodeData = array();
 
-
     /**
      * @param array                   $config
      * @param ServiceLocatorInterface $serviceLocator
@@ -525,12 +520,11 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
             $this->$method($val);
         }
 
-
         //Set default data to be posted back to server
         $this->mergePostData(
             array(
-                 self::GRID_IDENTIFIER  => $this->getId(),
-                 self::ENTITY_IDENTFIER => $this->getEntity()
+                self::GRID_IDENTIFIER  => $this->getId(),
+                self::ENTITY_IDENTFIER => $this->getEntity()
             )
         );
 
@@ -551,16 +545,13 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         $addParameters = isset($this->_config['add_parameters']) ? $this->_config['add_parameters'] : array();
         $this->getNavGrid()->mergeAddParameters($addParameters);
 
-
         //Edit parameters
         $editParameters = isset($this->_config['edit_parameters']) ? $this->_config['edit_parameters'] : array();
         $this->getNavGrid()->mergeEditParameters($editParameters);
 
-
         //Search Parameters
         $searchParameters = isset($this->_config['search_parameters']) ? $this->_config['search_parameters'] : array();
         $this->getNavGrid()->mergeSearchParameters($searchParameters);
-
 
         //Delete Parameters
         $deleteParameters = isset($this->_config['delete_parameters']) ? $this->_config['delete_parameters'] : array();
@@ -569,7 +560,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         //View Parameters
         $viewParameters = isset($this->_config['view_parameters']) ? $this->_config['view_parameters'] : array();
         $this->getNavGrid()->mergeViewParameters($viewParameters);
-
 
         //set add/edit form options
         $formOptions = isset($this->_config['form_options']) ? $this->_config['form_options'] : array();
@@ -611,7 +601,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         $this->setOnPaging(new Expr($this->getJsCode()->prepareSetPagingCookie()));
 
         $this->getJsCode()->addAutoResizeScript($this->getId());
-
 
         return $this;
     }
@@ -668,12 +657,14 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         return $this;
     }
 
-
     public function formatGridData($rows, $columns)
     {
         $records     = array();
         $columnNames = array_keys($columns);
 
+        if (method_exists($rows, 'getId')) {
+            $rows = [$rows]; //This is an entity object and not iterable
+        }
         /** @var $row \SynergyCommon\Entity\BaseEntity */
         foreach ($rows as $k => $row) {
 
@@ -748,7 +739,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
             'options'    => array()
         );
     }
-
 
     /**
      * Set up column sizes based on user settings taken from cookies
@@ -999,7 +989,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
 
         return $this;
     }
-
 
     /**
      * Get actions column
@@ -1591,13 +1580,13 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     protected function _isSubGrid($name)
     {
         return isset($this->_config['column_model'][$name]['isSubGrid'])
-            and $this->_config['column_model'][$name]['isSubGrid'];
+        and $this->_config['column_model'][$name]['isSubGrid'];
     }
 
     protected function _isSubGridAsGrid($name)
     {
         return isset($this->_config['column_model'][$name]['isSubGridAsGrid'])
-            and $this->_config['column_model'][$name]['isSubGridAsGrid'];
+        and $this->_config['column_model'][$name]['isSubGridAsGrid'];
     }
 
     /**
@@ -1749,7 +1738,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         return $this->_url;
     }
 
-
     /**
      * Get current grid id
      *
@@ -1826,7 +1814,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     {
         return $this->_serviceLocator;
     }
-
 
     public function setConfig($config)
     {
@@ -1906,7 +1893,6 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      * @return mixed
      */
     abstract public function setGridIdentity($entityClassName, $gridId = '', $displayTree = true);
-
 
     /**
      * Set the object manager (entityManager, etc for the grid type)
