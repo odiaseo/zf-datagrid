@@ -3,10 +3,7 @@ namespace SynergyDataGrid\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use SynergyCommon\Paginator\Adapter\DoctrinePaginator;
 use SynergyDataGrid\Model\Config\ModelOptions;
@@ -127,7 +124,6 @@ class BaseModel
         $this->setAlias($alias);
 
         return $this;
-
     }
 
     /**
@@ -667,7 +663,6 @@ class BaseModel
                             $message = "Unable to update join table: {$target} field" . $param . '"';
                         }
                     }
-
                 } else {
                     $type = $mapping->fieldMappings[$param]['type'];
                     if ($type == 'datetime' || $type == 'date') {
@@ -681,8 +676,14 @@ class BaseModel
                             $message = 'Wrong date format for column "' . $param . '"';
                             break;
                         }
-                    } elseif ($type == 'json_array' && is_string($value)) {
+                    } elseif (($type == 'array' or $type == 'object') && is_string($value)) {
+                        $value = unserialize($value);
+                        $entity->$method($value);
+                    } elseif ($type == 'simple_array' && is_string($value)) {
                         $value = array_filter(explode(',', $value));
+                        $entity->$method($value);
+                    } elseif ($type == 'json_array' && is_string($value)) {
+                        $value = json_decode($value, true);
                         $entity->$method($value);
                     } else {
                         $entity->$method($value);
@@ -708,7 +709,6 @@ class BaseModel
         }
 
         return false;
-
     }
 
     /**

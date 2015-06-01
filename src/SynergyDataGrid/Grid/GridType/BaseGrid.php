@@ -13,9 +13,6 @@ namespace SynergyDataGrid\Grid\GridType;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use SynergyDataGrid\Grid\Base;
 use SynergyDataGrid\Grid\Column;
 use SynergyDataGrid\Grid\JsCode;
@@ -29,7 +26,6 @@ use Zend\Filter\Word\CamelCaseToSeparator;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Json\Expr;
 use Zend\Json\Json;
-use Zend\Paginator\Paginator;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Stdlib\RequestInterface;
 
@@ -667,6 +663,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         }
         /** @var $row \SynergyCommon\Entity\BaseEntity */
         foreach ($rows as $k => $row) {
+            $mapping = $this->getModel()->getEntityManager()->getClassMetadata(get_class($row));
 
             if ($rowId = $row->getId()) {
                 $records[$k]['id'] = $rowId;
@@ -680,6 +677,11 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
                 if ($name == 'myac') {
                     continue;
                 }
+                $type = null;
+                if (isset($mapping->fieldMappings[$name])) {
+                    $type = $mapping->fieldMappings[$name]['type'];
+                }
+                $column->setDoctrineDataType($type);
                 $index = array_search($name, $columnNames);
                 if ($index !== false) {
                     $records[$k]['cell'][$index] = $column->cellValue($row);

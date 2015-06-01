@@ -98,6 +98,9 @@ class Column extends Base
      * @var \Zend\Filter\FilterInterface
      */
     protected $_htmlFilter;
+
+    /** @var  string */
+    protected $doctrineDataType;
     /**
      * Default rows count for "textarea" editype
      *
@@ -257,6 +260,7 @@ class Column extends Base
     {
         $name   = $this->getName();
         $method = 'get' . ucfirst($name);
+        $type   = $this->getDoctrineDataType();
 
         try {
             $cellValue = $row->$method();
@@ -278,11 +282,9 @@ class Column extends Base
             } else {
                 $cellValue = '';
             }
-
         } elseif (is_object($cellValue) and method_exists($cellValue, 'getId')) {
             $cellValue = $cellValue->getId();
         }
-
 
         if ($this->getEdittype() == 'select') {
             $value = $this->getEditoptions()->getValue();
@@ -313,7 +315,11 @@ class Column extends Base
              */
             $retv = $cellValue->format(self::DEFAULT_DATETIME_SRCFORMAT);
         } elseif (is_array($cellValue)) {
-            $retv = serialize($cellValue);
+            if ($type == 'json_array') {
+                $retv = json_encode($cellValue);
+            } else {
+                $retv = serialize($cellValue);
+            }
         } elseif (is_string($cellValue)) {
             $retv = $this->getHtmlFilter()->filter($cellValue);
         } else {
@@ -341,7 +347,7 @@ class Column extends Base
             } elseif (isset($metadata->associationMappings[$name])) {
                 $dbColumnType = $metadata->associationMappings[$name]['type'];
             }
-            $dbColumnType = $dbColumnType ? : 'string';
+            $dbColumnType = $dbColumnType ?: 'string';
 
             $this->setDbColumnType($dbColumnType);
         }
@@ -609,5 +615,21 @@ class Column extends Base
         }
 
         return $this->_htmlFilter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDoctrineDataType()
+    {
+        return $this->doctrineDataType;
+    }
+
+    /**
+     * @param string $doctrineDataType
+     */
+    public function setDoctrineDataType($doctrineDataType)
+    {
+        $this->doctrineDataType = $doctrineDataType;
     }
 }
