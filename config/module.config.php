@@ -61,7 +61,7 @@ return array(
 		 */
 		'plugins'                           => array(
 			'date_picker' => array(
-				'dateFormat' => 'D, d M yy',
+				'dateFormat' => 'yy-mm-dd',
 				'timeFormat' => 'hh:mm'
 			)
 		),

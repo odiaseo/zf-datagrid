@@ -653,7 +653,7 @@ class BaseModel
                     } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_ONE) {
                         if ($value and $foreignEntity = $this->getEntityManager()->find($target, $value)) {
                             $entity->$method($foreignEntity);
-                        } else {
+                        } elseif (!empty($mapping->associationMappings[$param]['joinColumns'][0]['nullable'])) {
                             $entity->$method(null);
                         }
                     } elseif ($value) {

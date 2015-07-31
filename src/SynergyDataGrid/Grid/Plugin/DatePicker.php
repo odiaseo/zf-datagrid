@@ -49,7 +49,7 @@ class DatePicker extends Property
      * @see http://docs.jquery.com/UI/Datepicker/formatDate
      * @const string
      */
-    const DATE_DEFAULTFORMAT = 'F d, yy';
+    const DATE_DEFAULTFORMAT = 'yy-mm-dd';
 
     /**
      * Default time format for DatetimePicker control

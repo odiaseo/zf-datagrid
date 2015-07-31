@@ -146,7 +146,7 @@ class Column extends Base
      *
      * @var string
      */
-    const DEFAULT_DATE_NEWFORMAT = 'F d, Y';
+    const DEFAULT_DATE_NEWFORMAT = 'Y-m-d';
     /**
      * Default source format for date formatter when using time (for use with integrated datetimepicker)
      *
@@ -162,7 +162,7 @@ class Column extends Base
      *
      * @var string
      */
-    const DEFAULT_DATETIME_NEWFORMAT = 'F d, Y H:i:s';
+    const DEFAULT_DATETIME_NEWFORMAT = 'Y-m-d H:i:s';
 
     /**
      *  Set up base options
