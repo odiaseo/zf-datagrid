@@ -1,5 +1,6 @@
 <?php
 namespace SynergyDataGrid\Service;
+
 /*
  * This file is part of the Synergy package.
  *
@@ -13,6 +14,7 @@ namespace SynergyDataGrid\Service;
  *
  */
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 
 class SubGridService
@@ -47,10 +49,19 @@ class SubGridService
             $subGridModel = $this->getModel($targetEntity, $data);
             $parentMeta   = $model->getEntityManager()->getClassMetadata($className);
 
-
             if ($mappedBy = $parentMeta->associationMappings[$field]['mappedBy']) {
-                $subGridFilter = array($mappedBy => $data['subgridid']);
-                $subGridModel->getOptions()->setSubGridFilter($subGridFilter);
+                if ($parentMeta->associationMappings[$field]['type'] = ClassMetadata::MANY_TO_MANY) {
+                    $joinTable = [
+                        'entity' => $parentMeta->associationMappings[$field]['sourceEntity'],
+                        'alias'  => 'jt_' . $mappedBy,
+                        'field'  => $mappedBy,
+                        'key'    => $data['subgridid']
+                    ];
+                    $subGridModel->getOptions()->addJoin($joinTable);
+                } else {
+                    $subGridFilter = array($mappedBy => $data['subgridid']);
+                    $subGridModel->getOptions()->setSubGridFilter($subGridFilter);
+                }
                 $paginator = $subGridModel->getPaginator();
                 $childRows = $paginator->getIterator();
                 $total     = $paginator->count();
@@ -65,24 +76,21 @@ class SubGridService
                 $childRows = new ArrayCollection();
             }
 
-
             /** @var $subGrid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
             $subGrid = $this->_serviceManager->get('jqgrid');
             $subGrid->setGridIdentity($targetEntity, $field);
-
 
             $subGrid->reorderColumns();
             $columns = $subGrid->setGridColumns()->getColumns();
 
             $record = array(
-                'page'    => $subGridModel->getOptions()->getPage() ? : 1,
+                'page'    => $subGridModel->getOptions()->getPage() ?: 1,
                 'total'   => ceil($total / $rowNum),
                 'records' => $total,
                 'rows'    => $subGrid->formatGridData($childRows, $columns)
             );
 
             return $record;
-
         } catch (\Exception $exception) {
             $this->getLogger()->logException($exception);
             $record = array(
@@ -136,7 +144,7 @@ class SubGridService
             $className = $this->getClassnameFromEntityKey($data['entity']);
             $model     = $this->getModel($className, $data);
             $field     = $data['fieldName'];
-            $getter = 'get' . ucfirst($field);
+            $getter    = 'get' . ucfirst($field);
 
             $mapping = $model->getEntityManager()->getClassMetadata($className);
             $target  = $mapping->associationMappings[$field]['targetEntity'];

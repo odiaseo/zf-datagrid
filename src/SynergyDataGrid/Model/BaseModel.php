@@ -329,6 +329,9 @@ class BaseModel
     public function getPaginator()
     {
         $query     = $this->createQuery();
+        //$dql       = $query->getDQL();
+        //$sql = $query->getQuery()->getSQL();
+        //die($sql);
         $paginator = new DoctrinePaginator($query);
 
         return $paginator;
@@ -365,6 +368,14 @@ class BaseModel
         $this->_qb->select($this->getAlias());
         $this->_qb->from($this->getEntityClass(), $this->getAlias());
 
+        if ($joins = $this->getOptions()->getJoins()) {
+            foreach ($joins as $index => $join) {
+                $placeHolder = ':p' . $join['field'] . $index;
+                $this->_qb->innerJoin($this->getAlias() . '.' . $join['field'], $join['alias'])
+                    ->andWhere($join['alias'] . '.id = ' . $placeHolder)
+                    ->setParameter($placeHolder, $join['key']);
+            }
+        }
         if ($itemCountPerPage = $this->_options->getRows()) {
             $this->_qb->setMaxResults($itemCountPerPage);
         }

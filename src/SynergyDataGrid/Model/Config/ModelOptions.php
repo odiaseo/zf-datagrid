@@ -16,8 +16,12 @@ namespace SynergyDataGrid\Model\Config;
 
 use Zend\Stdlib\AbstractOptions;
 
-class ModelOptions
-    extends AbstractOptions
+/**
+ * Class ModelOptions
+ *
+ * @package SynergyDataGrid\Model\Config
+ */
+class ModelOptions extends AbstractOptions
 {
     protected $_grid;
 
@@ -46,6 +50,34 @@ class ModelOptions
     protected $_subGridFilter;
 
     protected $_presets;
+
+    /**
+     * Table to join to
+     *
+     * @var array
+     */
+    protected $_joins = [];
+
+    /**
+     * @return array
+     */
+    public function getJoins()
+    {
+        return $this->_joins;
+    }
+
+    /**
+     * @param array $joins
+     */
+    public function setJoins($joins)
+    {
+        $this->_joins = $joins;
+    }
+
+    public function addJoin($data)
+    {
+        $this->_joins[] = $data;
+    }
 
     public function setPresets($presets)
     {
