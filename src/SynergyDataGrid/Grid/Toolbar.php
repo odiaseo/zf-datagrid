@@ -39,7 +39,8 @@ class Toolbar extends Property
      */
     public function __construct(
         BaseGrid $grid, $buttons = array(), $position = self::POSITION_BOTTOM, $configPosition = self::POSITION_BOTTOM
-    ) {
+    )
+    {
         switch ($position) {
             case self::POSITION_BOTTOM:
                 $prefix = ($configPosition == self::POSITION_BOTTOM) ? self::TOOLBAR_PREFIX_TOP

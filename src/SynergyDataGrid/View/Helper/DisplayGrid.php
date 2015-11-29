@@ -193,7 +193,6 @@ class DisplayGrid extends AbstractHelper
                 $gridId, $grid->getEditurl()
             );
             $postCommand[] = sprintf('obj_%s[0].addJSONData(%s) ;', $gridId, Json::encode($initialData));
-
         }
 
         $grid->getJsCode()->prepareAfterInsertRow();
@@ -206,7 +205,7 @@ class DisplayGrid extends AbstractHelper
         }
 
         //Add subgrid as grid data. This will override any subgrid
-        if ($grid instanceof SubGridAwareInterface and  $subGrids = $grid->getSubGridsAsGrid()) {
+        if ($grid instanceof SubGridAwareInterface and $subGrids = $grid->getSubGridsAsGrid()) {
 
             $l = $s = $h = array();
             foreach ($subGrids as $subGrid) {
@@ -247,12 +246,12 @@ class DisplayGrid extends AbstractHelper
                 $grid->getNavGrid()->setSearch(false);
             }
 
-            $options   = $grid->getNavGrid()->getOptions() ? : new \stdClass();
-            $prmEdit   = $grid->getNavGrid()->getEditParameters() ? : new \stdClass();
-            $prmAdd    = $grid->getNavGrid()->getAddParameters() ? : new \stdClass();
-            $prmDel    = $grid->getNavGrid()->getDeleteParameters() ? : new \stdClass();
-            $prmSearch = $grid->getNavGrid()->getSearchParameters() ? : new \stdClass();
-            $prmView   = $grid->getNavGrid()->getViewParameters() ? : new \stdClass();
+            $options   = $grid->getNavGrid()->getOptions() ?: new \stdClass();
+            $prmEdit   = $grid->getNavGrid()->getEditParameters() ?: new \stdClass();
+            $prmAdd    = $grid->getNavGrid()->getAddParameters() ?: new \stdClass();
+            $prmDel    = $grid->getNavGrid()->getDeleteParameters() ?: new \stdClass();
+            $prmSearch = $grid->getNavGrid()->getSearchParameters() ?: new \stdClass();
+            $prmView   = $grid->getNavGrid()->getViewParameters() ?: new \stdClass();
 
             $jsPager = sprintf(
                 'obj_%s.jqGrid("navGrid","#%s",%s,%s,%s,%s,%s,%s);',
@@ -265,7 +264,6 @@ class DisplayGrid extends AbstractHelper
                 Json::encode($prmSearch, false, array('enableJsonExprFinder' => true)),
                 Json::encode($prmView, false, array('enableJsonExprFinder' => true))
             );
-
 
             //display filter toolbar
             if ($config['filter_toolbar']['enabled']) {
@@ -332,10 +330,13 @@ class DisplayGrid extends AbstractHelper
         //add custom toolbar buttons
         if ($showToolbar) {
             if ($toolbarPosition == Toolbar::POSITION_BOTH) {
-                $toolbars[]
-                            = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM, $toolbarPosition);
+                $toolbars[] = new Toolbar(
+                    $grid,
+                    $config['toolbar_buttons'],
+                    Toolbar::POSITION_BOTTOM,
+                    $toolbarPosition
+                );
                 $toolbars[] = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_TOP, $toolbarPosition);
-
             } elseif ($toolbarPosition == Toolbar::POSITION_BOTTOM) {
                 $toolbars[]
                     = new Toolbar($grid, $config['toolbar_buttons'], Toolbar::POSITION_BOTTOM, $toolbarPosition);

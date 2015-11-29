@@ -25,6 +25,7 @@ use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
 use SynergyDataGrid\Helper\BaseConfigHelper;
 use SynergyDataGrid\Util\ArrayUtils;
 use Zend\Filter\Word\DashToCamelCase;
+use Zend\Filter\Word\SeparatorToCamelCase;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Json\Expr;
 use Zend\Stdlib\RequestInterface;
@@ -109,7 +110,7 @@ final class DoctrineORMGrid
         $mapping = $subGrid->getEntityManager()->getClassMetadata($subGridMap['targetEntity']);
 
         $params[] = $subGridMap['fieldName'];
-        $id = current($mapping->identifier);
+        $id       = current($mapping->identifier);
 
         foreach ($mapping->fieldMappings as $map) {
             if (in_array($map['fieldName'], $this->_config['excluded_columns'])) {
@@ -129,7 +130,7 @@ final class DoctrineORMGrid
 
         $subGrid->name = $names;
 
-        $subGrid->width = $width; //@todo get width from column model
+        $subGrid->width  = $width; //@todo get width from column model
         $subGrid->params = $params;
 
         return $subGrid;
@@ -147,20 +148,20 @@ final class DoctrineORMGrid
         $adjustment = 0;
 
         if (!$this->_columnsSet) {
-            $filter = new DashToCamelCase();
-            $utils = new ArrayUtils();
-            $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
+            $filter          = new DashToCamelCase();
+            $utils           = new ArrayUtils();
+            $mapping         = $this->getEntityManager()->getClassMetadata($this->getEntity());
             $reflectionClass = new \ReflectionClass($this->getEntity());
-            $configDefaults = $this->_config['default_values'];
+            $configDefaults  = $this->_config['default_values'];
 
             if (is_string($configDefaults)) {
                 $configDefaults = $this->getServiceLocator()->get($configDefaults);
             }
 
             /** @var $service \SynergyDataGrid\Service\GridService' */
-            $service = $this->getServiceLocator()->get('synergy\service\grid');
-            $entityKey = $service->getEntityKeyFromClassname($this->getEntity());
-            $entityAttr = lcfirst($filter->filter($entityKey));
+            $service        = $this->getServiceLocator()->get('synergy\service\grid');
+            $entityKey      = $service->getEntityKeyFromClassname($this->getEntity());
+            $entityAttr     = lcfirst($filter->filter($entityKey));
             $specificValues = ($entityAttr && isset($configDefaults['specific'][$entityAttr]))
                 ? $configDefaults['specific'][$entityAttr]
                 : array();
@@ -177,12 +178,12 @@ final class DoctrineORMGrid
             );
 
             $excludedColumns = array_unique($excludedColumns);
-            $count = 10;
+            $count           = 10;
 
             foreach ($mapping->fieldMappings as $map) {
                 $adjustment = 0;
-                $fieldName = $map['fieldName'];
-                $default = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
+                $fieldName  = $map['fieldName'];
+                $default    = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
 
                 if (in_array($fieldName, $excludedColumns)) {
                     continue;
@@ -210,7 +211,7 @@ final class DoctrineORMGrid
                     case 'string' :
                         if (isset($map['length'])) {
                             $data['editoptions']['maxlength'] = $map['length'];
-                            $data['editoptions']['size'] = $map['length'];
+                            $data['editoptions']['size']      = $map['length'];
                             break;
                         }
                         $data['searchoptions']['sopt'] = $this->getSearchOptions('cn');
@@ -218,12 +219,12 @@ final class DoctrineORMGrid
                 }
 
                 if ($map['columnName'] == 'id') {
-                    $data['editable'] = false;
-                    $data['key'] = true;
+                    $data['editable']              = false;
+                    $data['key']                   = true;
                     $data['formoptions']['rowpos'] = 1;
                     $data['formoptions']['colpos'] = 1;
                     $data['searchoptions']['sopt'] = $this->getSearchOptions('bw');
-                    $adjustment = 10;
+                    $adjustment                    = 10;
 
                     if ($this->isTreeGrid) {
                         $this->_config['column_model'][$fieldName]['width']
@@ -232,29 +233,29 @@ final class DoctrineORMGrid
                 }
 
                 if ((isset($map['length']) and $map['length'] >= 255) or $map['type'] == 'text') {
-                    $data['edittype'] = self::TYPE_TEXTAREA;
-                    $data['hidden'] = true;
+                    $data['edittype']                = self::TYPE_TEXTAREA;
+                    $data['hidden']                  = true;
                     $data['editrules']['edithidden'] = true;
                 }
 
                 if ('boolean' == $map['type']) {
-                    $data['align'] = 'center';
-                    $data['formatter'] = 'checkbox';
-                    $data['edittype'] = 'checkbox';
-                    $data['stype'] = self::TYPE_SELECT;
-                    $data['searchoptions']['sopt'] = array('eq', 'ne');
+                    $data['align']                  = 'center';
+                    $data['formatter']              = 'checkbox';
+                    $data['edittype']               = 'checkbox';
+                    $data['stype']                  = self::TYPE_SELECT;
+                    $data['searchoptions']['sopt']  = array('eq', 'ne');
                     $data['searchoptions']['value'] = ':;0:No;1:Yes';
-                    $data['editoptions']['value'] = '1:0';
+                    $data['editoptions']['value']   = '1:0';
                 }
 
                 if (in_array($fieldName, $this->_config['hidden_columns'])) {
-                    $data['hidden'] = true;
+                    $data['hidden']                  = true;
                     $data['editrules']['edithidden'] = true;
                 }
 
                 if (in_array($fieldName, $this->_config['non_editable_columns'])) {
                     $data['editable'] = false;
-                    $data['hidden'] = true;
+                    $data['hidden']   = true;
                 }
 
                 if (isset($this->_config['column_type_mapping'][$fieldName])) {
@@ -273,24 +274,24 @@ final class DoctrineORMGrid
                 }
 
                 if ($this->isRequired($map, $data, $fieldName, $default)) {
-                    $data['editrules']['required'] = true;
+                    $data['editrules']['required']    = true;
                     $data['formoptions']['elmprefix'] = '<i class="req">*</i>';
                 } else {
-                    $data['editrules']['required'] = false;
+                    $data['editrules']['required']    = false;
                     $data['formoptions']['elmprefix'] = '<i class="nq"></i>';
                 }
 
                 //@todo temporary fix to tree expand column when hidden elements appear before it
-                $colIndex = $data['hidden'] ? ($count + 99) : ($count - $adjustment);
+                $colIndex              = $data['hidden'] ? ($count + 99) : ($count - $adjustment);
                 $columnData[$colIndex] = $data;
 
                 $count++;
             }
 
             foreach ($mapping->associationMappings as $map) {
-                $data = array();
+                $data      = array();
                 $fieldName = $map['fieldName'];
-                $default = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
+                $default   = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
 
                 if (in_array($fieldName, $this->_config['excluded_columns'])) {
                     continue;
@@ -304,12 +305,12 @@ final class DoctrineORMGrid
                     if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
                         $index = count($this->_subGrid);
                         /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
-                        $subGrid = $this->getSubGridModel($map);
-                        $target = $fieldName;
+                        $subGrid   = $this->getSubGridModel($map);
+                        $target    = $fieldName;
                         $generator = null;
 
                         if (is_string($this->_config['grid_url_generator'])) {
-                            $generator = $this->_serviceLocator->get($this->_config['grid_url_generator']);
+                            $generator  = $this->_serviceLocator->get($this->_config['grid_url_generator']);
                             $subGridUrl = $this->getSubGridUrl();
 
                             if ($generator instanceof BaseConfigHelper) {
@@ -415,7 +416,7 @@ final class DoctrineORMGrid
                     or $map['type'] == ClassMetadataInfo::ONE_TO_MANY
                 ) {
                     $data['editoptions']['multiple'] = true;
-                    $data['hidden'] = true;
+                    $data['hidden']                  = true;
                 }
 
                 if (!isset($data['searchoptions']['sopt'])) {
@@ -427,10 +428,10 @@ final class DoctrineORMGrid
                 }
 
                 if ($this->isRequired($map, $data, $fieldName, $default)) {
-                    $data['editrules']['required'] = true;
+                    $data['editrules']['required']    = true;
                     $data['formoptions']['elmprefix'] = '<i class="req">*</i>';
                 } else {
-                    $data['editrules']['required'] = false;
+                    $data['editrules']['required']    = false;
                     $data['formoptions']['elmprefix'] = '<i class="nq"></i>';
                 }
 
@@ -473,7 +474,7 @@ final class DoctrineORMGrid
         try {
             if (!$request) {
                 $serviceManager = $this->getModel()->getServiceManager();
-                $request = $serviceManager->get('request');
+                $request        = $serviceManager->get('request');
             }
             if (!$this->getUrl()) {
                 $this->setUrl($request->getRequestUri());
@@ -533,33 +534,33 @@ final class DoctrineORMGrid
         /** @var $model \SynergyDataGrid\Model\BaseModel */
         $model = $this->getModel($this->_entity);
 
-        $row = $model->getEntityManager()->getRepository($this->_entity)->find($id);
-        $method = 'get' . ucfirst($field);
+        $row       = $model->getEntityManager()->getRepository($this->_entity)->find($id);
+        $method    = 'get' . ucfirst($field);
         $refObject = $row->$method();
 
         if ($refObject instanceof PersistentCollection) {
-            $mapping = $refObject->getMapping();
+            $mapping      = $refObject->getMapping();
             $targetEntity = $mapping['targetEntity'];
         } else {
             $targetEntity = get_class($refObject);
         }
 
         $subGridModel = $model = $this->getModel($targetEntity);
-        $parentMeta = $model->getEntityManager()->getClassMetadata($this->_entity);
+        $parentMeta   = $model->getEntityManager()->getClassMetadata($this->_entity);
 
         //$model->setEntityManager($this->getEntityManager());
         //$model->setModelService($this->_entity);
 
         if ($mappedBy = $parentMeta->associationMappings[$field]['mappedBy']) {
             $subGridFilter = array($mappedBy => $id);
-            $paginator = $this->getPaginator($request, $subGridModel, $subGridFilter);
-            $childRows = $paginator->getIterator();
-            $total = $paginator->count();
-            $rowNum = $paginator->getQuery()->getMaxResults();
+            $paginator     = $this->getPaginator($request, $subGridModel, $subGridFilter);
+            $childRows     = $paginator->getIterator();
+            $total         = $paginator->count();
+            $rowNum        = $paginator->getQuery()->getMaxResults();
         } else {
             $childRows = $refObject;
-            $total = count($refObject);
-            $rowNum = $request->getPost('rows');
+            $total     = count($refObject);
+            $rowNum    = $request->getPost('rows');
         }
 
         if (!$childRows) {
@@ -596,7 +597,7 @@ final class DoctrineORMGrid
      */
     protected function _createGridData(Request $request, $dataOnly = true)
     {
-        $page = $request->getPost('page', 1);
+        $page      = $request->getPost('page', 1);
         $paginator = $this->getPaginator($request);
 
         $rows = $paginator->getIterator();
@@ -604,7 +605,7 @@ final class DoctrineORMGrid
         $this->reorderColumns();
         $columns = $this->setGridColumns($dataOnly)->getColumns();
 
-        $total = $paginator->count();
+        $total  = $paginator->count();
         $rowNum = $paginator->getQuery()->getMaxResults();
 
         $grid = array(
@@ -626,8 +627,8 @@ final class DoctrineORMGrid
      */
     public function delete(Request $request)
     {
-        $id = $request->getPost('id');
-        $retv = false;
+        $id      = $request->getPost('id');
+        $retv    = false;
         $message = 'Unable to delete record.';
         if ($id) {
             $retv = $this->getModel()->remove($id);
@@ -652,16 +653,16 @@ final class DoctrineORMGrid
         $id = $request->getPost('id');
 
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
-        $target = $mapping->associationMappings[$fieldName]['targetEntity'];
+        $target  = $mapping->associationMappings[$fieldName]['targetEntity'];
 
         $model = $this->getModel($target);
 
         try {
-            $retv = $model->remove($id);
+            $retv    = $model->remove($id);
             $message = sprintf('Row #%d successfully deleted', $id);
         } catch (\Exception $e) {
             $message = 'Unable to delete record. ' . $e->getMessage();
-            $retv = false;
+            $retv    = false;
         }
 
         return array('error' => $retv ? false : true, 'message' => $message);
@@ -677,10 +678,10 @@ final class DoctrineORMGrid
     protected function createEntity($request, $entity = null, $model = null)
     {
         /** @var $request \Zend\Http\PhpEnvironment\Request */
-        $params = $request->getPost();
-        $pass = true;
-        $message = '';
-        $model = $model ?: $this->getModel();
+        $params      = $request->getPost();
+        $pass        = true;
+        $message     = '';
+        $model       = $model ?: $this->getModel();
         $entityClass = $model->getEntityClass();
 
         if (!$entity) {
@@ -706,7 +707,7 @@ final class DoctrineORMGrid
                 ) {
 
                     $method = 'set' . ucfirst($param);
-                    $value = ($value == 'null' or empty($value)) ? null : $value;
+                    $value  = ($value == 'null' or empty($value)) ? null : $value;
 
                     if (isset($mapping->associationMappings[$param])) {
                         $target = $mapping->associationMappings[$param]['targetEntity'];
@@ -730,7 +731,7 @@ final class DoctrineORMGrid
                                 if ($foreignEntity = $this->getEntityManager()->find($target, $v)) {
                                     $entityParam->add($foreignEntity);
                                 } else {
-                                    $pass = false;
+                                    $pass    = false;
                                     $message = "Unable to update join table: {$target} " . $param . '"';
                                 }
                             }
@@ -739,7 +740,7 @@ final class DoctrineORMGrid
                             if ($foreignEntity = $this->getEntityManager()->find($target, $value)) {
                                 $entity->$method($foreignEntity);
                             } else {
-                                $pass = false;
+                                $pass    = false;
                                 $message = "Unable to update join table: {$target} field" . $param . '"';
                             }
                         }
@@ -749,12 +750,12 @@ final class DoctrineORMGrid
                         if ($type == 'datetime' || $type == 'date') {
                             try {
                                 //attempt to ensure date is in acceptable format for datetime object
-                                $ts = strtotime($value);
-                                $ds = $ts ? date(\DateTime::ISO8601, $ts) : null;
+                                $ts    = strtotime($value);
+                                $ds    = $ts ? date(\DateTime::ISO8601, $ts) : null;
                                 $value = $ds ? new \DateTime($ds) : null;
                                 $entity->$method($value);
                             } catch (\Exception $e) {
-                                $pass = false;
+                                $pass    = false;
                                 $message = 'Wrong date format for column "' . $param . '"';
                                 break;
                             }
@@ -784,10 +785,10 @@ final class DoctrineORMGrid
     public function editSubGrid($request, $id, $field)
     {
         /** @var $request \Zend\Http\PhpEnvironment\Request */
-        $pass = true;
-        $row = null;
+        $pass    = true;
+        $row     = null;
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
-        $target = $mapping->associationMappings[$field]['targetEntity'];
+        $target  = $mapping->associationMappings[$field]['targetEntity'];
 
         $subGridId = $request->getPost('id', null);
 
@@ -795,7 +796,7 @@ final class DoctrineORMGrid
             $entity = $this->getEntityManager()->getRepository($target)->find($subGridId);
         } else {
             /** @var $row \SynergyCommon\Entity\AbstractEntity */
-            $row = $this->getEntityManager()->getRepository($this->_entity)->find($id);
+            $row    = $this->getEntityManager()->getRepository($this->_entity)->find($id);
             $entity = new $target;
         }
 
@@ -814,7 +815,7 @@ final class DoctrineORMGrid
                 $message = '';
             } catch (\Exception $e) {
                 $message = $e->getMessage();
-                $pass = false;
+                $pass    = false;
             }
 
             return array('error' => !$pass, 'message' => $message, 'id' => $id);
@@ -833,18 +834,18 @@ final class DoctrineORMGrid
      */
     public function edit($request)
     {
-        $pass = true;
+        $pass    = true;
         $message = '';
-        $id = '';
+        $id      = '';
 
         if ($entity = $this->createEntity($request)) {
             try {
-                $entity = $this->getModel()->save($entity);
-                $id = $entity->getId();
+                $entity  = $this->getModel()->save($entity);
+                $id      = $entity->getId();
                 $message = '';
             } catch (\Exception $e) {
                 $message = $e->getMessage();
-                $pass = false;
+                $pass    = false;
             }
         }
 
@@ -881,10 +882,10 @@ final class DoctrineORMGrid
         } elseif (is_callable($function)) {
             $values = $function($this->_serviceLocator, $map['targetEntity'], $map['mappedBy'], $this);
         } else {
-            $idField = $this->_config['default_association_mapping_id'];
+            $idField    = $this->_config['default_association_mapping_id'];
             $labelField = $this->_config['default_association_mapping_label'];
 
-            $qb = $this->getEntityManager()->createQueryBuilder();
+            $qb   = $this->getEntityManager()->createQueryBuilder();
             $list = $qb->select("e.$idField, e.$labelField")
                 ->from($map['targetEntity'], 'e')
                 ->getQuery()
@@ -922,9 +923,11 @@ final class DoctrineORMGrid
         $this->setId($gridId . $idSuffix);
         $this->setEntity($entityClassName);
         $this->setService($this->getServiceLocator());
+        $filter    = new SeparatorToCamelCase('-');
+        $configKey = lcfirst($filter->filter($gridId));
 
         $config = $this->getConfig();
-        $utils = new ArrayUtils();
+        $utils  = new ArrayUtils();
 
         if ($displayTree) {
             $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
@@ -933,10 +936,10 @@ final class DoctrineORMGrid
                 $this->isTreeGrid = true;
 
                 //Set tree grid options
-                $treeOptions = isset($config ['tree_grid_options']) ? $config ['tree_grid_options']
+                $treeOptions               = isset($config ['tree_grid_options']) ? $config ['tree_grid_options']
                     : array();
                 $treeOptions['rownumbers'] = false;
-                $config ['grid_options'] = $utils->arrayMergeRecursiveCustom(
+                $config ['grid_options']   = $utils->arrayMergeRecursiveCustom(
                     $config ['grid_options'],
                     $treeOptions
                 );
@@ -946,20 +949,20 @@ final class DoctrineORMGrid
         /**
          * Merge grid specific configurations
          */
-        if (isset($config [$gridId])) {
+        if (isset($config [$configKey])) {
             $config ['grid_options'] = $utils->arrayMergeRecursiveCustom(
                 $config ['grid_options'],
-                $config [$gridId]
+                $config [$configKey]
             );
         }
 
         /**
          * Merge column model overrides
          */
-        if (isset($config ['column_model_override'][$gridId])) {
+        if (isset($config ['column_model_override'][$configKey])) {
             $config ['column_model'] = $utils->arrayMergeRecursiveCustom(
                 $config ['column_model'],
-                $config ['column_model_override'][$gridId]
+                $config ['column_model_override'][$configKey]
             );
         }
 
@@ -967,9 +970,9 @@ final class DoctrineORMGrid
          * Set default crud route
          */
         /** @var $service \SynergyDataGrid\Service\GridService' */
-        $service = $this->getServiceLocator()->get('synergy\service\grid');
+        $service   = $this->getServiceLocator()->get('synergy\service\grid');
         $entityKey = $service->getEntityKeyFromClassname($entityClassName);
-        $crudUrl = $this->getCrudUrl($entityKey, $queryParams);
+        $crudUrl   = $this->getCrudUrl($entityKey, $queryParams);
 
         if (!empty($config['api_domain'])) {
             $crudUrl = rtrim($config['api_domain'], '/') . '/' . ltrim($crudUrl, '/');
@@ -1119,7 +1122,7 @@ final class DoctrineORMGrid
         $entityClass = $entityClass ?: $this->getEntity();
         /** @var $model \SynergyDataGrid\Model\BaseModel */
         $model = $this->_serviceLocator->get('synergydatagrid\model');
-        $em = $this->getEntityManager();
+        $em    = $this->getEntityManager();
 
         $model->setEntityManager($em);
         $model->setEntityClass($entityClass);
@@ -1212,18 +1215,18 @@ final class DoctrineORMGrid
     protected function getPaginator($request, $model = null, $subGridFilter = array())
     {
         $treeFilter = array();
-        $sort = array();
-        $filter = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
+        $sort       = array();
+        $filter     = $request->getPost('_search') == 'true' ? $this->_getFilterParams($request) : false;
 
         if ($this->isTreeGrid) {
             $sort['lft'] = array(
                 'sidx' => 'lft',
                 'sord' => 'ASC'
             );
-            $node = $request->getPost('nodeid', false);
+            $node        = $request->getPost('nodeid', false);
             if (false and $node > 0) { //@todo fix bug
-                $n_lvl = (integer)$request->getPost("n_level");
-                $n_lvl = $n_lvl + 1;
+                $n_lvl      = (integer)$request->getPost("n_level");
+                $n_lvl      = $n_lvl + 1;
                 $treeFilter = array(
                     'lft'    => (integer)$request->getPost("n_left"),
                     'rgt'    => (integer)$request->getPost("n_right"),
@@ -1254,11 +1257,11 @@ final class DoctrineORMGrid
             $perPage = $this->getRowNum() ?: $this->_defaultItemCountPerPage;
         }
 
-        $page = $request->getPost('page', 1);
-        $offset = ($page - 1) * $perPage;
-        $model = $model ?: $this->getModel();
+        $page    = $request->getPost('page', 1);
+        $offset  = ($page - 1) * $perPage;
+        $model   = $model ?: $this->getModel();
         $adapter = new ORMQueryAdapter($this, $model, $filter, $sort, $treeFilter);
-        $query = $adapter->createQuery($offset, $perPage);
+        $query   = $adapter->createQuery($offset, $perPage);
 
         //filter result if subgrid
         if ($subGridFilter) {

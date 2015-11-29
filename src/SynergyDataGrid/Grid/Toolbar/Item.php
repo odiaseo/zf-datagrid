@@ -17,6 +17,11 @@ namespace SynergyDataGrid\Grid\Toolbar;
 use SynergyDataGrid\Grid\Property;
 use Zend\Json\Expr;
 
+/**
+ * Class Item
+ *
+ * @package SynergyDataGrid\Grid\Toolbar
+ */
 class Item extends Property
 {
     protected $_id;
@@ -27,6 +32,7 @@ class Item extends Property
     protected $_class = 'toolbar-item';
     protected $_attributes = '';
     protected $_onLoad;
+    protected $_order = 1;
 
     public function __construct($parentId, array $options)
     {
