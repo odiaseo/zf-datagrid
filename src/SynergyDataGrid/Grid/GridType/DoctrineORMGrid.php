@@ -964,6 +964,14 @@ final class DoctrineORMGrid
                 $config ['column_model'],
                 $config ['column_model_override'][$configKey]
             );
+
+            $overrideModels = array_keys($config['column_model_override'][$configKey]);
+            foreach ($overrideModels as $identifiedModel) {
+                $modelIndex = array_search($identifiedModel, $config['excluded_columns']);
+                if ($modelIndex !== false) {
+                    unset($config['excluded_columns'][$modelIndex]);
+                }
+            }
         }
 
         /**
