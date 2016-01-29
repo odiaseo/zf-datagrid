@@ -34,7 +34,7 @@ class DisplayGrid extends AbstractHelper
 {
     /**
      * @param BaseGrid $grid
-     * @param bool     $appendScript
+     * @param bool $appendScript
      *
      * @return mixed
      */
@@ -362,9 +362,10 @@ class DisplayGrid extends AbstractHelper
                         or $buttonPosition == $toolbarPosition
                     ) {
                         $onLoad[] = sprintf(
-                            "%s.append(\"<button data-grid-id='%s' data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
+                            "%s.append(\"<button data-entity-id='%s' data-grid-id='%s' data-toolbar-id='%s' id='%s' title='%s' class='%s' %s><i class='icon %s'></i> %s</button>\");
                                                                     jQuery('#%s', '#%s').bind('click', %s);",
                             $toolbarId,
+                            $grid->getEntityId(),
                             $gridId,
                             $toolbarId,
                             $toolbarButton->getId(),

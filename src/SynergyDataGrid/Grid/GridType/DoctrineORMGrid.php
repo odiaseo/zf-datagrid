@@ -919,12 +919,12 @@ final class DoctrineORMGrid
         $queryParams = array()
     )
     {
+        $filter    = new SeparatorToCamelCase('-');
+        $configKey = lcfirst($filter->filter($gridId));
         $this->setEntityId($gridId);
         $this->setId($gridId . $idSuffix);
         $this->setEntity($entityClassName);
         $this->setService($this->getServiceLocator());
-        $filter    = new SeparatorToCamelCase('-');
-        $configKey = lcfirst($filter->filter($gridId));
 
         $config = $this->getConfig();
         $utils  = new ArrayUtils();
