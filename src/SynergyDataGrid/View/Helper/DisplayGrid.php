@@ -395,7 +395,7 @@ class DisplayGrid extends AbstractHelper
         }
 
         $onLoad[] = sprintf(
-            " synergyResizeGrid('#%s', '.%s');", $grid->getId(), $grid->getJsCode()->getContainerClass()
+            "; synergyResizeGrid('#%s', '.%s');", $grid->getId(), $grid->getJsCode()->getContainerClass()
         );
 
         $html = array_merge($html, $grid->getHtml());
