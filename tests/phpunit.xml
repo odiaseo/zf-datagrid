@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="Bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false">
+<phpunit bootstrap="module/SynergyDataGridTest/Bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false">
 
     <testsuites>
         <testsuite name="Synergy Data Grid Test Suite">

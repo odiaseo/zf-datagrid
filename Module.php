@@ -2,7 +2,6 @@
 namespace SynergyDataGrid;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use SynergyDataGrid\Grid\GridType\BaseGrid;
 use Zend\ServiceManager\ServiceManager;
 
 /**
@@ -47,10 +46,6 @@ class Module
                 'synergy\service\grid'    => 'SynergyDataGrid\Service\GridService',
                 'synergy\service\subgrid' => 'SynergyDataGrid\Service\SubGridService',
             ),
-            'invokables'         => array(
-                'SynergyDataGrid\Service\GridService'    => 'SynergyDataGrid\Service\GridService',
-                'SynergyDataGrid\Service\SubGridService' => 'SynergyDataGrid\Service\SubGridService',
-            ),
             'shared'             => array(
                 'jqgrid'                => false,
                 'synergydatagrid\model' => false,
@@ -61,7 +56,9 @@ class Module
                 'SynergyDataGrid\Helper\AbstractGridConfigFactory'
             ),
             'factories'          => array(
-                'logger' => 'SynergyCommon\Service\LoggerFactory',
+                'logger'                                 => 'SynergyCommon\Service\LoggerFactory',
+                'SynergyDataGrid\Service\GridService'    => 'SynergyDataGrid\Service\GridServiceFactory',
+                'SynergyDataGrid\Service\SubGridService' => 'SynergyDataGrid\Service\SubGridServiceFactory',
             ),
         );
     }

@@ -14,7 +14,6 @@ namespace SynergyDataGrid\Grid\GridType;
  *
  */
 
-
 use SynergyDataGrid\Grid\Base;
 
 class SubGrid extends Base
@@ -65,5 +64,4 @@ class SubGrid extends Base
     {
         return $this->_entityManager;
     }
-
 }

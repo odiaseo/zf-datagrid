@@ -1,14 +1,12 @@
 <?php
 namespace SynergyDataGridTest\Test;
 
-
 use SynergyDataGridTest\BaseTestClass;
 
 /**
  * @backupGlobals disabled
  */
-class CrudTest
-    extends BaseTestClass
+class CrudTest extends BaseTestClass
 {
     public function testGetList()
     {
@@ -24,15 +22,12 @@ class CrudTest
 
         $payLoad = $service->getGridList($params);
         $this->assertArrayHasKey('error', $payLoad);
-
     }
 
     public function testGridInstance()
     {
         /** @var $grid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
         $grid = $this->_serviceManager->get('jqgrid');
-        $config = $grid->getConfig();
-
         $this->assertInstanceOf('\SynergyDataGrid\Grid\GridType\DoctrineORMGrid', $grid);
     }
 }

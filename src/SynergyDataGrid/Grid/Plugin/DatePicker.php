@@ -63,7 +63,7 @@ class DatePicker extends Property
      * Set up base DatePicker options
      *
      * @param      \SynergyDataGrid\Grid\GridType\BaseGrid $grid
-     * @param null                                         $options
+     * @param null $options
      */
     public function __construct($grid, $options = null)
     {
@@ -137,7 +137,6 @@ class DatePicker extends Property
         $allDatetimesInGrid = "";
         $allDatesInForm     = "'";
         $allDatetimesInForm = "'";
-
 
         /** @var $dateColumn \SynergyDataGrid\Grid\Column */
         $dateColumn = null;
@@ -270,5 +269,4 @@ class DatePicker extends Property
 
         return $datePicker;
     }
-
 }

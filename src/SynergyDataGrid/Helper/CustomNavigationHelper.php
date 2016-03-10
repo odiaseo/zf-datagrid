@@ -1,7 +1,6 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use SynergyDataGrid\Grid\GridType\BaseGrid;
 use Zend\Json\Expr;
 
 /**

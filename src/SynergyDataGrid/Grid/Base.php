@@ -13,7 +13,6 @@ namespace SynergyDataGrid\Grid;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Util\ArrayUtils;
 
 /**
@@ -33,12 +32,11 @@ abstract class Base
      */
     protected $_options = array();
 
-
     /**
      * Override set to allow access to all possible options
      *
-     * @param string $name  option name
-     * @param mixed  $value option value
+     * @param string $name option name
+     * @param mixed $value option value
      *
      * @return void
      */
@@ -72,7 +70,7 @@ abstract class Base
     /**
      * Set all options at once
      *
-     * @param array $options  of all options
+     * @param array $options of all options
      *
      * @return mixed
      */
@@ -122,8 +120,8 @@ abstract class Base
     /**
      * Set single option
      *
-     * @param string $name  name of option
-     * @param mixed  $value value of option
+     * @param string $name name of option
+     * @param mixed $value value of option
      *
      * @return mixed
      */

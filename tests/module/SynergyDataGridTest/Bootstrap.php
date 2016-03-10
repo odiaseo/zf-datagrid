@@ -1,4 +1,5 @@
 <?php
+namespace SynergyDataGridTest;
 
 use Zend\Mvc\Application;
 use Zend\ServiceManager\ServiceManager;
@@ -6,7 +7,7 @@ use Zend\ServiceManager\ServiceManager;
 error_reporting(E_ALL | E_STRICT);
 date_default_timezone_set('UTC');
 
-chdir(dirname(__DIR__));
+chdir(dirname(realpath(__DIR__ . '/../../')));
 $basePath = realpath('./') . '/';
 
 set_include_path(
@@ -20,8 +21,7 @@ set_include_path(
     )
 );
 
-
-$classList = include  __DIR__ . "/autoload_classmap.php";
+$classList = include __DIR__ . "/../../autoload_classmap.php";
 
 spl_autoload_register(
     function ($class) use ($classList, $basePath) {
@@ -56,20 +56,10 @@ class Bootstrap
 
         $zf2ModulePaths[] = './';
 
-        $config = array(
-            'module_listener_options' => array(
-                'module_paths' => $zf2ModulePaths,
-            ),
-            'modules'                 => array(
-                'DoctrineModule',
-                'DoctrineORMModule',
-                'SynergyDataGrid',
-                'SynergyDataGridTest',
-            )
-        );
+        $config              = include __DIR__ . '/../../../config/application.config.php';
+        $config['modules'][] = 'SynergyDataGridTest';
 
-
-        include __DIR__ . '/../init_autoloader.php';
+        include __DIR__ . '/../../../init_autoloader.php';
 
         /** @var \Zend\Mvc\Application $app */
         $app = Application::init($config);
@@ -92,7 +82,7 @@ class Bootstrap
     protected static function findParentPath($path)
     {
         $dir    = __DIR__;
-        $srcDir = realpath($dir . '/../');
+        $srcDir = realpath($dir . '/../../../');
 
         return $srcDir . '/' . $path;
     }

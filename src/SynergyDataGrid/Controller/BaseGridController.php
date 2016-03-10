@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the Synergy package.
  *
  * (c) Pele Odiase <info@rhemastudio.com>
@@ -17,8 +17,11 @@ use SynergyCommon\Controller\BaseRestfulController;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractRestfulController;
 
-class BaseGridController
-    extends BaseRestfulController
+/**
+ * Class BaseGridController
+ * @package SynergyDataGrid\Controller
+ */
+class BaseGridController extends BaseRestfulController
 {
 
     public function _processRequest()
@@ -86,5 +89,4 @@ class BaseGridController
             }
         }
     }
-
 }

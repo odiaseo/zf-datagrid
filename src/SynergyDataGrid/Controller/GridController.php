@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the Synergy package.
  *
  * (c) Pele Odiase <info@rhemastudio.com>
@@ -16,6 +16,10 @@ namespace SynergyDataGrid\Controller;
 
 use Zend\Http\Response;
 
+/**
+ * Class GridController
+ * @package SynergyDataGrid\Controller
+ */
 class GridController extends BaseGridController
 {
     public function getList()
@@ -30,7 +34,6 @@ class GridController extends BaseGridController
         $payLoad = $service->getGridList($params);
 
         return $this->_sendPayload($payLoad);
-
     }
 
     /**
@@ -56,9 +59,7 @@ class GridController extends BaseGridController
             $payLoad = $service->createRecord($params);
         }
 
-
         return $this->_sendPayload($payLoad);
-
     }
 
     /**
@@ -81,6 +82,5 @@ class GridController extends BaseGridController
         $payLoad = $service->updateRecord($params);
 
         return $this->_sendPayload($payLoad);
-
     }
 }

@@ -35,7 +35,7 @@ class BaseTestClass
     public function setUp()
     {
         parent::setUp();
-        $this->_serviceManager = \Bootstrap::getServiceManager();
+        $this->_serviceManager = Bootstrap::getServiceManager();
 
         $this->controller = new GridController();
         $this->request    = new Request();

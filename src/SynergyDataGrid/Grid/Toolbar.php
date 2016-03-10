@@ -33,9 +33,9 @@ class Toolbar extends Property
      * Set up base NavGrid options
      *
      * @param BaseGrid $grid
-     * @param array    $buttons
-     * @param string   $position
-     * @param string   $configPosition
+     * @param array $buttons
+     * @param string $position
+     * @param string $configPosition
      */
     public function __construct(
         BaseGrid $grid, $buttons = array(), $position = self::POSITION_BOTTOM, $configPosition = self::POSITION_BOTTOM

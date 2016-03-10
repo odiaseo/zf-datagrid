@@ -328,7 +328,7 @@ class BaseModel
      */
     public function getPaginator()
     {
-        $query     = $this->createQuery();
+        $query = $this->createQuery();
         //$dql       = $query->getDQL();
         //$sql = $query->getQuery()->getSQL();
         //die($sql);
@@ -437,7 +437,7 @@ class BaseModel
     /**
      * Sort the result set by a specified column.
      *
-     * @param string $field     Column name
+     * @param string $field Column name
      * @param string $direction Ascending (ASC) or Descending (DESC)
      *
      * @return void
@@ -485,10 +485,10 @@ class BaseModel
     /**
      * Filter the result set based on criteria.
      *
-     * @param mixed $field      column name or array of column names if search is multiple
-     * @param mixed $value      value to filter result set or array of values if search is multiple
+     * @param mixed $field column name or array of column names if search is multiple
+     * @param mixed $value value to filter result set or array of values if search is multiple
      * @param mixed $expression search expression or array of expressions if search is multiple
-     * @param array $options    array of search options
+     * @param array $options array of search options
      *
      * @return void
      */
@@ -519,7 +519,7 @@ class BaseModel
     /**
      * Multiple filtering
      *
-     * @param array $rules   array of rules fore multiple filtering
+     * @param array $rules array of rules fore multiple filtering
      * @param array $options array of search options
      *
      * @return void
@@ -548,7 +548,7 @@ class BaseModel
      * Place wildcard filtering in value
      *
      * @param string $expression expression to filter
-     * @param string $value      value to add wildcard to
+     * @param string $value value to add wildcard to
      *
      * @return string
      */

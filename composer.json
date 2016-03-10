@@ -28,14 +28,14 @@
         "doctrine/doctrine-orm-module": ">=0.5",
         "doctrine/doctrine-module": ">=0.7",
         "doctrine/orm": "2.*",
-        "synergy/common": "1.0.x-dev"
+        "synergy/common": "1.0.x-dev",
+        "monolog/monolog": "^1.18"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "~4.0"
     },
     "suggest": {
-        "gedmo/doctrine-extensions": ">=v2.2.0",
-        "monolog/monolog": "For enhanced logging features"
+        "gedmo/doctrine-extensions": ">=v2.2.0"
     },
     "autoload": {
         "psr-0": {
@@ -44,7 +44,7 @@
         },
         "classmap": [
             "./Module.php",
-            "tests/module/Module.php"
+            "tests/module/SynergyDataGridTest/Module.php"
         ]
     },
     "extra": {

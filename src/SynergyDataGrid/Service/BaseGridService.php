@@ -52,7 +52,6 @@ class BaseGridService extends BaseService
 
         if (isset($data['customFilters'])) {
             $filters = $this->processSearchFilters($data['customFilters'], $filters);
-
         }
         if (isset($data['filters'])) {
             $filters = $this->processSearchFilters($data['filters'], $filters);

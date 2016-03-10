@@ -55,5 +55,4 @@ interface SubGridAwareInterface
      * @return mixed
      */
     public function getSubGridModel($subGridMap);
-
 }

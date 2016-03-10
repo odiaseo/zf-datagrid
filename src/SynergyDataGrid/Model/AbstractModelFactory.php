@@ -57,6 +57,5 @@ class AbstractModelFactory
         $model->setLogger($logger);
 
         return $model;
-
     }
 }

@@ -14,7 +14,6 @@ namespace SynergyDataGrid\Grid\Adapter;
  *
  */
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Model\BaseModel;
 
@@ -80,11 +79,11 @@ abstract class QueryAdapter
     /**
      * Set up base PaginatorAdapter options
      *
-     * @param BaseGrid  $grid
+     * @param BaseGrid $grid
      * @param BaseModel $service
-     * @param bool      $filter array of filter options
-     * @param array     $sort   array of sort options
-     * @param null      $treeData
+     * @param bool $filter array of filter options
+     * @param array $sort array of sort options
+     * @param null $treeData
      */
     public function __construct(BaseGrid $grid, BaseModel $service, $filter = false, $sort = array(), $treeData = null)
     {
@@ -202,5 +201,4 @@ abstract class QueryAdapter
     {
         return $this->_treeFilter;
     }
-
 }

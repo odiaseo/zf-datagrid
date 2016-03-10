@@ -1,7 +1,7 @@
 <?php
 namespace SynergyDataGrid\Grid\GridType;
 
-/*
+/**
  * This file is part of the Synergy package.
  *
  * (c) Pele Odiase <info@rhemastudio.com>
@@ -437,7 +437,6 @@ final class DoctrineORMGrid
 
                 $columnData[$count - $adjustment] = $data;
                 $count++;
-
             }
 
             ksort($columnData);
@@ -459,7 +458,7 @@ final class DoctrineORMGrid
      * Completely render current grid object or just send AJAX response
      *
      * @param RequestInterface $request
-     * @param array            $options
+     * @param array $options
      *
      * @return array|\stdClass|string
      */
@@ -509,7 +508,6 @@ final class DoctrineORMGrid
                     $data = $this->_createGridData($request);
                 }
             };
-
         } catch (\Exception $e) {
             $data = array(
                 'error'   => true,
@@ -591,7 +589,7 @@ final class DoctrineORMGrid
      * Create grid data based on request and using pagination
      *
      * @param Request $request
-     * @param bool    $dataOnly
+     * @param bool $dataOnly
      *
      * @return array|\stdClass
      */
@@ -744,7 +742,6 @@ final class DoctrineORMGrid
                                 $message = "Unable to update join table: {$target} field" . $param . '"';
                             }
                         }
-
                     } else {
                         $type = $mapping->fieldMappings[$param]['type'];
                         if ($type == 'datetime' || $type == 'date') {
@@ -822,7 +819,6 @@ final class DoctrineORMGrid
         } else {
             return $this->return;
         }
-
     }
 
     /**
@@ -905,9 +901,9 @@ final class DoctrineORMGrid
      *
      * @param        $entityClassName
      * @param string $gridId
-     * @param null   $idSuffix When display multiple grids on the same entity, use to make the gridId unique
-     * @param bool   $displayTree
-     * @param array  $queryParams
+     * @param null $idSuffix When display multiple grids on the same entity, use to make the gridId unique
+     * @param bool $displayTree
+     * @param array $queryParams
      *
      * @return $this
      */
@@ -1215,7 +1211,7 @@ final class DoctrineORMGrid
 
     /**
      * @param       $request \Zend\Http\PhpEnvironment\Request
-     * @param null  $model
+     * @param null $model
      * @param array $subGridFilter
      *
      * @return Paginator|\Zend\Paginator\Paginator
@@ -1241,7 +1237,6 @@ final class DoctrineORMGrid
                     'level'  => $n_lvl,
                     'parent' => $node
                 );
-
             } elseif (!$this->_config['tree_load_all']) {
                 $treeFilter = array('level' => 1);
             }
@@ -1329,5 +1324,4 @@ final class DoctrineORMGrid
 
         return $values;
     }
-
 }

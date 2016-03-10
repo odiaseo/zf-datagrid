@@ -1,8 +1,6 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use SynergyDataGrid\Grid\GridType\BaseGrid;
-
 /**
  * Class DefaultAssociationCallbackHelper
  * This is the default association mapping callbach function
@@ -48,7 +46,6 @@ class DefaultAssociationCallbackHelper
                     ->orderBy('e.title')
                     ->getQuery()
                     ->execute();
-
             }
 
             foreach ($list as $item) {

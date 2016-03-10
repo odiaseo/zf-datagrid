@@ -452,7 +452,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     protected $_nodeData = array();
 
     /**
-     * @param array                   $config
+     * @param array $config
      * @param ServiceLocatorInterface $serviceLocator
      * @param                         $manager
      */
@@ -605,7 +605,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      * Create Column object based on given options and add it to the grid
      *
      * @param string $columnTitle title of a column
-     * @param array  $column      array of column options
+     * @param array $column array of column options
      *
      * @return \SynergyDataGrid\Grid\GridType\BaseGrid
      */
@@ -1847,7 +1847,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      * Completely render current grid object or just send AJAX response
      *
      * @param RequestInterface $request
-     * @param array            $options
+     * @param array $options
      *
      * @return mixed
      */
@@ -1874,7 +1874,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      * Create grid data based on request and using pagination
      *
      * @param Request $request
-     * @param bool    $dataOnly
+     * @param bool $dataOnly
      *
      * @return mixed
      */
@@ -1890,7 +1890,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      *
      * @param        $entityClassName
      * @param string $gridId
-     * @param bool   $displayTree
+     * @param bool $displayTree
      *
      * @return mixed
      */

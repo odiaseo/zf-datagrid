@@ -45,20 +45,17 @@ class JsCode extends Base
      */
     protected $_containerClass = 'grid-data';
 
-
     protected $_padding;
-
 
     /**
      * @param BaseGrid $grid
-     * @param int      $padding
+     * @param int $padding
      */
     public function __construct(BaseGrid $grid = null, $padding = 0)
     {
         $this->grid     = $grid;
         $this->_padding = $padding;
     }
-
 
     public function addAutoResizeScript($gridId)
     {
@@ -77,7 +74,6 @@ class JsCode extends Base
         );
     }
 
-
     /**
      * Add actions column to the grid with base controls (edit or editform, delete)
      *
@@ -92,52 +88,49 @@ class JsCode extends Base
         $this->grid->addColumn(
             'Actions',
             array(
-                 'name'          => 'myac',
-                 'width'         => $width,
-                 'fixed'         => true,
-                 'sortable'      => false,
-                 'resizable'     => false,
-                 'formatter'     => $numCustom ? new Expr($this->getActionFunctioName()) : 'actions',
-                 'search'        => false,
-                 'classes'       => 'action-column',
-                 'viewable'      => false,
-                 'editable'      => false,
-                 'editrules'     => array(
-                     'edithidden' => false
-                 ),
-                 'formatoptions' => array(
-                     'keys'           => false,
-                     'editbutton'     => $options['nav_grid']['edit'],
-                     'editformbutton' => $this->grid->getAllowEditForm(),
-                     'delbutton'      => $options['nav_grid']['del'],
-                     'delOptions'     => array(
-                         'afterSubmit' => new Expr("function(response, postdata) {
+                'name'          => 'myac',
+                'width'         => $width,
+                'fixed'         => true,
+                'sortable'      => false,
+                'resizable'     => false,
+                'formatter'     => $numCustom ? new Expr($this->getActionFunctioName()) : 'actions',
+                'search'        => false,
+                'classes'       => 'action-column',
+                'viewable'      => false,
+                'editable'      => false,
+                'editrules'     => array(
+                    'edithidden' => false
+                ),
+                'formatoptions' => array(
+                    'keys'           => false,
+                    'editbutton'     => $options['nav_grid']['edit'],
+                    'editformbutton' => $this->grid->getAllowEditForm(),
+                    'delbutton'      => $options['nav_grid']['del'],
+                    'delOptions'     => array(
+                        'afterSubmit' => new Expr("function(response, postdata) {
                                                     var json = eval('(' + response.responseText + ')');
                                                     return [json.success, json.message];
                                                }                                              ")
-                     ),
-                     'editOptions'    => $options['edit_parameters'],
-                     'onError'        => new Expr("function(rowid,response) {
+                    ),
+                    'editOptions'    => $options['edit_parameters'],
+                    'onError'        => new Expr("function(rowid,response) {
                                                                     var json = eval('(' + response.responseText + ')');
                                                                    alert('Error saving row: ' + json.message);
                                                                    jQuery('#" . $this->grid->getGridId() . "').restoreAfterError = false;
                                                                          return true;
                                                                    }
                                                                    ")
-                 ))
+                ))
         );
     }
-
 
     public function getActionFunctioName()
     {
         return $this->grid->getId() . '_actions';
     }
 
-
     protected function getCustomButtons($rowId)
     {
-
     }
 
     /**
@@ -148,7 +141,7 @@ class JsCode extends Base
      */
     public function renderActionsFormatter()
     {
-        $btns = $this->grid->getRowActionButtons() ? : new \stdClass();
+        $btns = $this->grid->getRowActionButtons() ?: new \stdClass();
         $btns = Encoder::encode($btns);
 
         $formatterCode
@@ -384,7 +377,6 @@ ACTION;
                 " . ($this->grid->getReloadAfterResize() ? "window.document.location.reload();" : "") . "
           }
             ");
-
     }
 
     /**
@@ -402,7 +394,6 @@ ACTION;
                 jQuery.cookie(sortingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
-
     }
 
     /**
@@ -420,7 +411,6 @@ ACTION;
                 jQuery.cookie(pagingCookieName, newValue, { expires: 30, path: '/' }); 
           }
             ");
-
     }
 
     /**
@@ -445,15 +435,14 @@ ACTION;
                 " . ($this->grid->getReloadAfterChangeColumnsOrdering() ? "window.document.location.reload();" : "") . "
             });
             ");
-
     }
 
     /**
      * Prepare javscript code for detail grid loading
      *
-     * @param string $detailGridId    id of details grid
+     * @param string $detailGridId id of details grid
      * @param string $detailFieldName name of field (in detail grid) to connect master and detail grids
-     * @param string $captionPrefix   prefix of caption for detail grid
+     * @param string $captionPrefix prefix of caption for detail grid
      *
      * @return string
      */
@@ -481,7 +470,6 @@ ACTION;
                                 } 
                             }                     
              ");
-
         }
 
         return $retv;
@@ -567,5 +555,4 @@ ACTION;
     {
         return $this->_padding;
     }
-
 }

@@ -100,7 +100,7 @@ class ORMQueryAdapter extends QueryAdapter
     /**
      * Sort the result set by a specified column.
      *
-     * @param string $field     Column name
+     * @param string $field Column name
      * @param string $direction Ascending (ASC) or Descending (DESC)
      *
      * @return void
@@ -148,10 +148,10 @@ class ORMQueryAdapter extends QueryAdapter
     /**
      * Filter the result set based on criteria.
      *
-     * @param mixed $field      column name or array of column names if search is multiple
-     * @param mixed $value      value to filter result set or array of values if search is multiple
+     * @param mixed $field column name or array of column names if search is multiple
+     * @param mixed $value value to filter result set or array of values if search is multiple
      * @param mixed $expression search expression or array of expressions if search is multiple
-     * @param array $options    array of search options
+     * @param array $options array of search options
      *
      * @return void
      */
@@ -173,7 +173,7 @@ class ORMQueryAdapter extends QueryAdapter
         } elseif (is_string($expression) && array_key_exists($expression, $this->_operator)) {
             $this->_qb->andWhere(
                 $this->getService()->getAlias() . '.' . $field . ' '
-                    . str_replace('?', ':' . $field, $this->_operator[$expression])
+                . str_replace('?', ':' . $field, $this->_operator[$expression])
             );
             $this->_qb->setParameter($field, $this->_setWildCardInValue($expression, $value));
         }
@@ -182,7 +182,7 @@ class ORMQueryAdapter extends QueryAdapter
     /**
      * Multiple filtering
      *
-     * @param array $rules   array of rules fore multiple filtering
+     * @param array $rules array of rules fore multiple filtering
      * @param array $options array of search options
      *
      * @return void
@@ -195,12 +195,12 @@ class ORMQueryAdapter extends QueryAdapter
             if ($boolean == 'OR') {
                 $this->_qb->orWhere(
                     $this->getService()->getAlias() . '.' . $rule['field']
-                        . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
+                    . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
                 );
             } else {
                 $this->_qb->andWhere(
                     $this->getService()->getAlias() . '.' . $rule['field']
-                        . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
+                    . ' ' . str_replace('?', ':' . $rule['field'], $this->_operator[$rule['expression']])
                 );
             }
             $this->_qb->setParameter($rule['field'], $this->_setWildCardInValue($rule['expression'], $rule['value']));
@@ -211,7 +211,7 @@ class ORMQueryAdapter extends QueryAdapter
      * Place wildcard filtering in value
      *
      * @param string $expression expression to filter
-     * @param string $value      value to add wildcard to
+     * @param string $value value to add wildcard to
      *
      * @return string
      */
@@ -236,5 +236,4 @@ class ORMQueryAdapter extends QueryAdapter
 
         return $value;
     }
-
 }

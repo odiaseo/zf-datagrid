@@ -73,8 +73,8 @@ class UrlGeneratorHelper
                 $url = $helper(
                     'synergydatagrid\subgrid',
                     array(
-                         'entity'    => $entityKey,
-                         'fieldName' => $fieldName
+                        'entity'    => $entityKey,
+                        'fieldName' => $fieldName
                     )
                 );
 

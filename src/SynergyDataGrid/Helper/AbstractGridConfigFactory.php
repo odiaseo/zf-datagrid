@@ -1,7 +1,6 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use SynergyDataGrid\Helper\BaseConfigHelper;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -21,7 +20,7 @@ class AbstractGridConfigFactory
      */
     public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $config = $serviceLocator->get('config');
+        $config       = $serviceLocator->get('config');
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);
 
         if (substr($requestedName, 0, strlen($this->_configPrefix)) == $this->_configPrefix

@@ -1,16 +1,13 @@
 <?php
 namespace SynergyDataGrid\Service;
 
-/*
+/**
  * This file is part of the Synergy package.
  *
  * (c) Pele Odiase <info@rhemastudio.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @author Pele Odiase
- * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
 class GridService extends BaseGridService
@@ -48,7 +45,6 @@ class GridService extends BaseGridService
                 'records' => $total,
                 'rows'    => $grid->formatGridData($rows, $columns)
             );
-
         } catch (\Exception $exception) {
 
             $this->getLogger()->logException($exception);
@@ -93,7 +89,6 @@ class GridService extends BaseGridService
         }
 
         return $return;
-
     }
 
     /**
@@ -199,5 +194,4 @@ class GridService extends BaseGridService
 
         return $grid->getObjectManager();
     }
-
 }
