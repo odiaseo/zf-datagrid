@@ -33,7 +33,11 @@ class ArrayUtils
      */
     public function arrayMergeRecursiveCustom($array1, $array2)
     {
-        foreach ($array2 AS $key => $value) {
+        if (!is_array(current($array2)) and is_int(key($array2)) and count($array2) > 2) {
+            return array_values(array_unique(array_merge($array1, $array2)));
+        }
+
+        foreach ($array2 as $key => $value) {
             if (array_key_exists($key, $array1) && !empty($array1[$key])) {
                 if (!is_array($array2[$key])) {
                     $array1[$key] = $array2[$key];
@@ -44,7 +48,8 @@ class ArrayUtils
                 $array1[$key] = $value;
             }
         }
-        unset($key, $value);
+        unset($key);
+        unset($value);
 
         return $array1;
     }
