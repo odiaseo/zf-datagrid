@@ -175,6 +175,7 @@ return array(
             'multiselect'        => true,
             'multiboxonly'       => false,
             'rownumbers'         => false,
+            'regional'           => 'en',
             //add buttons to display on each row (action column)
             'rowActionButtons'   => array()
 
