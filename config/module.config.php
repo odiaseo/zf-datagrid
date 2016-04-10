@@ -159,6 +159,7 @@ return array(
          * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options
          */
         'grid_options'                      => array(
+            'regional'           => 'en',
             'datatype'           => 'json',
             'mtype'              => 'POST',
             'viewrecords'        => true,
@@ -175,7 +176,6 @@ return array(
             'multiselect'        => true,
             'multiboxonly'       => false,
             'rownumbers'         => false,
-            'regional'           => 'en',
             //add buttons to display on each row (action column)
             'rowActionButtons'   => array()
 
