@@ -48,7 +48,7 @@ class BaseGridService extends BaseService
     {
 
         $filters   = array();
-        $operation = isset($data['searchOper']) ? $data['searchOper'] : 'eq';
+        $operation = empty($data['searchOper']) ?  'eq' : $data['searchOper'];
 
         if (isset($data['customFilters'])) {
             $filters = $this->processSearchFilters($data['customFilters'], $filters);
@@ -57,7 +57,7 @@ class BaseGridService extends BaseService
             $filters = $this->processSearchFilters($data['filters'], $filters);
         }
 
-        if (isset($data['searchField'])) {
+        if (!empty($data['searchField']) and !empty($data['searchString'])) {
             // Single field filtering
             $rules = array(
                 array(
