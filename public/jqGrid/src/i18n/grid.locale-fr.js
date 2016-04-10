@@ -1,4 +1,3 @@
-;(function($){
 /**
  * jqGrid French Translation
  * Tony Tomov tony@trirand.com
@@ -7,20 +6,55 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
 **/
+/*global jQuery, define */
+(function( factory ) {
+	"use strict";
+	if ( typeof define === "function" && define.amd ) {
+		// AMD. Register as an anonymous module.
+		define([
+			"jquery",
+			"../grid.base"
+		], factory );
+	} else {
+		// Browser globals
+		factory( jQuery );
+	}
+}(function( $ ) {
+
 $.jgrid = $.jgrid || {};
-$.extend($.jgrid,{
+if(!$.jgrid.hasOwnProperty("regional")) {
+	$.jgrid.regional = [];
+}
+$.jgrid.regional["fr"] = {
 	defaults : {
 		recordtext: "Enregistrements {0} - {1} sur {2}",
 		emptyrecords: "Aucun enregistrement à afficher",
 		loadtext: "Chargement...",
-		pgtext : "Page {0} sur {1}"
+		savetext: "Saving...",
+		pgtext : "Page {0} sur {1}",
+		pgfirst : "First Page",
+		pglast : "Last Page",
+		pgnext : "Next Page",
+		pgprev : "Previous Page",
+		pgrecs : "Records per Page",
+		showhide: "Toggle Expand Collapse Grid",
+		// mobile
+		pagerCaption : "Grid::Page Settings",
+		pageText : "Page:",
+		recordPage : "Records per Page",
+		nomorerecs : "No more records...",
+		scrollPullup: "Pull up to load more...",
+		scrollPulldown : "Pull down to refresh...",
+		scrollRefresh : "Release to refresh..."
 	},
 	search : {
 		caption: "Recherche...",
 		Find: "Chercher",
 		Reset: "Réinitialiser",
-		odata: [{ oper:'eq', text:"égal"},{ oper:'ne', text:"différent"},{ oper:'lt', text:"inférieur"},{ oper:'le', text:"inférieur ou égal"},{ oper:'gt', text:"supérieur"},{ oper:'ge', text:"supérieur ou égal"},{ oper:'bw', text:"commence par"},{ oper:'bn', text:"ne commence pas par"},{ oper:'in', text:"est dans"},{ oper:'ni', text:"n'est pas dans"},{ oper:'ew', text:"finit par"},{ oper:'en', text:"ne finit pas par"},{ oper:'cn', text:"contient"},{ oper:'nc', text:"ne contient pas"}],
-		groupOps: [	{ op: "AND", text: "tous" },	{ op: "OR",  text: "au moins un" }	]
+		odata: [{ oper:'eq', text:"égal"},{ oper:'ne', text:"différent"},{ oper:'lt', text:"inférieur"},{ oper:'le', text:"inférieur ou égal"},{ oper:'gt', text:"supérieur"},{ oper:'ge', text:"supérieur ou égal"},{ oper:'bw', text:"commence par"},{ oper:'bn', text:"ne commence pas par"},{ oper:'in', text:"est dans"},{ oper:'ni', text:"n'est pas dans"},{ oper:'ew', text:"finit par"},{ oper:'en', text:"ne finit pas par"},{ oper:'cn', text:"contient"},{ oper:'nc', text:"ne contient pas"},{ oper:'nu', text:'is null'},{ oper:'nn', text:'is not null'}, {oper:'bt', text:'entre'}],
+		groupOps: [	{ op: "AND", text: "tous" },	{ op: "OR",  text: "au moins un" }	],
+		operandTitle : "Click to select search operation.",
+		resetTitle : "Reset Search Value"
 	},
 	edit : {
 		addCaption: "Ajouter",
@@ -70,7 +104,12 @@ $.extend($.jgrid,{
 		alertcap: "Avertissement",
 		alerttext: "Veuillez sélectionner une ligne",
 		viewtext: "",
-		viewtitle: "Afficher la ligne sélectionnée"
+		viewtitle: "Afficher la ligne sélectionnée",
+		savetext: "",
+		savetitle: "Save row",
+		canceltext: "",
+		canceltitle : "Cancel row editing",
+		selectcaption : "Actions..."
 	},
 	col : {
 		caption: "Afficher/Masquer les colonnes",
@@ -100,7 +139,7 @@ $.extend($.jgrid,{
 			S: function (j) {return j == 1 ? 'er' : 'e';},
 			srcformat: 'Y-m-d',
 			newformat: 'd/m/Y',
-			parseRe : /[Tt\\\/:_;.,\t\s-]/,
+			parseRe : /[#%\\\/:_;.,\t\s-]/,
 			masks : {
 				ISO8601Long:"Y-m-d H:i:s",
 				ISO8601Short:"Y-m-d",
@@ -114,13 +153,26 @@ $.extend($.jgrid,{
 				UniversalSortableDateTime: "Y-m-d H:i:sO",
 				YearMonth: "F, Y"
 			},
-			reformatAfterEdit : false
+			reformatAfterEdit : false,
+			userLocalTime : false
 		},
 		baseLinkUrl: '',
 		showAction: '',
 		target: '',
 		checkbox : {disabled:true},
 		idName : 'id'
+	},
+	colmenu : {
+		sortasc : "Sort Ascending",
+		sortdesc : "Sort Descending",
+		columns : "Columns",
+		filter : "Filter",
+		grouping : "Group By",
+		ungrouping : "Ungroup",
+		searchTitle : "Get items with value that:",
+		freeze : "Freeze",
+		unfreeze : "Unfreeze",
+		reorder : "Move to reorder"
 	}
-});
-})(jQuery);
+};
+}));

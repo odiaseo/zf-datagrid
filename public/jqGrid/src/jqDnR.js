@@ -7,8 +7,22 @@
  * 
  * $Version: 2007.08.19 +r2
  */
-
-(function($){
+/*jshint eqeqeq:false */
+/*global jQuery, define */
+(function( factory ) {
+	"use strict";
+	if ( typeof define === "function" && define.amd ) {
+		// AMD. Register as an anonymous module.
+		define([
+			"jquery"
+		], factory );
+	} else {
+		// Browser globals
+		factory( jQuery );
+	}
+} (function( $ ) {
+"use strict";
+//module begin
 $.fn.jqDrag=function(h){return i(this,h,'d');};
 $.fn.jqResize=function(h,ar){return i(this,h,'r',ar);};
 $.jqDnR={
@@ -68,4 +82,27 @@ i=function(e,h,k,aR){
 },
 f=function(k){return parseInt(E.css(k),10)||false;},
 f1=function(k){return parseInt(E1.css(k),10)||false;};
-})(jQuery);
+/*
+	jQuery tinyDraggable v1.0.2
+    Copyright (c) 2014 Simon Steinberger / Pixabay
+    GitHub: https://github.com/Pixabay/jQuery-tinyDraggable
+    More info: https://pixabay.com/blog/posts/p-52/
+	License: http://www.opensource.org/licenses/mit-license.php
+*/
+$.fn.tinyDraggable = function(options){
+	var settings = $.extend({ handle: 0, exclude: 0 }, options);
+	return this.each(function(){
+	    var dx, dy, el = $(this), handle = settings.handle ? $(settings.handle, el) : el;
+        handle.on({
+        mousedown: function(e){
+			if (settings.exclude && ~$.inArray(e.target, $(settings.exclude, el))) { return; }
+			e.preventDefault();
+			var os = el.offset(); dx = e.pageX-os.left, dy = e.pageY-os.top;
+			$(document).on('mousemove.drag', function(e){ el.offset({top: e.pageY-dy, left: e.pageX-dx}); });
+			},
+			mouseup: function(e){ $(document).off('mousemove.drag'); }
+		});
+	});
+};
+//module end
+}));
