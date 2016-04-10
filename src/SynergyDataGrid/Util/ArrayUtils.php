@@ -25,15 +25,15 @@ class ArrayUtils
 
     /**
      * Merge two arrays recursive. First array values overwritted by second array values in case of the same keys.
-     *
-     * @param array $array1 first array to merge
-     * @param array $array2 second array to merge
-     *
+     * @param $array1
+     * @param $array2
+     * @param bool $checkNumericArray
      * @return array
      */
-    public function arrayMergeRecursiveCustom($array1, $array2)
+    public function arrayMergeRecursiveCustom($array1, $array2, $checkNumericArray = false)
     {
-        if (!is_array(current($array2)) and is_int(key($array2)) and count($array2) > 2) {
+
+        if ($checkNumericArray and !is_array(current($array2)) and is_int(key($array2)) and count($array2) > 2) {
             return array_values(array_unique(array_merge($array1, $array2)));
         }
 
@@ -42,7 +42,7 @@ class ArrayUtils
                 if (!is_array($array2[$key])) {
                     $array1[$key] = $array2[$key];
                 } else {
-                    $array1[$key] = $this->arrayMergeRecursiveCustom($array1[$key], $array2[$key]);
+                    $array1[$key] = $this->arrayMergeRecursiveCustom($array1[$key], $array2[$key], $checkNumericArray);
                 }
             } else {
                 $array1[$key] = $value;

@@ -381,22 +381,20 @@ final class DoctrineORMGrid
                     $type = self::TYPE_SELECT;
                 }
 
-                $values = $this->_getRelatedList($map, $fieldName);
+                if (isset($this->_config['column_model'][$fieldName]['edittype'])
+                    && $this->_config['column_model'][$fieldName]['edittype'] == 'custom'
+                ) {
+                    $searchOptions = [
+                        'search' => false
+                    ];
+                } else {
+                    $values = $this->_getRelatedList($map, $fieldName);
 
-                if (is_array($values)) {
-                    $values = implode(';', $values);
-                }
+                    if (is_array($values)) {
+                        $values = implode(';', $values);
+                    }
 
-                $data = array_merge_recursive(
-                    array(
-                        'name'          => $fieldName,
-                        'edittype'      => $type,
-                        'stype'         => $type,
-                        'editable'      => true,
-                        'hidden'        => false,
-                        'editrules'     => array(
-                            'edithidden' => true,
-                        ),
+                    $searchOptions = [
                         'searchoptions' => array(
                             'value' => $values,
                             'sopt'  => array('eq', 'ne')
@@ -404,7 +402,21 @@ final class DoctrineORMGrid
                         'editoptions'   => array(
                             'value' => $values,
                         )
+                    ];
+                }
+
+                $data = array_merge_recursive(
+                    array(
+                        'name'      => $fieldName,
+                        'edittype'  => $type,
+                        'stype'     => $type,
+                        'editable'  => true,
+                        'hidden'    => false,
+                        'editrules' => array(
+                            'edithidden' => true,
+                        ),
                     ),
+                    $searchOptions,
                     $data
                 );
 

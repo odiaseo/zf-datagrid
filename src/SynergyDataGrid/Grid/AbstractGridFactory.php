@@ -66,7 +66,7 @@ class AbstractGridFactory implements AbstractFactoryInterface
             foreach ((array)$gridConfig['factories'] as $alias) {
                 if ($serviceLocator->has($alias)) {
                     $addConfig  = $serviceLocator->get($alias);
-                    $gridConfig = $util->arrayMergeRecursiveCustom($gridConfig, $addConfig);
+                    $gridConfig = $util->arrayMergeRecursiveCustom($gridConfig, $addConfig, true);
                 }
             }
         }
