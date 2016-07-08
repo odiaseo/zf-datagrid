@@ -651,7 +651,12 @@ class BaseModel
                         } else {
                             $entity->$method(new ArrayCollection());
                         }
-                        $value = explode(',', $value);
+
+                        if (is_string($value)) {
+                            $value = explode(',', $value);
+                        } else {
+                            $value = (array)$value;
+                        }
                         $value = array_unique(array_filter($value));
 
                         foreach ($value as $v) {
