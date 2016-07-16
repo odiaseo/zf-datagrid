@@ -237,6 +237,8 @@ class DisplayGrid extends AbstractHelper
             Json::encode($grid->getOptions(), false, array('enableJsonExprFinder' => true))
         );
 
+        $onLoad[] = sprintf("obj_%s.jqGrid('bindKeys');", $gridId);
+
         $datePicker = $grid->getDatePicker()->prepareDatepicker();
         $js         = array_merge($js, $datePicker);
 
