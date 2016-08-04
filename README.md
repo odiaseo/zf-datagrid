@@ -28,10 +28,7 @@ For use all available jqGrid plugin and library features please see jqGrid docum
 
 ##With Composer
    1. Go to your project's directory.
-   2. Edit your `composer.json` file and add
-> `"synergy/synergydatagrid": "dev-master"` into the
-> `require` section.
-   3. Run `php composer.phar install` (or `php composer.phar update`).
+   2. Run the command `composer require "synergy/synergydatagrid"` 
    4. Follow the Post installation steps bellow
 
 #Post Installation steps
