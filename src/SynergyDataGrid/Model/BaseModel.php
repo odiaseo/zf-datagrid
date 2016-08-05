@@ -666,7 +666,11 @@ class BaseModel
                                 $message = "Unable to update join table: {$target} " . $param . '"';
                             }
                         }
-                    } elseif ($mapping->associationMappings[$param]['type'] == ClassMetadataInfo::MANY_TO_ONE) {
+                    } elseif (in_array(
+                        $mapping->associationMappings[$param]['type'],
+                        [ClassMetadataInfo::MANY_TO_ONE, ClassMetadataInfo::ONE_TO_ONE]
+                    )
+                    ) {
                         if ($value and $foreignEntity = $this->getEntityManager()->find($target, $value)) {
                             $entity->$method($foreignEntity);
                         } elseif (!empty($mapping->associationMappings[$param]['joinColumns'][0]['nullable'])) {
