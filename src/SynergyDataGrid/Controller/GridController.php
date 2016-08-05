@@ -53,11 +53,22 @@ class GridController extends BaseGridController
             $this->params()->fromRoute()
         );
 
-        if ($this->params()->fromPost('oper') == 'del') {
-            $payLoad = $service->deleteRecord($params);
-        } else {
-            $payLoad = $service->createRecord($params);
-        }
+        $payLoad = $service->createRecord($params);
+
+        return $this->_sendPayload($payLoad);
+    }
+
+    public function deleteList($data)
+    {
+        /** @var $service \SynergyDataGrid\Service\GridService */
+        $service = $this->getServiceLocator()->get('synergy\service\grid');
+        $params  = array_merge(
+            $data,
+            $this->params()->fromQuery(),
+            $this->params()->fromRoute()
+        );
+
+        $payLoad = $service->deleteRecord($params);
 
         return $this->_sendPayload($payLoad);
     }

@@ -106,12 +106,7 @@ class JsCode extends Base
                     'editbutton'     => $options['nav_grid']['edit'],
                     'editformbutton' => $this->grid->getAllowEditForm(),
                     'delbutton'      => $options['nav_grid']['del'],
-                    'delOptions'     => array(
-                        'afterSubmit' => new Expr("function(response, postdata) {
-                                                    var json = eval('(' + response.responseText + ')');
-                                                    return [json.success, json.message];
-                                               }                                              ")
-                    ),
+                    'delOptions'     => $options['delete_parameters'],
                     'editOptions'    => $options['edit_parameters'],
                     'onError'        => new Expr("function(rowid,response) {
                                                                     var json = eval('(' + response.responseText + ')');
