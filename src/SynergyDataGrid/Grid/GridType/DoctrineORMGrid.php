@@ -300,7 +300,10 @@ final class DoctrineORMGrid
                 if ($this->_isSubGridAsGrid($fieldName) and !$this->_isSubGrid($fieldName)) {
                     $this->_subGridsAsGrid[] = $this->createSubGridAsGrid($map);
                     $this->setSubGrid(true);
-                    continue;
+
+                    if(!$this->_isEditable($fieldName)){
+                        continue;
+                    }
                 } else {
                     if (!$this->_hasSubGrid and $this->_isSubGrid($fieldName)) {
                         $index = count($this->_subGrid);
