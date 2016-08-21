@@ -36,7 +36,8 @@
         "doctrine/doctrine-module": ">=0.7",
         "doctrine/orm": "2.*",
         "synergy/common": "<3.0",
-        "monolog/monolog": "^1.18"
+        "monolog/monolog": "^1.18",
+        "satooshi/php-coveralls": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"

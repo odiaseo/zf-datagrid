@@ -12,3 +12,4 @@ composer.lock
 composer.phar
 autoload
 local.php
+build
