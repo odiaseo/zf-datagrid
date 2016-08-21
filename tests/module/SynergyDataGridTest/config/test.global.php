@@ -4,7 +4,7 @@ return array(
         'driver'     => array(
             'test\entity\default' => array(
                 'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-                'paths' => array(__DIR__ . '/module/SynergyDataGridTest/Entity'),
+                'paths' => array(__DIR__ . '/../Entity'),
             ),
 
             'orm_default'         => array(

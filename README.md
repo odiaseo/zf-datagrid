@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/odiaseo/zf2-datagrid.svg?branch=master)](https://travis-ci.org/odiaseo/zf2-datagrid)
+
 #SynergyDataGrid (ZF2 module)
 ##Introduction
 SynergyDataGrid is a [Zend Framework 2](http://framework.zend.com/zf2) module facilitating usage of [JqGrid](http://www.trirand.com/blog/) in ZF2 applications.
