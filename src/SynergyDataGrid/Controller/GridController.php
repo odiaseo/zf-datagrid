@@ -14,7 +14,7 @@
 
 namespace SynergyDataGrid\Controller;
 
-use Zend\Http\Response;
+use SynergyDataGrid\Service\GridService;
 
 /**
  * Class GridController
@@ -22,16 +22,15 @@ use Zend\Http\Response;
  */
 class GridController extends BaseGridController
 {
+
     public function getList()
     {
-        /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('synergy\service\grid');
-        $params  = array_merge(
+        $params = array_merge(
             $this->params()->fromQuery(),
             $this->params()->fromRoute()
         );
 
-        $payLoad = $service->getGridList($params);
+        $payLoad = $this->_getService()->getGridList($params);
 
         return $this->_sendPayload($payLoad);
     }
@@ -45,30 +44,26 @@ class GridController extends BaseGridController
      */
     public function create($data)
     {
-        /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('synergy\service\grid');
-        $params  = array_merge(
-            $data,
-            $this->params()->fromQuery(),
-            $this->params()->fromRoute()
+        $params = array_merge(
+            (array)$data,
+            (array)$this->params()->fromQuery(),
+            (array)$this->params()->fromRoute()
         );
 
-        $payLoad = $service->createRecord($params);
+        $payLoad = $this->_getService()->createRecord($params);
 
         return $this->_sendPayload($payLoad);
     }
 
     public function deleteList($data)
     {
-        /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('synergy\service\grid');
-        $params  = array_merge(
-            $data,
-            $this->params()->fromQuery(),
-            $this->params()->fromRoute()
+        $params = array_merge(
+            (array)$data,
+            (array)$this->params()->fromQuery(),
+            (array)$this->params()->fromRoute()
         );
 
-        $payLoad = $service->deleteRecord($params);
+        $payLoad = $this->_getService()->deleteRecord($params);
 
         return $this->_sendPayload($payLoad);
     }
@@ -82,16 +77,23 @@ class GridController extends BaseGridController
      */
     public function replaceList($data)
     {
-        /** @var $service \SynergyDataGrid\Service\GridService */
-        $service = $this->getServiceLocator()->get('synergy\service\grid');
-        $params  = array_merge(
-            $data,
-            $this->params()->fromQuery(),
-            $this->params()->fromRoute()
+        $params = array_merge(
+            (array)$data,
+            (array)$this->params()->fromQuery(),
+            (array)$this->params()->fromRoute()
         );
 
-        $payLoad = $service->updateRecord($params);
+        $payLoad = $this->_getService()->updateRecord($params);
 
         return $this->_sendPayload($payLoad);
+    }
+
+    /**
+     * @param null $serviceKey
+     * @return GridService
+     */
+    protected function _getService($serviceKey = null)
+    {
+        return $this->getServiceLocator()->get('synergy\service\grid');
     }
 }

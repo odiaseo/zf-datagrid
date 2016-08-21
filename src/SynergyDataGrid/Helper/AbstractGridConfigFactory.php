@@ -1,24 +1,23 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
-class AbstractGridConfigFactory
-    implements AbstractFactoryInterface
+/**
+ * Class AbstractGridConfigFactory
+ * @package SynergyDataGrid\Helper
+ */
+class AbstractGridConfigFactory implements AbstractFactoryInterface
 {
     protected $_configPrefix = 'synergy\helper\\';
 
     /**
-     * Determine if we can create a service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
-     *
+     * @param ContainerInterface $serviceLocator
+     * @param string $requestedName
      * @return bool
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreate(ContainerInterface $serviceLocator, $requestedName)
     {
         $config       = $serviceLocator->get('config');
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);
@@ -33,15 +32,12 @@ class AbstractGridConfigFactory
     }
 
     /**
-     * Create service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
-     *
+     * @param ContainerInterface $serviceLocator
+     * @param string $requestedName
+     * @param array|null $options
      * @return mixed
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
         /** @var $serviceLocator \Zend\ServiceManager\ServiceManager */
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);

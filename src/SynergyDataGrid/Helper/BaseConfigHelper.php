@@ -2,12 +2,13 @@
 namespace SynergyDataGrid\Helper;
 
 use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 
+/**
+ * Class BaseConfigHelper
+ * @package SynergyDataGrid\Helper
+ */
 abstract class BaseConfigHelper
-    implements ServiceManagerAwareInterface
 {
-
     /**
      * @var \Zend\ServiceManager\ServiceManager
      */

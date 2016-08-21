@@ -3,7 +3,7 @@
 
     <testsuites>
         <testsuite name="Synergy Data Grid Test Suite">
-            <directory suffix="Test.php">tests/module/SynergyDataGridTest/Test</directory>
+            <directory suffix="Test.php">tests/module/SynergyDataGridTest</directory>
         </testsuite>
     </testsuites>
     <php>

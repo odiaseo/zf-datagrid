@@ -1,10 +1,13 @@
 <?php
-namespace SynergyDataGridTest\Test;
+namespace SynergyDataGridTest\Grid;
 
 use Doctrine\ORM\QueryBuilder;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Grid\GridType\DoctrineORMGrid;
+use SynergyDataGrid\View\Helper\DisplayGrid;
 use SynergyDataGridTest\BaseTestClass;
+use SynergyDataGridTest\Entity\TestBrand;
+use SynergyDataGridTest\Entity\TestStore;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Stdlib\Parameters;
 use Zend\View\Renderer\PhpRenderer;
@@ -12,8 +15,7 @@ use Zend\View\Renderer\PhpRenderer;
 /**
  * @backupGlobals disabled
  */
-class GridTest
-    extends BaseTestClass
+class GridTest extends BaseTestClass
 {
     /** @var \SynergyDataGrid\Grid\GridType\DoctrineORMGrid; */
     protected $_grid;
@@ -27,15 +29,12 @@ class GridTest
 
     public function testGridFactory()
     {
-        $this->assertInstanceOf(
-            '\SynergyDataGrid\Grid\GridType\DoctrineORMGrid', $this->_grid,
-            'Invalid grid instance created'
-        );
+        $this->assertInstanceOf(DoctrineORMGrid::class, $this->_grid, 'Invalid grid instance created');
     }
 
     public function testGridIdentity()
     {
-        $entityClassName = '\SynergyDataGridTest\Entity\TestBrand';
+        $entityClassName = TestBrand::class;
         $this->_grid->setGridIdentity($entityClassName);
 
         $service = $this->_grid->getModel();
@@ -53,31 +52,46 @@ class GridTest
 
     public function testGridDisplay()
     {
-        $entityClassName = '\SynergyDataGridTest\Entity\TestBrand';
+        $entityClassName = TestBrand::class;
         $this->_grid->setGridIdentity($entityClassName, 'testbrand');
 
         $config                        = $this->_grid->getConfig();
         $config['first_data_as_local'] = false;
         $this->_grid->setConfig($config);
         /** @var $viewHelper \SynergyDataGrid\View\Helper\DisplayGrid */
-        $viewHelper = $this->_serviceManager->get('viewhelpermanager')->get('displayGrid');
+        $viewHelper = $this->_serviceManager->get('ViewHelperManager')->get('displayGrid');
         $this->assertInstanceOf('\SynergyDataGrid\View\Helper\DisplayGrid', $viewHelper);
 
         $return = $viewHelper->initGrid($this->_grid);
         $this->assertTrue(count($return) > 0);
     }
 
+    public function testGridDisplayWithLocalData()
+    {
+        $entityClassName = TestBrand::class;
+        $this->_grid->setGridIdentity($entityClassName, 'testbrand');
+
+        $config                        = $this->_grid->getConfig();
+        $config['first_data_as_local'] = true;
+        $this->_grid->setConfig($config);
+        /** @var $viewHelper \SynergyDataGrid\View\Helper\DisplayGrid */
+        $viewHelper = $this->_serviceManager->get('ViewHelperManager')->get('displayGrid');
+        $this->assertInstanceOf('\SynergyDataGrid\View\Helper\DisplayGrid', $viewHelper);
+        $return = $viewHelper->__invoke($this->_grid, true);
+        $this->assertTrue(count($return) > 0);
+    }
+
     public function testSubGrid()
     {
-        $entityClassName = '\SynergyDataGridTest\Entity\TestStore';
+        $entityClassName = TestStore::class;
         $this->_grid->setGridIdentity($entityClassName);
 
         $config                        = $this->_grid->getConfig();
         $config['first_data_as_local'] = false;
         $this->_grid->setConfig($config);
-        /** @var $viewHelper \SynergyDataGrid\View\Helper\DisplayGrid */
-        $viewHelper = $this->_serviceManager->get('viewhelpermanager')->get('displayGrid');
-        $this->assertInstanceOf('\SynergyDataGrid\View\Helper\DisplayGrid', $viewHelper);
+        /** @var $viewHelper DisplayGrid */
+        $viewHelper = $this->_serviceManager->get('ViewHelperManager')->get('displayGrid');
+        $this->assertInstanceOf(DisplayGrid::class, $viewHelper);
 
         $return = $viewHelper->initGrid($this->_grid);
         $this->assertTrue(count($return) > 0);
@@ -89,13 +103,12 @@ class GridTest
         $this->_grid->setGridColumns();
 
         $subGrid = $this->_grid->createSubGridAsGrid($mapping->associationMappings['testBrands']);
-        $this->assertInstanceOf('\SynergyDataGrid\Grid\GridType\BaseGrid', $subGrid);
-
+        $this->assertInstanceOf(BaseGrid::class, $subGrid);
     }
 
     public function testGridData()
     {
-        $entityClassName = '\SynergyDataGridTest\Entity\TestBrand';
+        $entityClassName = TestBrand::class;
         $this->_grid->setGridIdentity($entityClassName);
 
         $this->_grid->setCustomQueryBuilder(
@@ -118,11 +131,10 @@ class GridTest
         $parameters = new Parameters($params);
         $request->setPost($parameters);
 
-
         $this->_grid->prepareGridData($request);
 
         /** @var $viewHelper \SynergyDataGrid\View\Helper\DisplayGrid */
-        $viewHelper = $this->_serviceManager->get('viewhelpermanager')->get('displayGrid');
+        $viewHelper = $this->_serviceManager->get('ViewHelperManager')->get('displayGrid');
 
         $viewHelper->setView(new PhpRenderer());
         $data = $viewHelper($this->_grid, false);

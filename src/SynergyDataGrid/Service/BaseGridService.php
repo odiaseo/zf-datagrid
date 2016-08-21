@@ -48,7 +48,7 @@ class BaseGridService extends BaseService
     {
 
         $filters   = array();
-        $operation = empty($data['searchOper']) ?  'eq' : $data['searchOper'];
+        $operation = empty($data['searchOper']) ? 'eq' : $data['searchOper'];
 
         if (isset($data['customFilters'])) {
             $filters = $this->processSearchFilters($data['customFilters'], $filters);
@@ -79,7 +79,7 @@ class BaseGridService extends BaseService
      *
      * @return array
      */
-    private function  processSearchFilters($params, $combined = array())
+    private function processSearchFilters($params, $combined = array())
     {
         $filter = Json::decode($params, Json::TYPE_ARRAY);
 

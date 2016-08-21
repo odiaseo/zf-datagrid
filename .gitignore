@@ -12,3 +12,5 @@ composer.phar
 autoload
 local.php
 build
+*.local.xml
+coverage-report

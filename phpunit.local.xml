@@ -16,7 +16,7 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml" charset="UTF-8"
+        <log type="coverage-html" target="tests/coverage-report" charset="UTF-8"
              yui="true" highlight="true" lowUpperBound="50"
              highLowerBound="80"/>
     </logging>

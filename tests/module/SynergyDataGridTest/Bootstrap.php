@@ -1,8 +1,8 @@
 <?php
 namespace SynergyDataGridTest;
 
+use Doctrine\ORM\Tools\SchemaTool;
 use Zend\Mvc\Application;
-use Zend\ServiceManager\ServiceManager;
 
 error_reporting(E_ALL | E_STRICT);
 date_default_timezone_set('UTC');
@@ -66,6 +66,8 @@ class Bootstrap
 
         $serviceManager         = $app->getServiceManager();
         static::$serviceManager = $serviceManager;
+
+        self::setUpDatabase();
     }
 
     public static function getServiceManager()
@@ -85,6 +87,19 @@ class Bootstrap
         $srcDir = realpath($dir . '/../../../');
 
         return $srcDir . '/' . $path;
+    }
+
+    /**
+     * @method getServiceManager()
+     */
+    public static function setUpDatabase()
+    {
+        unlink(sys_get_temp_dir() . '/sqlite.db');
+        $entityManager = self::getServiceManager()->get('doctrine.entitymanager.orm_default');
+        $tool          = new SchemaTool($entityManager);
+        $classes       = $entityManager->getMetadataFactory()->getAllMetadata();
+        $tool->getDropDatabaseSQL();
+        $tool->createSchema($classes);
     }
 }
 

@@ -14,10 +14,11 @@ namespace SynergyDataGrid\Grid;
  *
  */
 
+use Interop\Container\ContainerInterface;
 use SynergyDataGrid\Grid\GridType\DoctrineODMGrid;
+use SynergyDataGrid\Grid\GridType\DoctrineORMGrid;
 use SynergyDataGrid\Util\ArrayUtils;
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Class AbstractGridFactory
@@ -29,15 +30,11 @@ class AbstractGridFactory implements AbstractFactoryInterface
     protected $_configPrefix = 'jqgrid';
 
     /**
-     * Determine if we can create a service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
-     *
+     * @param ContainerInterface $container
+     * @param string $requestedName
      * @return bool
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreate(ContainerInterface $container, $requestedName)
     {
         if (substr($requestedName, 0, strlen($this->_configPrefix)) != $this->_configPrefix) {
             return false;
@@ -47,15 +44,12 @@ class AbstractGridFactory implements AbstractFactoryInterface
     }
 
     /**
-     * Create service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param                         $name
-     * @param                         $requestedName
-     *
-     * @return mixed
+     * @param ContainerInterface $serviceLocator
+     * @param string $requestedName
+     * @param array|null $options
+     * @return DoctrineODMGrid
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
         $gridType   = trim(str_replace($this->_configPrefix, '', $requestedName), '\\');
         $config     = $serviceLocator->get('Config');
@@ -74,11 +68,11 @@ class AbstractGridFactory implements AbstractFactoryInterface
         switch ($gridType) {
             case 'odm':
                 $manager = $serviceLocator->get('doctrine.entitymanager.odm_default');
-                $class   = 'SynergyDataGrid\Grid\GridType\DoctrineODMGrid';
+                $class   = DoctrineODMGrid::class;
                 break;
             default:
                 $manager = $serviceLocator->get('doctrine.entitymanager.orm_default');
-                $class   = 'SynergyDataGrid\Grid\GridType\DoctrineORMGrid';
+                $class   = DoctrineORMGrid::class;
         }
 
         /** @var DoctrineODMGrid $grid */

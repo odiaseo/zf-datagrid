@@ -44,15 +44,14 @@ use Zend\Json\Expr;
  *
  * @package                     SynergyDataGrid\Helper
  */
-class UrlGeneratorHelper
-    extends BaseConfigHelper
+class UrlGeneratorHelper extends BaseConfigHelper
 {
     public function execute(array $parameters)
     {
         list($entity, $fieldName, , $urlType) = $parameters;
 
         /** @var $helper \Zend\View\Helper\Url */
-        $helper = $this->_serviceManager->get('viewhelpermanager')->get('url');
+        $helper = $this->_serviceManager->get('ViewHelperManager')->get('url');
         $config = $this->_serviceManager->get('config');
         if (!empty($config['jqgrid']['api_domain'])) {
             $prefix = rtrim($config['jqgrid']['api_domain'], '/');
@@ -69,7 +68,7 @@ class UrlGeneratorHelper
 
         switch ($urlType) {
             case BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
-            case BaseGrid::DYNAMIC_URL_TYPE_SUBGRID :
+            case BaseGrid::DYNAMIC_URL_TYPE_SUBGRID:
                 $url = $helper(
                     'synergydatagrid\subgrid',
                     array(

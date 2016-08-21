@@ -1,11 +1,30 @@
 <?php
 
-use SynergyCommon\Service\ServiceLocatorAwareInitializer;
-use SynergyCommon\Service\ServiceManagerAwareInitializer;
-
 \date_default_timezone_set('Europe/London');
 return array(
     'modules'                 => array(
+        'Zend\Db',
+        'Zend\Log',
+        'Zend\Mail',
+        'Zend\Mvc\Console',
+        'Zend\Mvc\I18n',
+        'Zend\I18n',
+        'Zend\Mvc\Plugin\FilePrg',
+        'Zend\Mvc\Plugin\FlashMessenger',
+        'Zend\Mvc\Plugin\Identity',
+        'Zend\Mvc\Plugin\Prg',
+        'Zend\Navigation',
+        'Zend\Paginator',
+        'Zend\Serializer',
+        'Zend\ServiceManager\Di',
+        'Zend\Session',
+        'Zend\Router',
+        'Zend\Form',
+        'Zend\InputFilter',
+        'Zend\Filter',
+        'Zend\Validator',
+        'Zend\Hydrator',
+        'Zend\Cache',
         'DoctrineModule',
         'DoctrineORMModule',
         'SynergyCommon',
@@ -30,10 +49,4 @@ return array(
         'module_map_cache_key'     => 'synergy_grid_module',
         'cache_dir'                => 'data/cache',
     ),
-    'service_manager'         => [
-        'initializers' => [
-            'ServiceManagerAwareInitializer' => ServiceManagerAwareInitializer::class,
-            'ServiceLocatorAwareInitializer' => ServiceLocatorAwareInitializer::class,
-        ],
-    ]
 );

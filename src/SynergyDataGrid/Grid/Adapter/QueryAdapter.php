@@ -13,7 +13,6 @@ namespace SynergyDataGrid\Grid\Adapter;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use Doctrine\ORM\Query;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Model\BaseModel;
 

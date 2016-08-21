@@ -14,8 +14,6 @@
 namespace SynergyDataGrid\Controller;
 
 use SynergyCommon\Controller\BaseRestfulController;
-use Zend\Http\Response;
-use Zend\Mvc\Controller\AbstractRestfulController;
 
 /**
  * Class BaseGridController
@@ -23,7 +21,6 @@ use Zend\Mvc\Controller\AbstractRestfulController;
  */
 class BaseGridController extends BaseRestfulController
 {
-
     public function _processRequest()
     {
         $options        = array();

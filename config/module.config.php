@@ -411,12 +411,6 @@ return array(
             'ViewJsonStrategy',
         ),
     ),
-    'controllers'  => array(
-        'invokables' => array(
-            'SynergyDataGrid\Controller\Grid'    => 'SynergyDataGrid\Controller\GridController',
-            'SynergyDataGrid\Controller\SubGrid' => 'SynergyDataGrid\Controller\SubGridController',
-        ),
-    ),
     'synergy'      => array(
         /**
          * Location where entity classname to entity key mappings are stored

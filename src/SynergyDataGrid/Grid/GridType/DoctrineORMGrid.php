@@ -30,8 +30,11 @@ use Zend\Http\PhpEnvironment\Request;
 use Zend\Json\Expr;
 use Zend\Stdlib\RequestInterface;
 
-final class DoctrineORMGrid
-    extends BaseGrid
+/**
+ * Class DoctrineORMGrid
+ * @package SynergyDataGrid\Grid\GridType
+ */
+final class DoctrineORMGrid extends BaseGrid
 {
     /**
      * Response
@@ -301,7 +304,7 @@ final class DoctrineORMGrid
                     $this->_subGridsAsGrid[] = $this->createSubGridAsGrid($map);
                     $this->setSubGrid(true);
 
-                    if(!$this->_isEditable($fieldName)){
+                    if (!$this->_isEditable($fieldName)) {
                         continue;
                     }
                 } else {
@@ -1021,7 +1024,7 @@ final class DoctrineORMGrid
 
     public function getCrudUrl($entityKey, $queryParams = array())
     {
-        $urlHelper = $this->getServiceLocator()->get('viewhelpermanager')->get('url');
+        $urlHelper = $this->getServiceLocator()->get('ViewHelperManager')->get('url');
 
         return $urlHelper('synergydatagrid', array('entity' => $entityKey), array('query' => $queryParams));
     }
@@ -1029,7 +1032,8 @@ final class DoctrineORMGrid
     public function createSubGridAsGrid($subGridMap)
     {
         /** @var $subGrid \SynergyDataGrid\Grid\GridType\BaseGrid */
-        $subGrid = $this->getServiceLocator()->setShared('jqgrid', false)->get('jqgrid');
+        $this->getServiceLocator()->setShared('jqgrid', false);
+        $subGrid = $this->getServiceLocator()->get('jqgrid');
 
         $subGrid->setIsDetailGrid(true);
         $subGrid->setMasterGridId($this->getId());

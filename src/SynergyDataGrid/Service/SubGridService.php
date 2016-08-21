@@ -17,8 +17,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 
-class SubGridService
-    extends BaseGridService
+/**
+ * Class SubGridService
+ * @package SynergyDataGrid\Service
+ */
+class SubGridService extends BaseGridService
 {
 
     /**
@@ -85,7 +88,7 @@ class SubGridService
 
             $record = array(
                 'page'    => $subGridModel->getOptions()->getPage() ?: 1,
-                'total'   => ceil($total / $rowNum),
+                'total'   => $rowNum ? ceil($total / $rowNum) : 0,
                 'records' => $total,
                 'rows'    => $subGrid->formatGridData($childRows, $columns)
             );

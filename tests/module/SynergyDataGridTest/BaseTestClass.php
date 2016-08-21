@@ -4,11 +4,10 @@ namespace SynergyDataGridTest;
 use SynergyDataGrid\Controller\GridController;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Router\RouteMatch;
-use Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter;
+use Zend\Router\Http\RouteMatch;
+use Zend\Router\Http\TreeRouteStack as HttpRouter;
 
-class BaseTestClass
-    extends \PHPUnit_Framework_TestCase
+class BaseTestClass extends \PHPUnit_Framework_TestCase
 {
     /** @var \Zend\ServiceManager\ServiceManager */
     protected $_serviceManager;
@@ -26,7 +25,7 @@ class BaseTestClass
 
     protected $response;
 
-    /** @var  \Zend\Mvc\Router\RouteMatch */
+    /** @var  \Zend\Router\RouteMatch */
     protected $routeMatch;
 
     /** @var  \Zend\Mvc\MvcEvent */
@@ -37,7 +36,7 @@ class BaseTestClass
         parent::setUp();
         $this->_serviceManager = Bootstrap::getServiceManager();
 
-        $this->controller = new GridController();
+        $this->controller = new GridController($this->_serviceManager);
         $this->request    = new Request();
         $this->routeMatch = new RouteMatch(array());
         $this->event      = new MvcEvent();

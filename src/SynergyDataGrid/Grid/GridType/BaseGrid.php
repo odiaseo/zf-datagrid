@@ -1590,7 +1590,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
         return isset($this->_config['column_model'][$name]['isSubGridAsGrid'])
         and $this->_config['column_model'][$name]['isSubGridAsGrid'];
     }
-    
+
     protected function _isEditable($name)
     {
         return isset($this->_config['column_model'][$name]['editable'])

@@ -14,7 +14,7 @@
 
 namespace SynergyDataGrid\Controller;
 
-use Zend\Http\Response;
+use SynergyDataGrid\Service\SubGridService;
 
 /**
  * Class SubGridController
@@ -29,15 +29,12 @@ class SubGridController extends BaseGridController
      */
     public function getList()
     {
-
-        /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
-        $params  = array_merge(
+        $params = array_merge(
             $this->params()->fromQuery(),
             $this->params()->fromRoute()
         );
 
-        $payLoad = $service->getSubGridList($params);
+        $payLoad = $this->_getService()->getSubGridList($params);
 
         return $this->_sendPayload($payLoad);
     }
@@ -51,24 +48,19 @@ class SubGridController extends BaseGridController
      */
     public function replaceList($data)
     {
-        /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
-        $params  = array_merge(
+        $params = array_merge(
             $data,
             $this->params()->fromQuery(),
             $this->params()->fromRoute()
         );
 
-        $payLoad = $service->updateSubGridRecord($params);
+        $payLoad = $this->_getService()->updateSubGridRecord($params);
 
         return $this->_sendPayload($payLoad);
     }
 
     public function create($data)
     {
-        /** @var $service \SynergyDataGrid\Service\SubGridService */
-        $service = $this->getServiceLocator()->get('synergy\service\subgrid');
-
         $params = array_merge(
             $data,
             $this->params()->fromQuery(),
@@ -76,11 +68,21 @@ class SubGridController extends BaseGridController
         );
 
         if ($this->params()->fromPost('oper') == 'del') {
-            $payLoad = $service->deleteRecord($params);
+            $payLoad = $this->_getService()->deleteRecord($params);
         } else {
-            $payLoad = $service->createSubGridRecord($params);
+            $payLoad = $this->_getService()->createSubGridRecord($params);
         }
 
         return $this->_sendPayload($payLoad);
+    }
+
+    /**
+     * @param null $serviceKey
+     *
+     * @return SubGridService
+     */
+    protected function _getService($serviceKey = null)
+    {
+        return $this->getServiceLocator()->get('synergy\service\subgrid');
     }
 }

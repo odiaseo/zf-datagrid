@@ -13,7 +13,6 @@ namespace SynergyDataGrid\Grid;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use SynergyDataGrid\Grid\Column;
 use SynergyDataGrid\Grid\GridType\BaseGrid;
 use Zend\Json\Encoder;
 use Zend\Json\Expr;

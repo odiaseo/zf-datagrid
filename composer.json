@@ -1,66 +1,72 @@
 {
-    "name": "synergy/synergydatagrid",
-    "description": "Module to display data in grid using the jqGrid javascript plugin",
-    "type": "synergy-module",
-    "license": "BSD-3-Clause",
-    "keywords": [
-        "data grid",
-        "jqgrid",
-        "zf2",
-        "module"
-    ],
-    "homepage": "http://developer.peleodiase.com/synergy-data-grid",
-    "authors": [
-        {
-            "name": "Pele Odiase",
-            "email": "peleodiase@yahoo.co.uk"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://toran.vaboose.org/repo/private/"
-        },
-        {
-            "type": "composer",
-            "url": "http://toran.vaboose.org/repo/packagist/"
-        },
-        {
-            "packagist": false
-        }
-    ],
-    "require": {
-        "php": ">=5.4",
-        "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
-        "zendframework/zendframework": "^3.0.2",
-        "doctrine/doctrine-orm-module": "dev-master",
-        "doctrine/doctrine-module": "dev-master",
-        "zendframework/zend-mvc": "^3.0.2",
-        "synergy/common": "^3.0",
-        "monolog/monolog": "^1.18"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.0"
-    },
-    "suggest": {
-        "gedmo/doctrine-extensions": ">=v2.2.0"
-    },
-    "autoload": {
-        "psr-0": {
-            "SynergyDataGrid": "src/",
-            "SynergyDataGridTest": "tests/module"
-        },
-        "classmap": [
-            "./Module.php",
-            "tests/module/SynergyDataGridTest/Module.php"
-        ]
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    },
-    "config": {
-        "secure-http": false
+  "name": "synergy/synergydatagrid",
+  "description": "Module to display data in grid using the jqGrid javascript plugin",
+  "type": "synergy-module",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "data grid",
+    "jqgrid",
+    "zf2",
+    "module"
+  ],
+  "homepage": "http://developer.peleodiase.com/synergy-data-grid",
+  "authors": [
+    {
+      "name": "Pele Odiase",
+      "email": "peleodiase@yahoo.co.uk"
     }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://toran.vaboose.org/repo/private/"
+    },
+    {
+      "type": "composer",
+      "url": "http://toran.vaboose.org/repo/packagist/"
+    },
+    {
+      "packagist": false
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=5.5",
+    "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
+    "zendframework/zendframework": "^3.0.2",
+    "doctrine/doctrine-orm-module": "dev-master",
+    "doctrine/doctrine-module": "dev-master",
+    "zendframework/zend-mvc": "^3.0.2",
+    "synergy/common": "^3.0",
+    "monolog/monolog": "^1.18",
+    "satooshi/php-coveralls": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "suggest": {
+    "gedmo/doctrine-extensions": ">=v2.2.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "SynergyDataGrid": "src/",
+      "SynergyDataGridTest": "tests/module"
+    },
+    "psr-4": {
+      "SynergyCommon\\": "module/SynergyCommon/src/"
+    },
+    "classmap": [
+      "./Module.php",
+      "tests/module/SynergyDataGridTest/Module.php"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  },
+  "config": {
+    "secure-http": false
+  }
 }
