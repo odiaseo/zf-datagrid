@@ -2,7 +2,7 @@
 
 namespace SynergyDataGridTest;
 
-use SynergyCommon\Model\Config\ModelOptions;
+use SynergyDataGrid\Model\Config\ModelOptions;
 
 /**
  * Class run generic tests on entites. Verifies simple getters/setters
