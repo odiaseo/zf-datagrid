@@ -8,7 +8,7 @@ nbproject
 .settings
 vendor
 data/logs
-composer.lock
 composer.phar
 autoload
 local.php
+build

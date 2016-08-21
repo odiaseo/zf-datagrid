@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/module/SynergyDataGridTest/Bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false">
+
+    <testsuites>
+        <testsuite name="Synergy Data Grid Test Suite">
+            <directory suffix="Test.php">tests/module/SynergyDataGridTest/Test</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <includePath>./src</includePath>
+        <includePath>./vendor</includePath>
+    </php>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml" charset="UTF-8"
+             yui="true" highlight="true" lowUpperBound="50"
+             highLowerBound="80"/>
+    </logging>
+</phpunit>
