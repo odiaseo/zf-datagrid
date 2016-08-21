@@ -1,6 +1,8 @@
 [![Latest Stable Version](https://poser.pugx.org/synergy/synergydatagrid/v/stable)](https://packagist.org/packages/synergy/synergydatagrid)
 [![Total Downloads](https://poser.pugx.org/synergy/synergydatagrid/downloads)](https://packagist.org/packages/synergy/synergydatagrid)
+[![composer.lock](https://poser.pugx.org/synergy/synergydatagrid/composerlock)](https://packagist.org/packages/synergy/synergydatagrid)
 [![Build Status](https://travis-ci.org/odiaseo/zf2-datagrid.svg?branch=master)](https://travis-ci.org/odiaseo/zf2-datagrid)
+[![Coverage Status](https://coveralls.io/repos/github/odiaseo/zf2-datagrid/badge.svg)](https://coveralls.io/github/odiaseo/zf2-datagrid)
 
 #SynergyDataGrid (ZF2 module)
 ##Introduction
