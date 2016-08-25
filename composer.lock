@@ -470,12 +470,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineModule.git",
-                "reference": "4329f63dc191cbc2fabe5949c19365e9e0d040b1"
+                "reference": "2a4404a16e2937c0011e6413bc1b2d2f2b516eb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineModule/zipball/4329f63dc191cbc2fabe5949c19365e9e0d040b1",
-                "reference": "4329f63dc191cbc2fabe5949c19365e9e0d040b1",
+                "url": "https://api.github.com/repos/doctrine/DoctrineModule/zipball/2a4404a16e2937c0011e6413bc1b2d2f2b516eb4",
+                "reference": "2a4404a16e2937c0011e6413bc1b2d2f2b516eb4",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -493,9 +493,9 @@
                 "zendframework/zend-cache": "^2.7.1",
                 "zendframework/zend-form": "^2.9",
                 "zendframework/zend-hydrator": "^1.1 || ^2.2.1",
-                "zendframework/zend-mvc": "^2.7.10 || ^3.0.2",
+                "zendframework/zend-mvc": "^2.7.10 || ^3.0.1",
                 "zendframework/zend-paginator": "^2.7",
-                "zendframework/zend-servicemanager": "^2.7.6 || ^3.1.1",
+                "zendframework/zend-servicemanager": "^2.7.6 || ^3.1",
                 "zendframework/zend-stdlib": "^2.7.7 || ^3.0.1",
                 "zendframework/zend-validator": "^2.8.1"
             },
@@ -518,6 +518,11 @@
                 "bin/doctrine-module"
             ],
             "type": "library",
+            "extra": {
+                "zf": {
+                    "module": "DoctrineModule"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "DoctrineModule\\": "src/"
@@ -548,14 +553,14 @@
                     "homepage": "http://marco-pivetta.com/"
                 }
             ],
-            "description": "Zend Framework 2 Module that provides Doctrine basic functionality required for ORM and ODM modules",
+            "description": "Zend Framework Module that provides Doctrine basic functionality required for ORM and ODM modules",
             "homepage": "http://www.doctrine-project.org/",
             "keywords": [
                 "doctrine",
                 "module",
-                "zf2"
+                "zf"
             ],
-            "time": "2016-08-01 09:46:47"
+            "time": "2016-08-25 07:35:09"
         },
         {
             "name": "doctrine/doctrine-orm-module",
@@ -563,12 +568,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineORMModule.git",
-                "reference": "0640f17a37a599d4254b8e0c940f0c7b762f5d1d"
+                "reference": "1e147bb7526f78b3f39bc3d6b0a49907e6a586db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineORMModule/zipball/0640f17a37a599d4254b8e0c940f0c7b762f5d1d",
-                "reference": "0640f17a37a599d4254b8e0c940f0c7b762f5d1d",
+                "url": "https://api.github.com/repos/doctrine/DoctrineORMModule/zipball/1e147bb7526f78b3f39bc3d6b0a49907e6a586db",
+                "reference": "1e147bb7526f78b3f39bc3d6b0a49907e6a586db",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -584,8 +589,8 @@
                 "php": "^5.6 || ^7.0",
                 "symfony/console": "^2.3 || ^3.0",
                 "zendframework/zend-hydrator": "^1.1 || ^2.2.1",
-                "zendframework/zend-mvc": "^2.7.10 || ^3.0.2",
-                "zendframework/zend-servicemanager": "^2.7.6 || ^3.1.1",
+                "zendframework/zend-mvc": "^2.7.10 || ^3.0.1",
+                "zendframework/zend-servicemanager": "^2.7.6 || ^3.1",
                 "zendframework/zend-stdlib": "^2.7.7 || ^3.0.1"
             },
             "require-dev": {
@@ -606,6 +611,11 @@
                 "zendframework/zend-form": "if you want to use form elements backed by Doctrine"
             },
             "type": "library",
+            "extra": {
+                "zf": {
+                    "module": "DoctrineORMModule"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "DoctrineORMModule\\": "src/"
@@ -636,15 +646,15 @@
                     "homepage": "http://marco-pivetta.com/"
                 }
             ],
-            "description": "Zend Framework 2 Module that provides Doctrine ORM functionality",
+            "description": "Zend Framework Module that provides Doctrine ORM functionality",
             "homepage": "http://www.doctrine-project.org/",
             "keywords": [
                 "doctrine",
                 "module",
                 "orm",
-                "zf2"
+                "zf"
             ],
-            "time": "2016-08-01 19:11:59"
+            "time": "2016-08-25 08:24:43"
         },
         {
             "name": "doctrine/inflector",
@@ -2892,7 +2902,7 @@
         },
         {
             "name": "synergy/common",
-            "version": "v3.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/odiaseo/synergy-common.git",

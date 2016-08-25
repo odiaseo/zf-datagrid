@@ -146,13 +146,13 @@ class BaseGridService extends BaseService
         );
 
         /** @var $model \SynergyDataGrid\Model\BaseModel */
-        $model = $this->_serviceManager->get('synergydatagrid\model');
+        $model = $this->getServiceLocator()->get('synergydatagrid\model');
         $model->setEntityClass($className);
         $modelOptions = new ModelOptions($options);
         $model->setOptions($modelOptions);
 
         /** @var $entityManager \Doctrine\Orm\EntityManager */
-        $entityManager = $this->_serviceManager->get($model->getOrmKey());
+        $entityManager = $this->getServiceLocator()->get($model->getOrmKey());
         $model->setEntityManager($entityManager);
 
         return $model;

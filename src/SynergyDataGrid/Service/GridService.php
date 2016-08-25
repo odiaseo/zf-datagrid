@@ -25,7 +25,7 @@ class GridService extends BaseGridService
             $className = $this->getClassnameFromEntityKey($data['entity']);
 
             /** @var $grid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
-            $grid = $this->_serviceManager->get('jqgrid');
+            $grid = $this->getServiceLocator()->get('jqgrid');
             $grid->setGridIdentity($className, $data['entity']);
 
             $model = $this->getModel($className, $data, $grid->getConfig());
@@ -190,7 +190,7 @@ class GridService extends BaseGridService
     public function getEntityManager()
     {
         /** @var $grid \SynergyDataGrid\Grid\GridType\BaseGrid */
-        $grid = $this->_serviceManager->get('jqgrid');
+        $grid = $this->getServiceLocator()->get('jqgrid');
 
         return $grid->getObjectManager();
     }

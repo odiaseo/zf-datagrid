@@ -19,7 +19,7 @@ class GridServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
         $service = new GridService();
-        $service->setServiceManager($serviceLocator);
+        $service->setServiceLocator($serviceLocator);
         $service->setLogger($serviceLocator->get('logger'));
 
         return $service;

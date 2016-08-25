@@ -80,7 +80,7 @@ class SubGridService extends BaseGridService
             }
 
             /** @var $subGrid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
-            $subGrid = $this->_serviceManager->get('jqgrid');
+            $subGrid = $this->getServiceLocator()->get('jqgrid');
             $subGrid->setGridIdentity($targetEntity, $field);
 
             $subGrid->reorderColumns();
