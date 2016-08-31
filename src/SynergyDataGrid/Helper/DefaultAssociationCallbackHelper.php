@@ -12,8 +12,7 @@ namespace SynergyDataGrid\Helper;
  * @See     * http://www.trirand.com/jqgridwiki/doku.php?id=wiki:common_rules#editable
  * @package SynergyDataGrid\Helper
  */
-class DefaultAssociationCallbackHelper
-    extends BaseConfigHelper
+class DefaultAssociationCallbackHelper extends BaseConfigHelper
 {
     protected static $_list = array();
 

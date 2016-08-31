@@ -21,7 +21,7 @@ return array(
                     'route'       => '/synergydatagrid/crud/:entity[/:id]',
                     'defaults'    => array(
                         '__NAMESPACE__' => 'SynergyDataGrid\Controller',
-                        'controller'    => 'SynergyDataGrid\Controller\Grid',
+                        'controller'    => \SynergyDataGrid\Controller\GridController::class,
                     ),
                     'constraints' => array(
                         'entity' => '[a-zA-Z\-0-9]+'
@@ -34,7 +34,7 @@ return array(
                     'route'       => '/synergydatagrid/crud/:entity/subgrid/:fieldName[/:id]',
                     'defaults'    => array(
                         '__NAMESPACE__' => 'SynergyDataGrid\Controller',
-                        'controller'    => 'SynergyDataGrid\Controller\SubGrid',
+                        'controller'    => \SynergyDataGrid\Controller\SubGridController::class,
                     ),
                     'constraints' => array(
                         'entity'    => '[a-zA-Z\-0-9]+',
