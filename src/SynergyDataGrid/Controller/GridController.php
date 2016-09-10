@@ -50,7 +50,11 @@ class GridController extends BaseGridController
             (array)$this->params()->fromRoute()
         );
 
-        $payLoad = $this->_getService()->createRecord($params);
+        if (isset($params['oper']) and $params['oper'] == 'edit') {
+            $payLoad = $this->_getService()->updateRecord($params);
+        } else {
+            $payLoad = $this->_getService()->createRecord($params);
+        }
 
         return $this->_sendPayload($payLoad);
     }
