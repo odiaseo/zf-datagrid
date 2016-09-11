@@ -76,6 +76,19 @@ class SubGridController extends BaseGridController
         return $this->_sendPayload($payLoad);
     }
 
+    public function deleteList($data)
+    {
+        $params = array_merge(
+            (array)$data,
+            (array)$this->params()->fromQuery(),
+            (array)$this->params()->fromRoute()
+        );
+
+        $payLoad = $this->_getService()->deleteRecord($params);
+
+        return $this->_sendPayload($payLoad);
+    }
+
     /**
      * @param null $serviceKey
      *
