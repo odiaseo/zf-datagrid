@@ -36,7 +36,6 @@
     "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
     "zendframework/zendframework": "^3.0.2",
     "doctrine/doctrine-orm-module": "dev-master",
-    "doctrine/doctrine-module": "dev-master",
     "zendframework/zend-mvc": "^3.0.2",
     "synergy/common": "^3.0",
     "monolog/monolog": "^1.18"
