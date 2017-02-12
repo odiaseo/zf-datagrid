@@ -49,11 +49,10 @@
   },
   "autoload": {
     "psr-0": {
-      "SynergyDataGrid": "src/",
       "SynergyDataGridTest": "tests/module"
     },
     "psr-4": {
-      "SynergyCommon\\": "module/SynergyCommon/src/"
+      "SynergyDataGrid\\": "src/SynergyDataGrid"
     },
     "classmap": [
       "./Module.php",
