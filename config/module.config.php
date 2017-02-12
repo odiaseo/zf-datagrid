@@ -416,9 +416,10 @@ return array(
          * Location where entity classname to entity key mappings are stored
          */
         'entity_cache'          => array(
-            'orm' => 'data/cache/SynergyDataGrid/orm_entity_classmap.php',
-            'odm' => 'data/cache/SynergyDataGrid/odm_entity_classmap.php',
+            'orm' => 'data/SynergyDataGrid/orm_entity_classmap.php',
+            'odm' => 'data/SynergyDataGrid/odm_entity_classmap.php',
         ),
+        'check_entity_cache_file' => true,
         'entity_cache_lifetime' => 24 * 60 * 60,
         'config_helpers'        => array(
             'urlGenerator'               => 'SynergyDataGrid\Helper\UrlGeneratorHelper',
