@@ -37,7 +37,7 @@
     "zendframework/zendframework": "^3.0.2",
     "doctrine/doctrine-orm-module": "dev-master",
     "zendframework/zend-mvc": "^3.0.2",
-    "synergy/common": "^3.0",
+    "synergy/common": "^4.0",
     "monolog/monolog": "^1.18"
   },
   "require-dev": {
