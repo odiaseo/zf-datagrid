@@ -16,19 +16,6 @@
       "email": "peleodiase@yahoo.co.uk"
     }
   ],
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "http://toran.vaboose.org/repo/private/"
-    },
-    {
-      "type": "composer",
-      "url": "http://toran.vaboose.org/repo/packagist/"
-    },
-    {
-      "packagist": false
-    }
-  ],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
@@ -37,8 +24,8 @@
     "zendframework/zendframework": "^3.0.2",
     "doctrine/doctrine-orm-module": "dev-master",
     "zendframework/zend-mvc": "^3.0.2",
-    "synergy/common": "^4.0",
-    "monolog/monolog": "^1.18"
+    "monolog/monolog": "^1.18",
+    "synergy/common": "^5"
   },
   "require-dev": {
     "satooshi/php-coveralls": "^1.0",
@@ -58,8 +45,5 @@
       "./Module.php",
       "tests/module/SynergyDataGridTest/Module.php"
     ]
-  },
-  "config": {
-    "secure-http": false
   }
 }
