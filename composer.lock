@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e5348d4f9bf85ce7e933ee0d851a5afe",
-    "content-hash": "d97d4979ac3efeb638c9b7a8f4873cf9",
+    "hash": "b6af997420e42a36629eff1df00c8c2c",
+    "content-hash": "8025946f8d0dee34e301a9f862ee3d24",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2829,16 +2829,16 @@
         },
         {
             "name": "synergy/common",
-            "version": "v5.0.0",
+            "version": "v5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/odiaseo/synergy-common.git",
-                "reference": "77969f1dfbb9cf43d3f12600e471b94635c69722"
+                "reference": "6a203e958c9101ef9e9a09e706d1e335eaadbb7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/77969f1dfbb9cf43d3f12600e471b94635c69722",
-                "reference": "77969f1dfbb9cf43d3f12600e471b94635c69722",
+                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/6a203e958c9101ef9e9a09e706d1e335eaadbb7e",
+                "reference": "6a203e958c9101ef9e9a09e706d1e335eaadbb7e",
                 "shasum": ""
             },
             "require": {
@@ -2849,12 +2849,12 @@
                 "php": ">=5.6",
                 "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
                 "zendframework/zend-i18n-resources": "*",
-                "zendframework/zend-mvc": "^3.0.2",
-                "zendframework/zendframework": "^3.0.2"
+                "zendframework/zend-mvc": "^3",
+                "zendframework/zendframework": "^3"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.0",
-                "zfcampus/zf-development-mode": "^3.0"
+                "zfcampus/zf-development-mode": "^3"
             },
             "suggest": {
                 "monolog/monolog": "For enhanced logging features"
@@ -2892,7 +2892,7 @@
                 "abstract classes",
                 "synergy library"
             ],
-            "time": "2017-04-12 09:42:37"
+            "time": "2017-04-12 10:30:34"
         },
         {
             "name": "webmozart/assert",
