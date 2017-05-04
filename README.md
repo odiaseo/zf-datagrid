@@ -21,27 +21,29 @@ For use all available jqGrid plugin and library features please see jqGrid docum
 ### Optional
 + [Doctrine2 Behavioural Extensions](https://github.com/l3pp4rd/DoctrineExtensions)
 
-###Future Development Plans include:
+### Future Development Plans include:
 - Doctrine ODM Grid
 - Zend DB Grid
 
-#Installation
+# Installation
 
-##Manual Installation
+## Manual Installation
    1. Go to your project's directory.
    2. Clone this project into your `./vendor/synergy/` directory as a `synergydatagrid` module:
    >   `git clone https://github.com/odiaseo/zf2-datagrid.git`
    3. Copy all files in public directory to your project's public folder
 
-##With Composer
+## With Composer
    1. Go to your project's directory.
    2. Run the command `composer require "synergy/synergydatagrid"` 
    4. Follow the Post installation steps bellow
+   
+### For ZF2 projects use a version < 2.0
 
-#Post Installation steps
+# Post Installation steps
  Currently, this module supports only  Doctrine ORM entities so ensure that DoctrineORM is configured correctly.
 
-#Usage
+# Usage
 + In your controller class:
 ```php
          public function gridAction() {
@@ -77,7 +79,7 @@ For use all available jqGrid plugin and library features please see jqGrid docum
                     ->appendFile('/jqGrid/js/jquery.jqGrid.min.js', 'text/javascript') ;
 ```
 
-#Setting grid options
+# Setting grid options
 You can use/set any of the jqgrid options (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options)
 e.g. to set the "datatype" to local, in your controller add the code
 ```php
@@ -85,7 +87,7 @@ e.g. to set the "datatype" to local, in your controller add the code
 ```
 > The logic is append 'set' to any of the options and it would be added to the grid.
 
-#Adding ColModel Options
+# Adding ColModel Options
 All column model options can be added to the grid (see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:colmodel_options)
 In your grid configuration file or module.config.php, specify the the model options e.g.
 ```php
@@ -106,7 +108,7 @@ In your grid configuration file or module.config.php, specify the the model opti
         )
     );
 ```
-#Adding Custom Javascript
+# Adding Custom Javascript
 If you want to add additional javaScript to be rendered along with the grid script, you can do this:
 ```php
              $grid->getJsCode()->addCustomScript( new \Zend\Json\Expr(" and your script here" ));
@@ -116,7 +118,7 @@ or
              $grid->getJsCode()->addCustomScript("add your script here");
 ```
 
-#Adding Subgrid
+# Adding Subgrid
 You can add a sub grid as either
 + subgrid (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid)
 + subgrid as grid (http://www.trirand.com/jqgridwiki/doku.php?id=wiki:subgrid_as_grid)
@@ -195,7 +197,7 @@ variable that  would be replaced in the script when the subgrid editUrl is retur
                       }
                 )
 ```
-#Grid Specific Options (Multiple Grids)
+# Grid Specific Options (Multiple Grids)
 If you have multiple grids with different config requirements you can have grid specific option set for each grid.
 
 1. Add a unique ID for the grid by specifying the second parameter to the setGridIdentity() method in your controller action e.g.
@@ -219,10 +221,10 @@ If you have multiple grids with different config requirements you can have grid 
 ```
 > The grid specific options would be merged into the main grid options for grids with that ID.
 
-#Tree Grid
+# Tree Grid
 To render the tree grid, set the third parameter of the setGridIdentity() method to true in your controller action. This depends on the [Gedmo extension for doctrine](https://github.com/l3pp4rd/DoctrineExtensions). The entity class should implement the required Gedmo tree annotations for this to work;
 
-#Custom Queries
+# Custom Queries
 The grid by default loads data into the grid from the specified entity without any WHERE clauses.
 If you want to specify a WHERE clause to be used when populating the grid, you can do so by creating
 a  custom QueryBuilder builder and setting it on the grid as shown below:
