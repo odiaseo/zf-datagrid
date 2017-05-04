@@ -4,9 +4,10 @@
 [![Build Status](https://travis-ci.org/odiaseo/zf2-datagrid.svg?branch=master)](https://travis-ci.org/odiaseo/zf2-datagrid)
 [![Coverage Status](https://coveralls.io/repos/github/odiaseo/zf2-datagrid/badge.svg)](https://coveralls.io/github/odiaseo/zf2-datagrid)
 
-#SynergyDataGrid (ZF2 module)
-##Introduction
+# SynergyDataGrid (ZF3 module)
+## Introduction
 SynergyDataGrid is a [Zend Framework 3](http://framework.zend.com/zf2) module facilitating usage of [JqGrid](http://www.trirand.com/blog/) in ZF3 applications.
+
 It provides basic CRUD functions for editing  database tables as an AJAX-based grid.
 For use all available jqGrid plugin and library features please see jqGrid documentation at <http://www.trirand.com/jqgridwiki/doku.php>
 
