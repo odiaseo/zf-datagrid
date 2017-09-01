@@ -5,6 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/odiaseo/zf2-datagrid/badge.svg)](https://coveralls.io/github/odiaseo/zf2-datagrid)
 
 # SynergyDataGrid (ZF3 module)
+
 ## Introduction
 SynergyDataGrid is a [Zend Framework 3](http://framework.zend.com/zf2) module facilitating usage of [JqGrid](http://www.trirand.com/blog/) in ZF3 applications.
 
