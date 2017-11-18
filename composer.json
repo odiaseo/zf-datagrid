@@ -19,7 +19,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=5.5",
+    "php": ">=7.1",
     "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
     "zendframework/zendframework": "^3",
     "doctrine/doctrine-orm-module": "^1.1",

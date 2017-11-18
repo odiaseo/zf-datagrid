@@ -2287,16 +2287,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "099302cc53e57cbb7414fd9f3ace40e5e2767c0b"
+                "reference": "63cd7960a0a522c3537f6326706d7f3b8de65805"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/099302cc53e57cbb7414fd9f3ace40e5e2767c0b",
-                "reference": "099302cc53e57cbb7414fd9f3ace40e5e2767c0b",
+                "url": "https://api.github.com/repos/symfony/console/zipball/63cd7960a0a522c3537f6326706d7f3b8de65805",
+                "reference": "63cd7960a0a522c3537f6326706d7f3b8de65805",
                 "shasum": ""
             },
             "require": {
@@ -2351,11 +2351,11 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-12T16:53:41+00:00"
+            "time": "2017-11-16T15:24:32+00:00"
         },
         {
             "name": "symfony/debug",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
@@ -2411,7 +2411,7 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.8.30",
+            "version": "v2.8.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
@@ -2530,7 +2530,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
@@ -2585,16 +2585,16 @@
         },
         {
             "name": "synergy/common",
-            "version": "v6.1.0",
+            "version": "v6.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/odiaseo/synergy-common.git",
-                "reference": "b4c4e358c8a7079db211b4683bc6b45fba23e839"
+                "reference": "778ec155dc748266b51d69f7a3358cb6f274b3b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/b4c4e358c8a7079db211b4683bc6b45fba23e839",
-                "reference": "b4c4e358c8a7079db211b4683bc6b45fba23e839",
+                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/778ec155dc748266b51d69f7a3358cb6f274b3b1",
+                "reference": "778ec155dc748266b51d69f7a3358cb6f274b3b1",
                 "shasum": ""
             },
             "require": {
@@ -2649,7 +2649,7 @@
                 "abstract classes",
                 "synergy library"
             ],
-            "time": "2017-11-16T06:54:56+00:00"
+            "time": "2017-11-18T05:05:09+00:00"
         },
         {
             "name": "synergy/solarium-module",
@@ -6722,7 +6722,7 @@
         },
         {
             "name": "symfony/config",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
@@ -6784,7 +6784,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
@@ -6833,7 +6833,7 @@
         },
         {
             "name": "symfony/stopwatch",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stopwatch.git",
