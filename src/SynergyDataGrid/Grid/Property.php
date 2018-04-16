@@ -53,17 +53,21 @@ class Property extends Base
      *
      * @param array $options array of property options
      *
-     * @return array
+     * @return mixed
+     * @throws \Exception
      */
     public function mergeOptions(array $options = array())
     {
         $merged = parent::mergeOptions($options);
-        if ($this->getProperty() && $this->getOwner()) {
+        $owner = $this->getOwner();
+
+        if ($this->getProperty() && $owner) {
             $method = 'set' . ucfirst($this->getProperty());
-            $this->getOwner()->$method($merged);
+            $owner->$method($merged);
         }
-        if (substr(get_class($this->getOwner()), -7) == '\Column') {
-            $this->getOwner()->getGrid()->setColModel($this->getOwner()->getGrid()->getColumns());
+
+        if ($owner && substr(get_class($owner), -7) == '\Column') {
+            $owner->getGrid()->setColModel($owner->getGrid()->getColumns());
         }
 
         return $merged;
