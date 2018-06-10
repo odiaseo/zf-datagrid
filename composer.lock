@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "2318a1387e7c91e28245d91505f6312a",
@@ -2585,23 +2585,23 @@
         },
         {
             "name": "synergy/common",
-            "version": "v6.1.3",
+            "version": "v6.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/odiaseo/synergy-common.git",
-                "reference": "778ec155dc748266b51d69f7a3358cb6f274b3b1"
+                "reference": "be5db63f6cbde1c6ce7fe53fb70c0dcf74c7bc54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/778ec155dc748266b51d69f7a3358cb6f274b3b1",
-                "reference": "778ec155dc748266b51d69f7a3358cb6f274b3b1",
+                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/be5db63f6cbde1c6ce7fe53fb70c0dcf74c7bc54",
+                "reference": "be5db63f6cbde1c6ce7fe53fb70c0dcf74c7bc54",
                 "shasum": ""
             },
             "require": {
                 "doctrine/doctrine-orm-module": "^1.1",
                 "gedmo/doctrine-extensions": "^2.4",
                 "monolog/monolog": "^1.18",
-                "php": ">=5.6",
+                "php": ">=7.1",
                 "synergy/solarium-module": "^3.1",
                 "zendframework/zend-component-installer": "^1.0 || ^0.3 || ^1.0.0-dev@dev",
                 "zendframework/zend-i18n-resources": "*",
@@ -2649,7 +2649,7 @@
                 "abstract classes",
                 "synergy library"
             ],
-            "time": "2017-11-18T05:05:09+00:00"
+            "time": "2018-06-10T14:39:05+00:00"
         },
         {
             "name": "synergy/solarium-module",
