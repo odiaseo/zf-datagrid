@@ -135,7 +135,7 @@ class BaseModel
      */
     public function findObject($id = 0)
     {
-        return $this->getEntityManager()->getRepository($this->_entityClass)->find($id);
+        return $this->getEntityManager()->getRepository((string)$this->_entityClass)->find($id);
     }
 
     /**

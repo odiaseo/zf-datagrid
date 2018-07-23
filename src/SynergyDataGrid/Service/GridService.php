@@ -1,4 +1,5 @@
 <?php
+
 namespace SynergyDataGrid\Service;
 
 /**
@@ -26,7 +27,7 @@ class GridService extends BaseGridService
 
             /** @var $grid  \SynergyDataGrid\Grid\GridType\DoctrineORMGrid */
             $grid = $this->getServiceLocator()->get('jqgrid');
-            $grid->setGridIdentity($className, $data['entity']);
+            $grid->setGridIdentity((string)$className, (string)$data['entity']);
 
             $model = $this->getModel($className, $data, $grid->getConfig());
 
@@ -39,20 +40,20 @@ class GridService extends BaseGridService
             $total  = $paginator->count();
             $rowNum = $paginator->getQuery()->getMaxResults();
 
-            $return = array(
+            $return = [
                 'page'    => $model->getOptions()->getPage() ?: 1,
                 'total'   => $rowNum ? ceil($total / $rowNum) : 1,
                 'records' => $total,
                 'rows'    => $grid->formatGridData($rows, $columns)
-            );
+            ];
         } catch (\Exception $exception) {
 
             $this->getLogger()->logException($exception);
 
-            $return = array(
+            $return = [
                 'error'   => true,
                 'message' => $exception->getMessage()
-            );
+            ];
         }
 
         return $return;
@@ -74,18 +75,18 @@ class GridService extends BaseGridService
             $model     = $this->getModel($className, $data);
             $model->updateEntity($id, $data);
 
-            $return = array(
+            $return = [
                 'error'   => false,
                 'message' => sprintf('Record %s successfully updated', number_format($id, 0))
-            );
+            ];
         } catch (\Exception $exception) {
 
             $this->getLogger()->logException($exception);
 
-            $return = array(
+            $return = [
                 'error'   => true,
                 'message' => $exception->getMessage()
-            );
+            ];
         }
 
         return $return;
@@ -143,16 +144,16 @@ class GridService extends BaseGridService
 
             $entity = $model->save($entity);
 
-            $return = array(
+            $return = [
                 'error'   => false,
                 'message' => sprintf('Record %s successfully created', number_format($entity->getId(), 0))
-            );
+            ];
         } catch (\Exception $exception) {
             $this->getLogger()->logException($exception);
-            $return = array(
+            $return = [
                 'error'   => true,
                 'message' => $exception->getMessage()
-            );
+            ];
         }
 
         return $return;
@@ -170,18 +171,18 @@ class GridService extends BaseGridService
             $model     = $this->getModel($className);
             $model->remove($data['id']);
 
-            $return = array(
+            $return = [
                 'error'   => false,
                 'message' => sprintf('Record %s successfully deleted', number_format($data['id'], 0))
-            );
+            ];
         } catch (\Exception $exception) {
 
             $this->getLogger()->logException($exception);
 
-            $return = array(
+            $return = [
                 'error'   => true,
                 'message' => $exception->getMessage()
-            );
+            ];
         }
 
         return $return;

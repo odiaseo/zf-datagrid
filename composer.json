@@ -28,7 +28,7 @@
     "synergy/common": "*"
   },
   "require-dev": {
-    "satooshi/php-coveralls": "^1",
+    "satooshi/php-coveralls": "^2.0",
     "phpunit/phpunit": "~4"
   },
   "suggest": {
