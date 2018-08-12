@@ -3004,16 +3004,16 @@
         },
         {
             "name": "synergy/common",
-            "version": "v6.4.5",
+            "version": "v6.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/odiaseo/synergy-common.git",
-                "reference": "685b685b7097fb1dac04e7737848deee640e0078"
+                "reference": "9dd841a8ac6601a530b346765c4e171fac6ea8d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/685b685b7097fb1dac04e7737848deee640e0078",
-                "reference": "685b685b7097fb1dac04e7737848deee640e0078",
+                "url": "https://api.github.com/repos/odiaseo/synergy-common/zipball/9dd841a8ac6601a530b346765c4e171fac6ea8d3",
+                "reference": "9dd841a8ac6601a530b346765c4e171fac6ea8d3",
                 "shasum": ""
             },
             "require": {
@@ -3068,7 +3068,7 @@
                 "abstract classes",
                 "synergy library"
             ],
-            "time": "2018-08-10T15:59:25+00:00"
+            "time": "2018-08-12T18:57:04+00:00"
         },
         {
             "name": "synergy/solarium-module",
