@@ -40,7 +40,7 @@ class GridController extends BaseGridController
      *
      * @param mixed $data
      *
-     * @return \Zend\View\Model\ModelInterface
+     * @return \Laminas\View\Model\ModelInterface
      */
     public function create($data)
     {
@@ -77,7 +77,7 @@ class GridController extends BaseGridController
      *
      * @param mixed $data
      *
-     * @return mixed|\Zend\View\Model\ModelInterface
+     * @return mixed|\Laminas\View\Model\ModelInterface
      */
     public function replaceList($data)
     {

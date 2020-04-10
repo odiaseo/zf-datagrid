@@ -2,7 +2,7 @@
 namespace SynergyDataGrid\Model;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * This file is part of the Synergy package.

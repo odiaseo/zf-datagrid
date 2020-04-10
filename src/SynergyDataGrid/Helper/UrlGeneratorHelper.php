@@ -2,7 +2,7 @@
 namespace SynergyDataGrid\Helper;
 
 use SynergyDataGrid\Grid\GridType\BaseGrid;
-use Zend\Json\Expr;
+use Laminas\Json\Expr;
 
 /**
  * Class UrlGeneratorConfig
@@ -27,7 +27,7 @@ use Zend\Json\Expr;
  *         .....
  *         case \SynergyDataGrid\Grid\GridType\BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
  *
- * @var $helper \Zend\View\Helper\Url
+ * @var $helper \Laminas\View\Helper\Url
  *          $helper = $sm->get('viewhelpermanager')->get('url');
  *          $url    = $helper('your_route_name',
  *                              array(
@@ -36,7 +36,7 @@ use Zend\Json\Expr;
  *                              )
  *                      );
  *
- *              return new \Zend\Json\Expr("'$url?subgridid='+row_id");
+ *              return new \Laminas\Json\Expr("'$url?subgridid='+row_id");
  *          break;
  *          .......
  *        }
@@ -50,7 +50,7 @@ class UrlGeneratorHelper extends BaseConfigHelper
     {
         list($entity, $fieldName, , $urlType) = $parameters;
 
-        /** @var $helper \Zend\View\Helper\Url */
+        /** @var $helper \Laminas\View\Helper\Url */
         $helper = $this->_serviceManager->get('ViewHelperManager')->get('url');
         $config = $this->_serviceManager->get('config');
         if (!empty($config['jqgrid']['api_domain'])) {

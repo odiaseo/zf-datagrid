@@ -1,7 +1,7 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use Zend\ServiceManager\ServiceManager;
+use Laminas\ServiceManager\ServiceManager;
 
 /**
  * Class BaseConfigHelper
@@ -10,7 +10,7 @@ use Zend\ServiceManager\ServiceManager;
 abstract class BaseConfigHelper
 {
     /**
-     * @var \Zend\ServiceManager\ServiceManager
+     * @var \Laminas\ServiceManager\ServiceManager
      */
     protected $_serviceManager;
 

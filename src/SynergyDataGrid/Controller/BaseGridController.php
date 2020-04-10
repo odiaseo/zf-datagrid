@@ -69,7 +69,7 @@ class BaseGridController extends BaseRestfulController
         $rootId = $this->params()->fromPost('__root__', null);
         $nodeId = $this->params()->fromPost('nodeid', null);
 
-        /** @var $request \Zend\Http\PhpEnvironment\Request */
+        /** @var $request \Laminas\Http\PhpEnvironment\Request */
         $request = $this->getRequest();
 
         if ($rootId and !$nodeId) {

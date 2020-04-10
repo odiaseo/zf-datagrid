@@ -2,7 +2,7 @@
 namespace SynergyDataGrid\Helper;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Class AbstractGridConfigFactory
@@ -39,7 +39,7 @@ class AbstractGridConfigFactory implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
-        /** @var $serviceLocator \Zend\ServiceManager\ServiceManager */
+        /** @var $serviceLocator \Laminas\ServiceManager\ServiceManager */
         $configHelper = str_replace($this->_configPrefix, '', $requestedName);
         $config       = $serviceLocator->get('config');
 

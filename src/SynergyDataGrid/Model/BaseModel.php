@@ -105,7 +105,7 @@ class BaseModel
      */
     protected $_classMetadata;
     /**
-     * @var \Zend\ServiceManager\ServiceManager
+     * @var \Laminas\ServiceManager\ServiceManager
      */
     protected $_sm;
 
@@ -748,7 +748,7 @@ class BaseModel
     }
 
     /**
-     * @return \Zend\ServiceManager\ServiceManager
+     * @return \Laminas\ServiceManager\ServiceManager
      */
     public function getServiceManager()
     {

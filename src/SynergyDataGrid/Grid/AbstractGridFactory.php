@@ -18,7 +18,7 @@ use Interop\Container\ContainerInterface;
 use SynergyDataGrid\Grid\GridType\DoctrineODMGrid;
 use SynergyDataGrid\Grid\GridType\DoctrineORMGrid;
 use SynergyDataGrid\Util\ArrayUtils;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Class AbstractGridFactory

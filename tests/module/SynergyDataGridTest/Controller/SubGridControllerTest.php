@@ -5,16 +5,16 @@ use SynergyDataGrid\Controller\SubGridController;
 use SynergyDataGridTest\Bootstrap;
 use SynergyDataGridTest\Entity\TestBrand;
 use SynergyDataGridTest\Entity\TestStore;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\Console\Router\RouteMatch;
-use Zend\View\Model\ViewModel;
-use Zend\View\Variables;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\Console\Router\RouteMatch;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Variables;
 
 /**
  * Class SubGridControllerTest
  * @package SynergyDataGridTest\Controller
  */
-class SubGridControllerTest extends \PHPUnit_Framework_TestCase
+class SubGridControllerTest extends \PHPUnit\Framework\TestCase
 {
     protected $serviceManager;
 

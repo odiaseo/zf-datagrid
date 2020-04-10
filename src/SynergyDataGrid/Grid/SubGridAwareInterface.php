@@ -13,7 +13,7 @@ namespace SynergyDataGrid\Grid;
  * @license http://opensource.org/licenses/BSD-3-Clause
  *
  */
-use Zend\Http\PhpEnvironment\Request;
+use Laminas\Http\PhpEnvironment\Request;
 
 interface SubGridAwareInterface
 {

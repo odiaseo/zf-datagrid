@@ -16,7 +16,7 @@ namespace SynergyDataGrid\Service;
 
 use SynergyCommon\Service\BaseService;
 use SynergyDataGrid\Model\Config\ModelOptions;
-use Zend\Json\Json;
+use Laminas\Json\Json;
 
 /**
  * Class BaseGridService

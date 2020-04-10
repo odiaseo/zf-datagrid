@@ -25,7 +25,7 @@ class SubGridController extends BaseGridController
     /**
      * Get sub grid data
      *
-     * @return \Zend\View\Model\ModelInterface
+     * @return \Laminas\View\Model\ModelInterface
      */
     public function getList()
     {
@@ -44,7 +44,7 @@ class SubGridController extends BaseGridController
      *
      * @param mixed $data
      *
-     * @return mixed|\Zend\View\Model\ModelInterface
+     * @return mixed|\Laminas\View\Model\ModelInterface
      */
     public function replaceList($data)
     {

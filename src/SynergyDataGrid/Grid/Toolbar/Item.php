@@ -15,7 +15,7 @@ namespace SynergyDataGrid\Grid\Toolbar;
  */
 
 use SynergyDataGrid\Grid\Property;
-use Zend\Json\Expr;
+use Laminas\Json\Expr;
 
 /**
  * Class Item

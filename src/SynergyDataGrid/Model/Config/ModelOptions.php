@@ -14,7 +14,7 @@
  */
 namespace SynergyDataGrid\Model\Config;
 
-use Zend\Stdlib\AbstractOptions;
+use Laminas\Stdlib\AbstractOptions;
 
 /**
  * Class ModelOptions

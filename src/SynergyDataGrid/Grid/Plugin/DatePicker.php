@@ -14,7 +14,7 @@ namespace SynergyDataGrid\Grid\Plugin;
  *
  */
 use SynergyDataGrid\Grid\Property;
-use Zend\Json\Encoder;
+use Laminas\Json\Encoder;
 
 /**
  * DatePicker class for DatePicker plugin integration in jQgrid

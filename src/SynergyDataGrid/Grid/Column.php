@@ -17,7 +17,7 @@ use Doctrine\ORM\PersistentCollection;
 use SynergyDataGrid\Grid\Column\EditOptions;
 use SynergyDataGrid\Grid\Column\EditRules;
 use SynergyDataGrid\Grid\Column\FormatOptions;
-use Zend\Filter\HtmlEntities;
+use Laminas\Filter\HtmlEntities;
 
 /**
  * Column class for single grid column implementation
@@ -95,7 +95,7 @@ class Column extends Base
      */
     protected $_editrules;
     /**
-     * @var \Zend\Filter\FilterInterface
+     * @var \Laminas\Filter\FilterInterface
      */
     protected $_htmlFilter;
 

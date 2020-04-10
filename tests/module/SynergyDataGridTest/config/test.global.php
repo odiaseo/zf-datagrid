@@ -49,7 +49,7 @@ return array(
                     'icon'       => 'icon-info-sign',
                     'position'   => 'top',
                     'class'      => 'btn btn-mini',
-                    'callback'   => new \Zend\Json\Expr('function(){ alert("i am here");}'),
+                    'callback'   => new \Laminas\Json\Expr('function(){ alert("i am here");}'),
                     'onLoad'     => 'var home = "";',
                     'attributes' => array(
                         'data - entity' => 'templates',

@@ -1,7 +1,7 @@
 <?php
 namespace SynergyDataGrid\Helper;
 
-use Zend\Json\Expr;
+use Laminas\Json\Expr;
 
 /**
  * Class CustomNavigationHelper

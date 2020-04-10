@@ -18,11 +18,11 @@ use SynergyDataGrid\Grid\GridType\BaseGrid;
 use SynergyDataGrid\Grid\Plugin\DatePicker;
 use SynergyDataGrid\Grid\SubGridAwareInterface;
 use SynergyDataGrid\Grid\Toolbar;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Json\Expr;
-use Zend\Json\Json;
-use Zend\Stdlib\Parameters;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Json\Expr;
+use Laminas\Json\Json;
+use Laminas\Stdlib\Parameters;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * View Helper to render jqGrid control
@@ -64,7 +64,7 @@ class DisplayGrid extends AbstractHelper
 
             if ($appendScript) {
                 /**
-                 * @var $headScript \Zend\View\Helper\HeadScript
+                 * @var $headScript \Laminas\View\Helper\HeadScript
                  */
                 $headScript = $this->getView()->headScript();
 
@@ -92,7 +92,7 @@ class DisplayGrid extends AbstractHelper
                 );
             }
         } catch (\Exception $exception) {
-            /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
+            /** @var $serviceManager \Laminas\ServiceManager\ServiceManager */
             $serviceManager = $this->getView()->getHelperPluginManager()->getServiceLocator();
 
             if ($serviceManager->has('logger')) {
@@ -101,7 +101,7 @@ class DisplayGrid extends AbstractHelper
                 if ($logger instanceof ErrorHandler) {
                     $logger->logException($exception);
                 } else {
-                    /** @var $logger \Zend\Log\Logger */
+                    /** @var $logger \Laminas\Log\Logger */
                     $logger->err($exception->getMessage());
                 }
             }

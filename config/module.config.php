@@ -154,7 +154,7 @@ return array(
         /**
          * Grid options
          * All valid jqgrid options can be added here
-         * When adding function use \Zend\Expr\Expr e.g. new \Zend\Json\Expr('function(){ alert("i am here");}')
+         * When adding function use \Zend\Expr\Expr e.g. new \Laminas\Json\Expr('function(){ alert("i am here");}')
          *
          * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options
          */
@@ -216,7 +216,7 @@ return array(
          *          'icon'     => 'icon-info-sign',
          *          'position' => 'top',
          *          'class'    => 'btn btn-mini',
-         *          'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
+         *          'callback' => new \Laminas\Json\Expr('function(){ alert("i am here");}')
          *     )
          * ),
          *
@@ -333,7 +333,7 @@ return array(
         ),
         /**
          * Edit parameters
-         * e.g.  'afterSubmit' => new \Zend\Json\Expr("function() { alert('test'); }"),
+         * e.g.  'afterSubmit' => new \Laminas\Json\Expr("function() { alert('test'); }"),
          *
          * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
          */

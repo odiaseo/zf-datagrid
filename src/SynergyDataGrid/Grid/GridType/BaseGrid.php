@@ -22,12 +22,12 @@ use SynergyDataGrid\Grid\Plugin\DatePicker;
 use SynergyDataGrid\Grid\SubGridAwareInterface;
 use SynergyDataGrid\Model\BaseModel as BaseModel;
 use SynergyDataGrid\Util\ArrayUtils;
-use Zend\Filter\Word\CamelCaseToSeparator;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Json\Expr;
-use Zend\Json\Json;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Stdlib\RequestInterface;
+use Laminas\Filter\Word\CamelCaseToSeparator;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Json\Expr;
+use Laminas\Json\Json;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\RequestInterface;
 
 /**
  * JqGrid class for implement base jqGrid plugin functionality
@@ -224,7 +224,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
      */
     protected $_model;
     /**
-     * @var \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
+     * @var \Laminas\ServiceManager\ServiceLocatorInterface $serviceLocator
      */
     protected $_serviceLocator;
     /**
@@ -1816,7 +1816,7 @@ abstract class BaseGrid extends Base implements SubGridAwareInterface
     }
 
     /**
-     * @return \Zend\ServiceManager\ServiceManager
+     * @return \Laminas\ServiceManager\ServiceManager
      */
     public function getServiceLocator()
     {

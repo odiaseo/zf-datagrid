@@ -14,8 +14,8 @@ namespace SynergyDataGrid\Grid;
  *
  */
 use SynergyDataGrid\Grid\GridType\BaseGrid;
-use Zend\Json\Encoder;
-use Zend\Json\Expr;
+use Laminas\Json\Encoder;
+use Laminas\Json\Expr;
 
 /**
  *

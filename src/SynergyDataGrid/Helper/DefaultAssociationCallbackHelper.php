@@ -25,7 +25,7 @@ class DefaultAssociationCallbackHelper extends BaseConfigHelper
         }
 
         list($entity, $mappedBy) = $parameters;
-        /** @var $serviceManager \Zend\ServiceManager\ServiceManager */
+        /** @var $serviceManager \Laminas\ServiceManager\ServiceManager */
         $values = array(':Select');
         /** @var $em \Doctrine\Orm\EntityManager */
         $em = $this->_serviceManager->get('doctrine.entitymanager.orm_default');

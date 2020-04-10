@@ -24,11 +24,11 @@ use SynergyCommon\Paginator\Adapter\DoctrinePaginator;
 use SynergyDataGrid\Grid\Adapter\ORMQueryAdapter;
 use SynergyDataGrid\Helper\BaseConfigHelper;
 use SynergyDataGrid\Util\ArrayUtils;
-use Zend\Filter\Word\DashToCamelCase;
-use Zend\Filter\Word\SeparatorToCamelCase;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Json\Expr;
-use Zend\Stdlib\RequestInterface;
+use Laminas\Filter\Word\DashToCamelCase;
+use Laminas\Filter\Word\SeparatorToCamelCase;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Json\Expr;
+use Laminas\Stdlib\RequestInterface;
 
 /**
  * Class DoctrineORMGrid
@@ -482,7 +482,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function prepareGridData(RequestInterface $request = null, $options = array())
     {
-        /** @var $request \Zend\Http\PhpEnvironment\Request */
+        /** @var $request \Laminas\Http\PhpEnvironment\Request */
         $data = array(
             'error'   => false,
             'message' => ''
@@ -693,7 +693,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     protected function createEntity($request, $entity = null, $model = null)
     {
-        /** @var $request \Zend\Http\PhpEnvironment\Request */
+        /** @var $request \Laminas\Http\PhpEnvironment\Request */
         $params      = $request->getPost();
         $pass        = true;
         $message     = '';
@@ -799,7 +799,7 @@ final class DoctrineORMGrid extends BaseGrid
      */
     public function editSubGrid($request, $id, $field)
     {
-        /** @var $request \Zend\Http\PhpEnvironment\Request */
+        /** @var $request \Laminas\Http\PhpEnvironment\Request */
         $pass    = true;
         $row     = null;
         $mapping = $this->getEntityManager()->getClassMetadata($this->getEntity());
@@ -1229,11 +1229,11 @@ final class DoctrineORMGrid extends BaseGrid
     }
 
     /**
-     * @param       $request \Zend\Http\PhpEnvironment\Request
+     * @param       $request \Laminas\Http\PhpEnvironment\Request
      * @param null $model
      * @param array $subGridFilter
      *
-     * @return Paginator|\Zend\Paginator\Paginator
+     * @return Paginator|\Laminas\Paginator\Paginator
      */
     protected function getPaginator($request, $model = null, $subGridFilter = array())
     {

@@ -99,12 +99,12 @@ In your grid configuration file or module.config.php, specify the the model opti
             'column_model'  => array(
                 'my_column'       => array(
                     'align'       => 'center',
-                    'formatter'   => new Zend\Json\Expr('your code goes here'),
-                    'unformat'    => new Zend\Json\Expr('your code goes here'),
+                    'formatter'   => new Laminas\Json\Expr('your code goes here'),
+                    'unformat'    => new Laminas\Json\Expr('your code goes here'),
                     'edittype'    => 'custom',
                     'editoptions' => array(
-                        'custom_element' => new Zend\Json\Expr('your code goes here'),
-                        'custom_value'   => new Zend\Json\Expr('your code goes here')
+                        'custom_element' => new Laminas\Json\Expr('your code goes here'),
+                        'custom_value'   => new Laminas\Json\Expr('your code goes here')
                     )
                 ),
         )
@@ -113,7 +113,7 @@ In your grid configuration file or module.config.php, specify the the model opti
 # Adding Custom Javascript
 If you want to add additional javaScript to be rendered along with the grid script, you can do this:
 ```php
-             $grid->getJsCode()->addCustomScript( new \Zend\Json\Expr(" and your script here" ));
+             $grid->getJsCode()->addCustomScript( new \Laminas\Json\Expr(" and your script here" ));
 ```
 or
 ```php
@@ -187,7 +187,7 @@ variable that  would be replaced in the script when the subgrid editUrl is retur
                    switch($urlType){
                         .....
                          case  BaseGrid::DYNAMIC_URL_TYPE_ROW_EXPAND:
-                          //@var $helper \Zend\View\Helper\Url
+                          //@var $helper \Laminas\View\Helper\Url
                            $helper = $sm->get('viewhelpermanager')->get('url');
                            $url    = $helper('your_route_name',
                                      array(
@@ -195,7 +195,7 @@ variable that  would be replaced in the script when the subgrid editUrl is retur
                                              'fieldName' => $fieldName
                                      )
                              );
-                          return new \Zend\Json\Expr("'$url?subgridid='+row_id");
+                          return new \Laminas\Json\Expr("'$url?subgridid='+row_id");
                       }
                 )
 ```
@@ -409,7 +409,7 @@ identity as show below:
                 /**
                  * Grid options
                  * All valid jqgrid options can be added here
-                 * When adding function use \Zend\Expr\Expr e.g. new \Zend\Json\Expr('function(){ alert("i am here");}')
+                 * When adding function use \Zend\Expr\Expr e.g. new \Laminas\Json\Expr('function(){ alert("i am here");}')
                  *
                  * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:options
                  */
@@ -474,7 +474,7 @@ identity as show below:
                  *          'icon'     => 'icon-info-sign',
                  *          'position' => 'top',
                  *          'class'    => 'btn btn-mini',
-                 *          'callback' => new \Zend\Json\Expr('function(){ alert("i am here");}')
+                 *          'callback' => new \Laminas\Json\Expr('function(){ alert("i am here");}')
                  *     )
                  * ),
                  *
@@ -566,7 +566,7 @@ identity as show below:
 
                 /**
                  * Edit parameters
-                 * e.g.  'afterSubmit' => new \Zend\Json\Expr("function() { alert('test'); }"),
+                 * e.g.  'afterSubmit' => new \Laminas\Json\Expr("function() { alert('test'); }"),
                  *
                  * @see http://www.trirand.com/jqgridwiki/doku.php?id=wiki:navigator
                  */

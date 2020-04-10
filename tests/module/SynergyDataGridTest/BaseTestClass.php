@@ -2,17 +2,17 @@
 namespace SynergyDataGridTest;
 
 use SynergyDataGrid\Controller\GridController;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\MvcEvent;
-use Zend\Router\Http\RouteMatch;
-use Zend\Router\Http\TreeRouteStack as HttpRouter;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Router\Http\RouteMatch;
+use Laminas\Router\Http\TreeRouteStack as HttpRouter;
 
-class BaseTestClass extends \PHPUnit_Framework_TestCase
+class BaseTestClass extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Zend\ServiceManager\ServiceManager */
+    /** @var \Laminas\ServiceManager\ServiceManager */
     protected $_serviceManager;
 
-    /** @var \Zend\Mvc\Application */
+    /** @var \Laminas\Mvc\Application */
     protected $_app;
 
     /** @var \Doctrine\Orm\EntityManager */
@@ -20,15 +20,15 @@ class BaseTestClass extends \PHPUnit_Framework_TestCase
 
     protected $controller;
 
-    /** @var \Zend\Http\PhpEnvironment\Request $request */
+    /** @var \Laminas\Http\PhpEnvironment\Request $request */
     protected $request;
 
     protected $response;
 
-    /** @var  \Zend\Router\RouteMatch */
+    /** @var  \Laminas\Router\RouteMatch */
     protected $routeMatch;
 
-    /** @var  \Zend\Mvc\MvcEvent */
+    /** @var  \Laminas\Mvc\MvcEvent */
     protected $event;
 
     public function setUp()

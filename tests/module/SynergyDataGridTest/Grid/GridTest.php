@@ -8,9 +8,9 @@ use SynergyDataGrid\View\Helper\DisplayGrid;
 use SynergyDataGridTest\BaseTestClass;
 use SynergyDataGridTest\Entity\TestBrand;
 use SynergyDataGridTest\Entity\TestStore;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Stdlib\Parameters;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Stdlib\Parameters;
+use Laminas\View\Renderer\PhpRenderer;
 
 /**
  * @backupGlobals disabled
@@ -78,7 +78,7 @@ class GridTest extends BaseTestClass
         $viewHelper = $this->_serviceManager->get('ViewHelperManager')->get('displayGrid');
         $this->assertInstanceOf('\SynergyDataGrid\View\Helper\DisplayGrid', $viewHelper);
         $return = $viewHelper->__invoke($this->_grid, true);
-        $this->assertTrue(count($return) > 0);
+        $this->assertInternalType('string', $return);
     }
 
     public function testSubGrid()
