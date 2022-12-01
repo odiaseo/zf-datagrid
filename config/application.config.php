@@ -28,6 +28,8 @@ return array(
         'DoctrineORMModule',
         'SynergyCommon',
         'SynergyDataGrid',
+        'Laminas\ZendFrameworkBridge',
+        'Laminas\Diactoros',
     ),
     'module_listener_options' => array(
         'module_paths'             => array(
