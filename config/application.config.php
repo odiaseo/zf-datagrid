@@ -3,6 +3,7 @@
 \date_default_timezone_set('Europe/London');
 return array(
     'modules'                 => array(
+        'Laminas\Di',
         'Laminas\Mvc\Plugin\Identity',
         'Laminas\Mvc\Plugin\FilePrg',
         'Laminas\Mvc\Plugin\FlashMessenger',
@@ -16,11 +17,9 @@ return array(
         'Laminas\Db',
         'Laminas\Log',
         'Laminas\Mail',
-        'Laminas\Mvc\Console',
         'Laminas\Navigation',
         'Laminas\Paginator',
         'Laminas\Serializer',
-        'Laminas\ServiceManager\Di',
         'Laminas\Router',
         'Laminas\Validator',
         'Laminas\Hydrator',
